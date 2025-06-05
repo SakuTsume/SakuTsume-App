@@ -4,9 +4,9 @@ import Layout from './components/Layout';
 import HomePage from './pages/HomePage';
 import ProfilePage from './pages/ProfilePage';
 import MarketplacePage from './pages/MarketplacePage';
-import MessagesPage from './pages/MessagesPage';
-import NotificationsPage from './pages/NotificationsPage';
 import SearchPage from './pages/SearchPage';
+import NetworkPage from './pages/NetworkPage';
+import CreatePage from './pages/CreatePage';
 
 function App() {
   return (
@@ -16,9 +16,9 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/profile/:id" element={<ProfilePage />} />
           <Route path="/marketplace" element={<MarketplacePage />} />
-          <Route path="/messages" element={<MessagesPage />} />
-          <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/search" element={<SearchPage />} />
+          <Route path="/network" element={<NetworkPage />} />
+          <Route path="/create" element={<CreatePage />} />
         </Routes>
       </Layout>
     </Router>

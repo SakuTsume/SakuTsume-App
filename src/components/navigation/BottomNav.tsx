@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, Search, ShoppingBag, MessageCircle, User } from 'lucide-react';
+import { Home, Search, PlusSquare, User, Users, ShoppingBag } from 'lucide-react';
 
 const BottomNav: React.FC = () => {
   return (
@@ -32,27 +32,15 @@ const BottomNav: React.FC = () => {
         </NavLink>
         
         <NavLink 
-          to="/marketplace" 
+          to="/create" 
           className={({ isActive }) => 
             `flex flex-col items-center px-3 py-1 rounded-lg ${
               isActive ? 'text-primary-800' : 'text-neutral-500'
             }`
           }
         >
-          <ShoppingBag size={20} />
-          <span className="text-xs mt-1">Market</span>
-        </NavLink>
-        
-        <NavLink 
-          to="/messages" 
-          className={({ isActive }) => 
-            `flex flex-col items-center px-3 py-1 rounded-lg ${
-              isActive ? 'text-primary-800' : 'text-neutral-500'
-            }`
-          }
-        >
-          <MessageCircle size={20} />
-          <span className="text-xs mt-1">Messages</span>
+          <PlusSquare size={20} />
+          <span className="text-xs mt-1">Create</span>
         </NavLink>
         
         <NavLink 
@@ -65,6 +53,30 @@ const BottomNav: React.FC = () => {
         >
           <User size={20} />
           <span className="text-xs mt-1">Profile</span>
+        </NavLink>
+        
+        <NavLink 
+          to="/network" 
+          className={({ isActive }) => 
+            `flex flex-col items-center px-3 py-1 rounded-lg ${
+              isActive ? 'text-primary-800' : 'text-neutral-500'
+            }`
+          }
+        >
+          <Users size={20} />
+          <span className="text-xs mt-1">Network</span>
+        </NavLink>
+        
+        <NavLink 
+          to="/marketplace" 
+          className={({ isActive }) => 
+            `flex flex-col items-center px-3 py-1 rounded-lg ${
+              isActive ? 'text-primary-800' : 'text-neutral-500'
+            }`
+          }
+        >
+          <ShoppingBag size={20} />
+          <span className="text-xs mt-1">Market</span>
         </NavLink>
       </div>
     </nav>
