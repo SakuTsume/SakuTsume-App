@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Filter, MessageCircle, Users, MessageSquare, Mic, Star, ArrowUp, ArrowDown, Clock, Zap, Plus, Send, Phone, Video, MoreHorizontal, Hash, Volume2 } from 'lucide-react';
+import { Search, Filter, MessageCircle, Users, MessageSquare, Mic, Star, ArrowUp, ArrowDown, Clock, Zap, Plus, Send, Phone, Video, MoreHorizontal, Hash, Volume2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Mock data for different sections
@@ -261,6 +261,7 @@ const NetworkPage: React.FC = () => {
   const [messageInput, setMessageInput] = useState('');
   const [selectedCluster, setSelectedCluster] = useState<string | null>(null);
   const [networkFilter, setNetworkFilter] = useState('');
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const sendMessage = (e: React.FormEvent) => {
     e.preventDefault();
@@ -275,127 +276,196 @@ const NetworkPage: React.FC = () => {
     // In a real app, this would show a preview and then join
   };
 
+  const toggleSidebar = () => {
+    setSidebarCollapsed(!sidebarCollapsed);
+  };
+
   const renderMessagesTab = () => (
     <div className="flex h-[calc(100vh-112px)] overflow-hidden">
-      {/* Sidebar - Fixed height with its own scroll */}
-      <div className="w-80 bg-white border-r border-neutral-200 flex flex-col h-full">
+      {/* Sidebar - Collapsible width */}
+      <motion.div 
+        animate={{ width: sidebarCollapsed ? '64px' : '320px' }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
+        className="bg-white border-r border-neutral-200 flex flex-col h-full relative"
+      >
+        {/* Collapse/Expand Button */}
+        <button
+          onClick={toggleSidebar}
+          className="absolute -right-3 top-4 z-10 w-6 h-6 bg-white border border-neutral-200 rounded-full flex items-center justify-center text-neutral-600 hover:text-neutral-800 hover:bg-neutral-50 shadow-sm"
+        >
+          {sidebarCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+        </button>
+
         {/* Search - Fixed at top */}
-        <div className="p-4 border-b border-neutral-200 flex-shrink-0">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Search conversations..."
-              className="w-full py-2 pl-9 pr-4 rounded-lg bg-neutral-100 border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
-            />
-            <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-500" />
-          </div>
+        <div className={`p-4 border-b border-neutral-200 flex-shrink-0 ${sidebarCollapsed ? 'px-2' : ''}`}>
+          {!sidebarCollapsed ? (
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search conversations..."
+                className="w-full py-2 pl-9 pr-4 rounded-lg bg-neutral-100 border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
+              />
+              <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-500" />
+            </div>
+          ) : (
+            <div className="flex justify-center">
+              <button className="p-2 rounded-lg bg-neutral-100 text-neutral-600 hover:bg-neutral-200">
+                <Search size={16} />
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Scrollable content area */}
         <div className="flex-1 overflow-y-auto">
           {/* Direct Messages */}
-          <div className="p-4">
-            <h3 className="text-sm font-semibold text-neutral-600 mb-3 flex items-center">
-              <MessageCircle size={16} className="mr-2" />
-              DIRECT MESSAGES
+          <div className={`p-4 ${sidebarCollapsed ? 'px-2' : ''}`}>
+            <h3 className={`text-sm font-semibold text-neutral-600 mb-3 flex items-center ${
+              sidebarCollapsed ? 'justify-center' : ''
+            }`}>
+              <MessageCircle size={16} className={sidebarCollapsed ? '' : 'mr-2'} />
+              {!sidebarCollapsed && 'DIRECT MESSAGES'}
             </h3>
             <div className="space-y-1">
               {mockDirectMessages.map((dm) => (
                 <div
                   key={dm.id}
                   onClick={() => setSelectedDM(dm)}
-                  className={`p-3 rounded-lg cursor-pointer transition-colors ${
+                  className={`${sidebarCollapsed ? 'p-2' : 'p-3'} rounded-lg cursor-pointer transition-colors ${
                     selectedDM?.id === dm.id ? 'bg-primary-50' : 'hover:bg-neutral-50'
-                  } ${dm.priority ? 'border-l-4 border-red-500' : ''}`}
+                  } ${dm.priority ? 'border-l-4 border-red-500' : ''} ${
+                    sidebarCollapsed ? 'flex justify-center' : ''
+                  }`}
                 >
-                  <div className="flex items-center">
-                    <div className="relative mr-3">
+                  {sidebarCollapsed ? (
+                    <div className="relative">
                       <img
                         src={dm.avatar}
                         alt={dm.name}
-                        className="w-10 h-10 rounded-full object-cover"
+                        className="w-8 h-8 rounded-full object-cover"
                       />
                       {dm.online && (
-                        <span className="absolute bottom-0 right-0 w-3 h-3 bg-success-500 border-2 border-white rounded-full"></span>
+                        <span className="absolute bottom-0 right-0 w-2 h-2 bg-success-500 border border-white rounded-full"></span>
+                      )}
+                      {dm.unread > 0 && (
+                        <span className="absolute -top-1 -right-1 bg-primary-800 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                          {dm.unread}
+                        </span>
                       )}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-center">
-                        <h4 className="font-medium text-neutral-800 truncate">{dm.name}</h4>
-                        <span className="text-xs text-neutral-500">{dm.time}</span>
+                  ) : (
+                    <div className="flex items-center">
+                      <div className="relative mr-3">
+                        <img
+                          src={dm.avatar}
+                          alt={dm.name}
+                          className="w-10 h-10 rounded-full object-cover"
+                        />
+                        {dm.online && (
+                          <span className="absolute bottom-0 right-0 w-3 h-3 bg-success-500 border-2 border-white rounded-full"></span>
+                        )}
                       </div>
-                      <p className="text-sm text-neutral-600 truncate">{dm.lastMessage}</p>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-between items-center">
+                          <h4 className="font-medium text-neutral-800 truncate">{dm.name}</h4>
+                          <span className="text-xs text-neutral-500">{dm.time}</span>
+                        </div>
+                        <p className="text-sm text-neutral-600 truncate">{dm.lastMessage}</p>
+                      </div>
+                      {dm.unread > 0 && (
+                        <span className="bg-primary-800 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center ml-2">
+                          {dm.unread}
+                        </span>
+                      )}
                     </div>
-                    {dm.unread > 0 && (
-                      <span className="bg-primary-800 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center ml-2">
-                        {dm.unread}
-                      </span>
-                    )}
-                  </div>
+                  )}
                 </div>
               ))}
             </div>
           </div>
 
           {/* Audio Rooms */}
-          <div className="p-4 border-t border-neutral-200">
-            <h3 className="text-sm font-semibold text-neutral-600 mb-3 flex items-center">
-              <Mic size={16} className="mr-2" />
-              AUDIO ROOMS
+          <div className={`p-4 border-t border-neutral-200 ${sidebarCollapsed ? 'px-2' : ''}`}>
+            <h3 className={`text-sm font-semibold text-neutral-600 mb-3 flex items-center ${
+              sidebarCollapsed ? 'justify-center' : ''
+            }`}>
+              <Mic size={16} className={sidebarCollapsed ? '' : 'mr-2'} />
+              {!sidebarCollapsed && 'AUDIO ROOMS'}
             </h3>
             <div className="space-y-2">
               {mockAudioRooms.map((room) => (
                 <div
                   key={room.id}
                   onClick={() => joinAudioRoom(room.id)}
-                  className="p-3 rounded-lg bg-gradient-to-r from-primary-50 to-secondary-50 hover:from-primary-100 hover:to-secondary-100 cursor-pointer transition-colors"
+                  className={`${sidebarCollapsed ? 'p-2 flex justify-center' : 'p-3'} rounded-lg bg-gradient-to-r from-primary-50 to-secondary-50 hover:from-primary-100 hover:to-secondary-100 cursor-pointer transition-colors`}
                 >
-                  <div className="flex items-center justify-between mb-1">
-                    <h4 className="font-medium text-neutral-800">{room.name}</h4>
-                    <div className="flex items-center text-xs text-neutral-600">
-                      <Users size={12} className="mr-1" />
-                      {room.participants}/{room.maxParticipants}
+                  {sidebarCollapsed ? (
+                    <div className="relative">
+                      <Volume2 size={16} className="text-primary-600" />
+                      <span className="absolute -top-1 -right-1 bg-primary-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                        {room.participants}
+                      </span>
                     </div>
-                  </div>
-                  <p className="text-xs text-neutral-600 mb-2">{room.topic}</p>
-                  <div className="flex items-center">
-                    <Volume2 size={12} className="text-primary-600 mr-1" />
-                    <span className="text-xs text-primary-600">
-                      {room.speakers.join(', ')} speaking
-                    </span>
-                  </div>
+                  ) : (
+                    <>
+                      <div className="flex items-center justify-between mb-1">
+                        <h4 className="font-medium text-neutral-800">{room.name}</h4>
+                        <div className="flex items-center text-xs text-neutral-600">
+                          <Users size={12} className="mr-1" />
+                          {room.participants}/{room.maxParticipants}
+                        </div>
+                      </div>
+                      <p className="text-xs text-neutral-600 mb-2">{room.topic}</p>
+                      <div className="flex items-center">
+                        <Volume2 size={12} className="text-primary-600 mr-1" />
+                        <span className="text-xs text-primary-600">
+                          {room.speakers.join(', ')} speaking
+                        </span>
+                      </div>
+                    </>
+                  )}
                 </div>
               ))}
             </div>
           </div>
 
           {/* Recommended Communities */}
-          <div className="p-4 border-t border-neutral-200">
-            <h3 className="text-sm font-semibold text-neutral-600 mb-3 flex items-center">
-              <Star size={16} className="mr-2" />
-              RECOMMENDED
+          <div className={`p-4 border-t border-neutral-200 ${sidebarCollapsed ? 'px-2' : ''}`}>
+            <h3 className={`text-sm font-semibold text-neutral-600 mb-3 flex items-center ${
+              sidebarCollapsed ? 'justify-center' : ''
+            }`}>
+              <Star size={16} className={sidebarCollapsed ? '' : 'mr-2'} />
+              {!sidebarCollapsed && 'RECOMMENDED'}
             </h3>
             <div className="space-y-2">
               {mockRecommendedCommunities.map((community) => (
                 <div
                   key={community.id}
-                  className="p-3 rounded-lg border border-neutral-200 hover:border-primary-200 cursor-pointer transition-colors"
+                  className={`${sidebarCollapsed ? 'p-2 flex justify-center' : 'p-3'} rounded-lg border border-neutral-200 hover:border-primary-200 cursor-pointer transition-colors`}
                 >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium text-neutral-800">{community.name}</h4>
-                      <p className="text-xs text-neutral-600">{community.members.toLocaleString()} members</p>
+                  {sidebarCollapsed ? (
+                    <div className="w-6 h-6 rounded bg-primary-100 flex items-center justify-center">
+                      <span className="text-xs font-bold text-primary-800">
+                        {community.name.charAt(0)}
+                      </span>
                     </div>
-                    <button className="text-primary-600 hover:text-primary-700">
-                      <Plus size={16} />
-                    </button>
-                  </div>
+                  ) : (
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium text-neutral-800">{community.name}</h4>
+                        <p className="text-xs text-neutral-600">{community.members.toLocaleString()} members</p>
+                      </div>
+                      <button className="text-primary-600 hover:text-primary-700">
+                        <Plus size={16} />
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Main Chat Area - Fixed height with its own scroll */}
       <div className="flex-1 flex flex-col bg-neutral-50 h-full">
