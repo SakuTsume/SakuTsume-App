@@ -276,7 +276,7 @@ const NetworkPage: React.FC = () => {
   };
 
   const renderMessagesTab = () => (
-    <div className="flex h-[calc(100vh-128px)] overflow-hidden">
+    <div className="flex h-[calc(100vh-112px)] overflow-hidden">
       {/* Sidebar - Fixed height with its own scroll */}
       <div className="w-80 bg-white border-r border-neutral-200 flex flex-col h-full">
         {/* Search - Fixed at top */}
@@ -401,28 +401,28 @@ const NetworkPage: React.FC = () => {
       <div className="flex-1 flex flex-col bg-neutral-50 h-full">
         {selectedDM && (
           <>
-            {/* Chat Header - Fixed at top */}
-            <div className="p-4 bg-white border-b border-neutral-200 flex items-center justify-between flex-shrink-0">
+            {/* Chat Header - Made thinner */}
+            <div className="px-4 py-2 bg-white border-b border-neutral-200 flex items-center justify-between flex-shrink-0">
               <div className="flex items-center">
                 <img
                   src={selectedDM.avatar}
                   alt={selectedDM.name}
-                  className="w-10 h-10 rounded-full object-cover mr-3"
+                  className="w-8 h-8 rounded-full object-cover mr-3"
                 />
                 <div>
-                  <h3 className="font-medium text-neutral-800">{selectedDM.name}</h3>
-                  <p className="text-sm text-neutral-500">{selectedDM.profession}</p>
+                  <h3 className="font-medium text-neutral-800 text-sm">{selectedDM.name}</h3>
+                  <p className="text-xs text-neutral-500">{selectedDM.profession}</p>
                 </div>
               </div>
-              <div className="flex items-center space-x-2">
-                <button className="p-2 rounded-full hover:bg-neutral-100 text-neutral-600">
-                  <Phone size={18} />
+              <div className="flex items-center space-x-1">
+                <button className="p-1.5 rounded-full hover:bg-neutral-100 text-neutral-600">
+                  <Phone size={16} />
                 </button>
-                <button className="p-2 rounded-full hover:bg-neutral-100 text-neutral-600">
-                  <Video size={18} />
+                <button className="p-1.5 rounded-full hover:bg-neutral-100 text-neutral-600">
+                  <Video size={16} />
                 </button>
-                <button className="p-2 rounded-full hover:bg-neutral-100 text-neutral-600">
-                  <MoreHorizontal size={18} />
+                <button className="p-1.5 rounded-full hover:bg-neutral-100 text-neutral-600">
+                  <MoreHorizontal size={16} />
                 </button>
               </div>
             </div>
@@ -755,7 +755,7 @@ const NetworkPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-neutral-50">
-      {/* Top Navigation */}
+      {/* Top Navigation - Made thinner */}
       <div className="bg-white border-b border-neutral-200 sticky top-0 z-20">
         <div className="max-w-screen-xl mx-auto px-4">
           <div className="flex items-center space-x-8">
@@ -767,13 +767,13 @@ const NetworkPage: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as NetworkTab)}
-                className={`flex items-center px-4 py-4 font-medium text-sm border-b-2 transition-colors relative ${
+                className={`flex items-center px-4 py-3 font-medium text-sm border-b-2 transition-colors relative ${
                   activeTab === tab.id
                     ? 'border-amber-500 text-amber-600'
                     : 'border-transparent text-neutral-600 hover:text-neutral-800'
                 }`}
               >
-                <tab.icon size={18} className="mr-2" />
+                <tab.icon size={16} className="mr-2" />
                 {tab.label}
                 {tab.id === 'messages' && (
                   <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
@@ -790,7 +790,7 @@ const NetworkPage: React.FC = () => {
       </div>
 
       {/* Tab Content */}
-      <div className={activeTab === 'messages' ? '' : 'overflow-y-auto h-[calc(100vh-128px)]'}>
+      <div className={activeTab === 'messages' ? '' : 'overflow-y-auto h-[calc(100vh-112px)]'}>
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
