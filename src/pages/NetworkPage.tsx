@@ -178,6 +178,81 @@ const mockRecommendedConnections = [
   },
 ];
 
+// Mock messages for the chat
+const mockMessages = [
+  {
+    id: '1',
+    sender: 'them',
+    content: 'Hey! I really loved your work on that short film you posted. The cinematography was outstanding!',
+    time: '2:30 PM',
+    read: true,
+  },
+  {
+    id: '2',
+    sender: 'me',
+    content: 'Thanks so much! That means a lot coming from you. I spent a lot of time getting the lighting just right.',
+    time: '2:32 PM',
+    read: true,
+  },
+  {
+    id: '3',
+    sender: 'them',
+    content: 'It really shows. I was wondering if you might be available for a project I\'m working on next month? It\'s a short documentary about local artists.',
+    time: '2:34 PM',
+    read: true,
+  },
+  {
+    id: '4',
+    sender: 'them',
+    content: 'The budget is limited but I think it could be a great opportunity for both of us.',
+    time: '2:35 PM',
+    read: true,
+  },
+  {
+    id: '5',
+    sender: 'me',
+    content: 'That sounds really interesting! I\'d love to hear more about it. What kind of timeline are you thinking?',
+    time: '2:40 PM',
+    read: true,
+  },
+  {
+    id: '6',
+    sender: 'them',
+    content: 'We\'re looking at about a week of shooting, probably mid-July. Then maybe another week for initial edits?',
+    time: '2:42 PM',
+    read: true,
+  },
+  {
+    id: '7',
+    sender: 'them',
+    content: 'The voice samples sound perfect!',
+    time: '2:45 PM',
+    read: false,
+  },
+  // Add more messages to demonstrate scrolling
+  {
+    id: '8',
+    sender: 'me',
+    content: 'Perfect! That timeline works well for me. I\'m excited to collaborate on this project.',
+    time: '2:47 PM',
+    read: true,
+  },
+  {
+    id: '9',
+    sender: 'them',
+    content: 'Awesome! I\'ll send over the project details and we can set up a call to discuss everything in more detail.',
+    time: '2:50 PM',
+    read: true,
+  },
+  {
+    id: '10',
+    sender: 'me',
+    content: 'Sounds great! Looking forward to it.',
+    time: '2:52 PM',
+    read: true,
+  },
+];
+
 type NetworkTab = 'messages' | 'forums' | 'network';
 
 const NetworkPage: React.FC = () => {
@@ -201,11 +276,11 @@ const NetworkPage: React.FC = () => {
   };
 
   const renderMessagesTab = () => (
-    <div className="flex h-[calc(100vh-200px)]">
-      {/* Sidebar */}
-      <div className="w-80 bg-white border-r border-neutral-200 flex flex-col">
-        {/* Search */}
-        <div className="p-4 border-b border-neutral-200">
+    <div className="flex h-[calc(100vh-200px)] overflow-hidden">
+      {/* Sidebar - Fixed height with its own scroll */}
+      <div className="w-80 bg-white border-r border-neutral-200 flex flex-col h-full">
+        {/* Search - Fixed at top */}
+        <div className="p-4 border-b border-neutral-200 flex-shrink-0">
           <div className="relative">
             <input
               type="text"
@@ -216,8 +291,9 @@ const NetworkPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Direct Messages */}
+        {/* Scrollable content area */}
         <div className="flex-1 overflow-y-auto">
+          {/* Direct Messages */}
           <div className="p-4">
             <h3 className="text-sm font-semibold text-neutral-600 mb-3 flex items-center">
               <MessageCircle size={16} className="mr-2" />
@@ -321,12 +397,12 @@ const NetworkPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col bg-neutral-50">
+      {/* Main Chat Area - Fixed height with its own scroll */}
+      <div className="flex-1 flex flex-col bg-neutral-50 h-full">
         {selectedDM && (
           <>
-            {/* Chat Header */}
-            <div className="p-4 bg-white border-b border-neutral-200 flex items-center justify-between">
+            {/* Chat Header - Fixed at top */}
+            <div className="p-4 bg-white border-b border-neutral-200 flex items-center justify-between flex-shrink-0">
               <div className="flex items-center">
                 <img
                   src={selectedDM.avatar}
@@ -351,16 +427,43 @@ const NetworkPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Chat Messages */}
+            {/* Chat Messages - Scrollable area */}
             <div className="flex-1 p-4 overflow-y-auto">
               <div className="text-center text-neutral-500 text-sm mb-4">
                 Start of conversation with {selectedDM.name}
               </div>
-              {/* Messages would be rendered here */}
+              
+              {/* Render actual messages */}
+              <div className="space-y-4">
+                {mockMessages.map((message) => (
+                  <div
+                    key={message.id}
+                    className={`flex ${message.sender === 'me' ? 'justify-end' : 'justify-start'}`}
+                  >
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className={`max-w-[75%] rounded-xl px-4 py-3 ${
+                        message.sender === 'me'
+                          ? 'bg-primary-800 text-white rounded-br-none'
+                          : 'bg-white text-neutral-800 rounded-bl-none shadow-sm'
+                      }`}
+                    >
+                      <p className="text-sm">{message.content}</p>
+                      <div className={`text-xs mt-1 flex items-center justify-end ${
+                        message.sender === 'me' ? 'text-primary-100' : 'text-neutral-500'
+                      }`}>
+                        {message.time}
+                      </div>
+                    </motion.div>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            {/* Message Input */}
-            <div className="p-4 bg-white border-t border-neutral-200">
+            {/* Message Input - Fixed at bottom */}
+            <div className="p-4 bg-white border-t border-neutral-200 flex-shrink-0">
               <form onSubmit={sendMessage} className="flex items-center">
                 <input
                   type="text"
