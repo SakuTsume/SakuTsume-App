@@ -276,7 +276,7 @@ const NetworkPage: React.FC = () => {
   };
 
   const renderMessagesTab = () => (
-    <div className="flex h-[calc(100vh-112px)] overflow-hidden">
+    <div className="flex h-[calc(100vh-128px)] overflow-hidden">
       {/* Sidebar - Fixed height with its own scroll */}
       <div className="w-80 bg-white border-r border-neutral-200 flex flex-col h-full">
         {/* Search - Fixed at top */}
@@ -754,9 +754,9 @@ const NetworkPage: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-neutral-50 overflow-hidden">
+    <div className="min-h-screen bg-neutral-50">
       {/* Top Navigation */}
-      <div className="bg-white border-b border-neutral-200 sticky top-16 z-10">
+      <div className="bg-white border-b border-neutral-200 sticky top-0 z-20">
         <div className="max-w-screen-xl mx-auto px-4">
           <div className="flex items-center space-x-8">
             {[
@@ -790,7 +790,7 @@ const NetworkPage: React.FC = () => {
       </div>
 
       {/* Tab Content */}
-      <div className={activeTab === 'messages' ? '' : 'overflow-y-auto h-[calc(100vh-112px)]'}>
+      <div className={activeTab === 'messages' ? '' : 'overflow-y-auto h-[calc(100vh-128px)]'}>
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
