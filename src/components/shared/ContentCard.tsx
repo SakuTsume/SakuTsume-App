@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, MessageCircle, Share2, Bookmark } from 'lucide-react';
+import { Heart, MessageCircle, Share2, Bookmark, Star, Crown, Award } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface ContentCardProps {
@@ -17,6 +17,13 @@ interface ContentCardProps {
   comments: number;
   isLiked: boolean;
   isSaved: boolean;
+  isRisingTalent?: boolean;
+  trustScore?: number;
+  workMode?: boolean;
+  timestamp?: string;
+  isFollowing?: boolean;
+  isCastingCall?: boolean;
+  budget?: string;
 }
 
 const ContentCard: React.FC<ContentCardProps> = ({
@@ -28,25 +35,67 @@ const ContentCard: React.FC<ContentCardProps> = ({
   likes,
   comments,
   isLiked,
-  isSaved
+  isSaved,
+  isRisingTalent = false,
+  trustScore,
+  workMode = false,
+  timestamp,
+  isFollowing = false,
+  isCastingCall = false,
 }) => {
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="bg-white rounded-xl shadow-sm overflow-hidden mb-4"
+      className="bg-white overflow-hidden"
     >
       {/* User info */}
-      <div className="flex items-center p-4">
-        <img
-          src={userAvatar}
-          alt={username}
-          className="w-10 h-10 rounded-full object-cover mr-3"
-        />
-        <div>
-          <h3 className="font-medium text-neutral-800">{username}</h3>
-          <p className="text-sm text-neutral-500">{profession}</p>
+      <div className="flex items-center justify-between p-4">
+        <div className="flex items-center">
+          <div className="relative">
+            <img
+              src={userAvatar}
+              alt={username}
+              className="w-10 h-10 rounded-full object-cover mr-3"
+            />
+            {isRisingTalent && workMode && (
+              <div className="absolute -top-1 -right-1 w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center">
+                <Star size={10} className="text-white" />
+              </div>
+            )}
+          </div>
+          <div>
+            <div className="flex items-center">
+              <h3 className="font-medium text-neutral-800">{username}</h3>
+              {isRisingTalent && workMode && (
+                <Crown size={14} className="ml-2 text-amber-500" />
+              )}
+            </div>
+            <p className="text-sm text-neutral-500">{profession}</p>
+            {timestamp && (
+              <p className="text-xs text-neutral-400">{timestamp}</p>
+            )}
+          </div>
+        </div>
+        
+        <div className="flex items-center space-x-2">
+          {trustScore && workMode && (
+            <div className="flex items-center bg-blue-50 px-2 py-1 rounded-full">
+              <Award size={12} className="text-blue-600 mr-1" />
+              <span className="text-xs font-medium text-blue-800">{trustScore}</span>
+            </div>
+          )}
+          {isFollowing && (
+            <button className="px-3 py-1 bg-primary-100 text-primary-800 rounded-full text-xs font-medium">
+              Following
+            </button>
+          )}
+          {!isFollowing && (
+            <button className="px-3 py-1 bg-primary-800 text-white rounded-full text-xs font-medium">
+              Follow
+            </button>
+          )}
         </div>
       </div>
       
@@ -90,27 +139,46 @@ const ContentCard: React.FC<ContentCardProps> = ({
             </div>
           </div>
         )}
+        
+        {/* Rising Talent Overlay */}
+        {isRisingTalent && workMode && (
+          <div className="absolute top-3 left-3 bg-gradient-to-r from-amber-400 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center shadow-lg">
+            <Star size={12} className="mr-1" />
+            RISING TALENT
+          </div>
+        )}
+        
+        {/* Casting Call Overlay */}
+        {isCastingCall && (
+          <div className="absolute top-3 right-3 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium">
+            CASTING CALL
+          </div>
+        )}
       </div>
       
       {/* Actions */}
       <div className="flex items-center justify-between p-4">
         <div className="flex space-x-4">
-          <button className={`flex items-center space-x-1 ${isLiked ? 'text-accent-400' : 'text-neutral-600'}`}>
+          <button className={`flex items-center space-x-1 transition-colors ${
+            isLiked ? 'text-accent-400' : 'text-neutral-600 hover:text-accent-400'
+          }`}>
             <Heart size={20} fill={isLiked ? '#FF3366' : 'none'} />
-            <span>{likes}</span>
+            <span className="font-medium">{likes.toLocaleString()}</span>
           </button>
           
-          <button className="flex items-center space-x-1 text-neutral-600">
+          <button className="flex items-center space-x-1 text-neutral-600 hover:text-primary-600 transition-colors">
             <MessageCircle size={20} />
-            <span>{comments}</span>
+            <span className="font-medium">{comments}</span>
           </button>
           
-          <button className="flex items-center text-neutral-600">
+          <button className="flex items-center text-neutral-600 hover:text-primary-600 transition-colors">
             <Share2 size={20} />
           </button>
         </div>
         
-        <button className={isSaved ? 'text-primary-800' : 'text-neutral-600'}>
+        <button className={`transition-colors ${
+          isSaved ? 'text-primary-800' : 'text-neutral-600 hover:text-primary-800'
+        }`}>
           <Bookmark size={20} fill={isSaved ? '#5E17EB' : 'none'} />
         </button>
       </div>
@@ -120,6 +188,19 @@ const ContentCard: React.FC<ContentCardProps> = ({
         <p className="text-neutral-800">
           <span className="font-medium">{username}</span> {caption}
         </p>
+        
+        {/* Work Mode Additional Info */}
+        {workMode && trustScore && (
+          <div className="mt-2 flex items-center justify-between">
+            <div className="flex items-center text-sm text-neutral-600">
+              <Award size={14} className="mr-1" />
+              <span>Trust Score: {trustScore}/5.0</span>
+            </div>
+            <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+              View Portfolio
+            </button>
+          </div>
+        )}
       </div>
     </motion.div>
   );
