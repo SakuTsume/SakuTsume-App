@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const location = useLocation();
+  
+  // Check if we're on a profile page
+  const isProfilePage = location.pathname.startsWith('/profile');
   
   useEffect(() => {
     const handleScroll = () => {
@@ -34,24 +38,26 @@ const Navbar: React.FC = () => {
             }`}>SakuTsume</span>
           </Link>
           
-          {/* Mobile Menu Toggle */}
-          <div className="md:hidden">
-            <button
-              onClick={toggleMobileMenu}
-              className={`transition-colors ${
-                isScrolled ? 'text-neutral-600 hover:text-primary-800' : 'text-white hover:text-neutral-200'
-              }`}
-              aria-label={mobileMenuOpen ? "Close Menu" : "Open Menu"}
-            >
-              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-          </div>
+          {/* Mobile Menu Toggle - Only show on profile pages */}
+          {isProfilePage && (
+            <div className="md:hidden">
+              <button
+                onClick={toggleMobileMenu}
+                className={`transition-colors ${
+                  isScrolled ? 'text-neutral-600 hover:text-primary-800' : 'text-white hover:text-neutral-200'
+                }`}
+                aria-label={mobileMenuOpen ? "Close Menu" : "Open Menu"}
+              >
+                {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
+            </div>
+          )}
         </div>
       </div>
       
-      {/* Mobile Menu */}
+      {/* Mobile Menu - Only show on profile pages */}
       <AnimatePresence>
-        {mobileMenuOpen && (
+        {mobileMenuOpen && isProfilePage && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
