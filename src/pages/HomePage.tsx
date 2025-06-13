@@ -46,123 +46,164 @@ interface AuditionAlert {
   urgent?: boolean;
 }
 
-// Enhanced mock data for full-screen experience
-const mockForYouContent = [
-  {
-    id: '1',
-    username: 'maya_rising_va',
-    userAvatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=600',
-    profession: 'Voice Actor',
-    media: {
-      type: 'video' as const,
-      url: 'https://example.com/horror-scream.mp4',
-      thumbnail: 'https://images.pexels.com/photos/7991579/pexels-photo-7991579.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+// Generate infinite content function
+const generateContent = (startId: number, count: number) => {
+  const baseContent = [
+    {
+      username: 'maya_rising_va',
+      userAvatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=600',
+      profession: 'Voice Actor',
+      media: {
+        type: 'video' as const,
+        url: 'https://example.com/horror-scream.mp4',
+        thumbnail: 'https://images.pexels.com/photos/7991579/pexels-photo-7991579.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      },
+      caption: 'Spine-chilling villain voice for indie horror game 🎭 What do you think of this character? #VoiceActing #Horror #IndieGame',
+      likes: 342,
+      comments: 28,
+      isLiked: false,
+      isSaved: false,
+      isRisingTalent: true,
+      trustScore: 4.2,
+      workMode: true,
     },
-    caption: 'Spine-chilling villain voice for indie horror game 🎭 What do you think of this character? #VoiceActing #Horror #IndieGame',
-    likes: 342,
-    comments: 28,
-    isLiked: false,
-    isSaved: false,
-    isRisingTalent: true,
-    trustScore: 4.2,
-    workMode: true,
-  },
-  {
-    id: '2',
-    username: 'alex_cinematics',
-    userAvatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=600',
-    profession: 'Cinematographer',
-    media: {
-      type: 'image' as const,
-      url: 'https://images.pexels.com/photos/3062541/pexels-photo-3062541.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    {
+      username: 'alex_cinematics',
+      userAvatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=600',
+      profession: 'Cinematographer',
+      media: {
+        type: 'image' as const,
+        url: 'https://images.pexels.com/photos/3062541/pexels-photo-3062541.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      },
+      caption: 'Golden hour magic on our latest short film. Sometimes the best shots happen when you least expect them ✨ #Cinematography #GoldenHour',
+      likes: 156,
+      comments: 42,
+      isLiked: true,
+      isSaved: false,
+      isRisingTalent: false,
+      trustScore: 4.8,
+      workMode: true,
     },
-    caption: 'Golden hour magic on our latest short film. Sometimes the best shots happen when you least expect them ✨ #Cinematography #GoldenHour',
-    likes: 156,
-    comments: 42,
-    isLiked: true,
-    isSaved: false,
-    isRisingTalent: false,
-    trustScore: 4.8,
-    workMode: true,
-  },
-  {
-    id: '3',
-    username: 'sarah_actress_pro',
-    userAvatar: 'https://images.pexels.com/photos/1036623/pexels-photo-1036623.jpeg?auto=compress&cs=tinysrgb&w=600',
-    profession: 'Actress',
-    media: {
-      type: 'video' as const,
-      url: 'https://example.com/demo-reel.mp4',
-      thumbnail: 'https://images.pexels.com/photos/7991579/pexels-photo-7991579.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    {
+      username: 'sarah_actress_pro',
+      userAvatar: 'https://images.pexels.com/photos/1036623/pexels-photo-1036623.jpeg?auto=compress&cs=tinysrgb&w=600',
+      profession: 'Actress',
+      media: {
+        type: 'video' as const,
+        url: 'https://example.com/demo-reel.mp4',
+        thumbnail: 'https://images.pexels.com/photos/7991579/pexels-photo-7991579.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      },
+      caption: 'New scene from my showreel! Working with @director_jane was an incredible experience. Can\'t wait to share the full project 🎬',
+      likes: 498,
+      comments: 56,
+      isLiked: false,
+      isSaved: true,
+      timestamp: '2 hours ago',
+      isFollowing: true,
     },
-    caption: 'New scene from my showreel! Working with @director_jane was an incredible experience. Can\'t wait to share the full project 🎬',
-    likes: 498,
-    comments: 56,
-    isLiked: false,
-    isSaved: true,
-    timestamp: '2 hours ago',
-    isFollowing: true,
-  },
-  {
-    id: '4',
-    username: 'studiox_casting',
-    userAvatar: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=600',
-    profession: 'Casting Director',
-    media: {
-      type: 'image' as const,
-      url: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    {
+      username: 'studiox_casting',
+      userAvatar: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=600',
+      profession: 'Casting Director',
+      media: {
+        type: 'image' as const,
+        url: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      },
+      caption: '🚨 CASTING CALL: Cyberpunk Detective for upcoming web series. Looking for strong dramatic range and tech-savvy character work. Apply by Friday! #CastingCall #Cyberpunk',
+      likes: 89,
+      comments: 23,
+      isLiked: false,
+      isSaved: false,
+      timestamp: '4 hours ago',
+      isFollowing: true,
+      isCastingCall: true,
+      budget: '$3,000',
     },
-    caption: '🚨 CASTING CALL: Cyberpunk Detective for upcoming web series. Looking for strong dramatic range and tech-savvy character work. Apply by Friday! #CastingCall #Cyberpunk',
-    likes: 89,
-    comments: 23,
-    isLiked: false,
-    isSaved: false,
-    timestamp: '4 hours ago',
-    isFollowing: true,
-    isCastingCall: true,
-    budget: '$3,000',
-  },
-  {
-    id: '5',
-    username: 'tom_sound_design',
-    userAvatar: 'https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&cs=tinysrgb&w=600',
-    profession: 'Sound Designer',
-    media: {
-      type: 'audio' as const,
-      url: 'https://example.com/ambient-track.mp3',
-      thumbnail: 'https://images.pexels.com/photos/3783471/pexels-photo-3783471.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    {
+      username: 'tom_sound_design',
+      userAvatar: 'https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&cs=tinysrgb&w=600',
+      profession: 'Sound Designer',
+      media: {
+        type: 'audio' as const,
+        url: 'https://example.com/ambient-track.mp3',
+        thumbnail: 'https://images.pexels.com/photos/3783471/pexels-photo-3783471.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      },
+      caption: 'Ambient soundscape for a psychological thriller. Layered field recordings with synthetic textures 🎧 #SoundDesign #FilmAudio',
+      likes: 234,
+      comments: 31,
+      isLiked: false,
+      isSaved: false,
+      isRisingTalent: false,
+      trustScore: 4.6,
+      workMode: true,
     },
-    caption: 'Ambient soundscape for a psychological thriller. Layered field recordings with synthetic textures 🎧 #SoundDesign #FilmAudio',
-    likes: 234,
-    comments: 31,
-    isLiked: false,
-    isSaved: false,
-    isRisingTalent: false,
-    trustScore: 4.6,
-    workMode: true,
-  },
-];
+    {
+      username: 'indie_film_collective',
+      userAvatar: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=600',
+      profession: 'Film Collective',
+      media: {
+        type: 'video' as const,
+        url: 'https://example.com/behind-scenes.mp4',
+        thumbnail: 'https://images.pexels.com/photos/3062541/pexels-photo-3062541.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      },
+      caption: 'Behind the scenes of our latest indie horror film. The practical effects team outdid themselves! 🎬 #IndieFilm #Horror #BTS',
+      likes: 678,
+      comments: 89,
+      isLiked: true,
+      isSaved: false,
+      timestamp: '1 hour ago',
+      isFollowing: true,
+    },
+    {
+      username: 'music_composer_pro',
+      userAvatar: 'https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=600',
+      profession: 'Music Composer',
+      media: {
+        type: 'audio' as const,
+        url: 'https://example.com/epic-score.mp3',
+        thumbnail: 'https://images.pexels.com/photos/4195504/pexels-photo-4195504.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      },
+      caption: 'Epic orchestral score for upcoming fantasy film. 60-piece orchestra recorded at Abbey Road Studios 🎼 #FilmScore #Orchestra',
+      likes: 445,
+      comments: 67,
+      isLiked: false,
+      isSaved: true,
+      isRisingTalent: true,
+      trustScore: 4.9,
+      workMode: true,
+    },
+    {
+      username: 'animation_studio_x',
+      userAvatar: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=600',
+      profession: 'Animation Studio',
+      media: {
+        type: 'video' as const,
+        url: 'https://example.com/animation-reel.mp4',
+        thumbnail: 'https://images.pexels.com/photos/5063095/pexels-photo-5063095.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      },
+      caption: 'Character animation showcase from our latest 2D animated series. Hand-drawn frame by frame! ✨ #Animation #2D #CharacterDesign',
+      likes: 892,
+      comments: 134,
+      isLiked: true,
+      isSaved: false,
+      isRisingTalent: false,
+      trustScore: 4.7,
+      workMode: true,
+    },
+  ];
 
-const mockFollowingContent = [
-  {
-    id: '6',
-    username: 'indie_film_collective',
-    userAvatar: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=600',
-    profession: 'Film Collective',
-    media: {
-      type: 'video' as const,
-      url: 'https://example.com/behind-scenes.mp4',
-      thumbnail: 'https://images.pexels.com/photos/3062541/pexels-photo-3062541.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-    },
-    caption: 'Behind the scenes of our latest indie horror film. The practical effects team outdid themselves! 🎬 #IndieFilm #Horror #BTS',
-    likes: 678,
-    comments: 89,
-    isLiked: true,
-    isSaved: false,
-    timestamp: '1 hour ago',
-    isFollowing: true,
-  },
-];
+  const generated = [];
+  for (let i = 0; i < count; i++) {
+    const baseIndex = i % baseContent.length;
+    const content = { ...baseContent[baseIndex] };
+    content.id = `${startId + i}`;
+    // Randomize some values to make content feel fresh
+    content.likes = Math.floor(Math.random() * 1000) + 50;
+    content.comments = Math.floor(Math.random() * 100) + 5;
+    generated.push(content);
+  }
+  return generated;
+};
 
 // Enhanced live streams data with Twitch-like features
 const mockLiveStreams: LiveStream[] = [
@@ -313,7 +354,7 @@ const HomePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<HomeTab>('foryou');
   const [userMode, setUserMode] = useState<UserMode>('work');
   const [currentPostIndex, setCurrentPostIndex] = useState(0);
-  const [feedContent, setFeedContent] = useState(mockForYouContent);
+  const [feedContent, setFeedContent] = useState(() => generateContent(1, 20)); // Start with 20 posts
   const [isScrolling, setIsScrolling] = useState(false);
   const [touchStartY, setTouchStartY] = useState(0);
   const [isPlaying, setIsPlaying] = useState<{[key: string]: boolean}>({});
@@ -326,12 +367,20 @@ const HomePage: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<{[key: string]: HTMLVideoElement}>({});
 
+  // Load more content when approaching the end
+  useEffect(() => {
+    if (currentPostIndex >= feedContent.length - 3) {
+      const newContent = generateContent(feedContent.length + 1, 10);
+      setFeedContent(prev => [...prev, ...newContent]);
+    }
+  }, [currentPostIndex, feedContent.length]);
+
   // Update content based on tab
   useEffect(() => {
     if (activeTab === 'foryou') {
-      setFeedContent(mockForYouContent);
+      setFeedContent(generateContent(1, 20));
     } else if (activeTab === 'following') {
-      setFeedContent(mockFollowingContent);
+      setFeedContent(generateContent(1, 15));
     }
     setCurrentPostIndex(0);
   }, [activeTab]);
@@ -352,7 +401,7 @@ const HomePage: React.FC = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentPostIndex, feedContent.length, activeTab]);
+  }, [currentPostIndex, activeTab]);
 
   // Handle wheel scrolling
   useEffect(() => {
@@ -373,7 +422,7 @@ const HomePage: React.FC = () => {
       container.addEventListener('wheel', handleWheel, { passive: false });
       return () => container.removeEventListener('wheel', handleWheel);
     }
-  }, [currentPostIndex, feedContent.length, activeTab, isScrolling]);
+  }, [currentPostIndex, activeTab, isScrolling]);
 
   // Handle touch events
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -397,7 +446,7 @@ const HomePage: React.FC = () => {
   };
 
   const scrollToNext = () => {
-    if (currentPostIndex < feedContent.length - 1 && !isScrolling) {
+    if (!isScrolling) {
       setIsScrolling(true);
       setCurrentPostIndex(prev => prev + 1);
       setTimeout(() => setIsScrolling(false), 500);
@@ -675,14 +724,14 @@ const HomePage: React.FC = () => {
         </div>
       )}
 
-      {/* Navigation Hints */}
-      {index < feedContent.length - 1 && (
+      {/* Navigation Hints - Only show for first few posts */}
+      {index === 0 && (
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex items-center text-white/60 animate-bounce">
           <ChevronDown size={20} />
         </div>
       )}
       
-      {index > 0 && (
+      {index > 0 && index < 3 && (
         <div className="absolute top-16 left-1/2 transform -translate-x-1/2 flex items-center text-white/60">
           <ChevronUp size={20} />
         </div>
@@ -1075,11 +1124,6 @@ const HomePage: React.FC = () => {
           >
             {feedContent.map((content, index) => renderFullScreenPost(content, index))}
           </motion.div>
-          
-          {/* Post Counter */}
-          <div className="fixed bottom-4 left-4 z-30 bg-black/50 backdrop-blur-sm rounded-full px-3 py-1 text-white text-sm">
-            {currentPostIndex + 1} / {feedContent.length}
-          </div>
         </div>
       )}
     </div>
