@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ContentCard from '../components/shared/ContentCard';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -6,7 +6,8 @@ import {
   Briefcase, Sparkles, Star, Zap, DollarSign, MapPin,
   Calendar, ChevronRight, Volume2, Mic, Video, Heart,
   MessageCircle, Share2, Bookmark, Crown, AlertCircle,
-  UserPlus, Bell, Coffee, Headphones, Camera, Film
+  UserPlus, Bell, Coffee, Headphones, Camera, Film,
+  ChevronUp, ChevronDown, VolumeX
 } from 'lucide-react';
 
 // Types
@@ -39,7 +40,7 @@ interface AuditionAlert {
   urgent?: boolean;
 }
 
-// Mock data for different content types
+// Enhanced mock data for full-screen experience
 const mockForYouContent = [
   {
     id: '1',
@@ -78,9 +79,6 @@ const mockForYouContent = [
     trustScore: 4.8,
     workMode: true,
   },
-];
-
-const mockFollowingContent = [
   {
     id: '3',
     username: 'sarah_actress_pro',
@@ -118,6 +116,46 @@ const mockFollowingContent = [
     isCastingCall: true,
     budget: '$3,000',
   },
+  {
+    id: '5',
+    username: 'tom_sound_design',
+    userAvatar: 'https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&cs=tinysrgb&w=600',
+    profession: 'Sound Designer',
+    media: {
+      type: 'audio' as const,
+      url: 'https://example.com/ambient-track.mp3',
+      thumbnail: 'https://images.pexels.com/photos/3783471/pexels-photo-3783471.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    },
+    caption: 'Ambient soundscape for a psychological thriller. Layered field recordings with synthetic textures 🎧 #SoundDesign #FilmAudio',
+    likes: 234,
+    comments: 31,
+    isLiked: false,
+    isSaved: false,
+    isRisingTalent: false,
+    trustScore: 4.6,
+    workMode: true,
+  },
+];
+
+const mockFollowingContent = [
+  {
+    id: '6',
+    username: 'indie_film_collective',
+    userAvatar: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=600',
+    profession: 'Film Collective',
+    media: {
+      type: 'video' as const,
+      url: 'https://example.com/behind-scenes.mp4',
+      thumbnail: 'https://images.pexels.com/photos/3062541/pexels-photo-3062541.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    },
+    caption: 'Behind the scenes of our latest indie horror film. The practical effects team outdid themselves! 🎬 #IndieFilm #Horror #BTS',
+    likes: 678,
+    comments: 89,
+    isLiked: true,
+    isSaved: false,
+    timestamp: '1 hour ago',
+    isFollowing: true,
+  },
 ];
 
 const mockLiveStreams: LiveStream[] = [
@@ -147,32 +185,6 @@ const mockLiveStreams: LiveStream[] = [
     thumbnail: 'https://images.pexels.com/photos/3783471/pexels-photo-3783471.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
     isLive: true,
   },
-  {
-    id: '3',
-    streamer: {
-      name: 'Tom Sound',
-      avatar: 'https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&cs=tinysrgb&w=600',
-      verified: false,
-    },
-    title: 'Game Dubbing Session - Behind the Scenes',
-    category: 'Behind the Scenes',
-    viewers: 593,
-    thumbnail: 'https://images.pexels.com/photos/3062541/pexels-photo-3062541.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-    isLive: true,
-  },
-  {
-    id: '4',
-    streamer: {
-      name: 'Anime Club',
-      avatar: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=600',
-      verified: true,
-    },
-    title: 'Fan Q&A - Voice Acting Journey',
-    category: 'Q&A',
-    viewers: 2431,
-    thumbnail: 'https://images.pexels.com/photos/4195504/pexels-photo-4195504.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-    isLive: true,
-  },
 ];
 
 const mockAuditionAlerts: AuditionAlert[] = [
@@ -186,74 +198,156 @@ const mockAuditionAlerts: AuditionAlert[] = [
     type: 'Voice Acting',
     urgent: true,
   },
-  {
-    id: '2',
-    title: 'Documentary Narrator',
-    budget: '$1,500',
-    location: 'Los Angeles, CA',
-    deadline: '1 week left',
-    company: 'Discovery Channel',
-    type: 'Narration',
-  },
 ];
 
 const HomePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<HomeTab>('foryou');
   const [userMode, setUserMode] = useState<UserMode>('work');
+  const [currentPostIndex, setCurrentPostIndex] = useState(0);
   const [feedContent, setFeedContent] = useState(mockForYouContent);
-  const [showAuditionAlert, setShowAuditionAlert] = useState(false);
-  const [currentAuditionIndex, setCurrentAuditionIndex] = useState(0);
+  const [isScrolling, setIsScrolling] = useState(false);
+  const [touchStartY, setTouchStartY] = useState(0);
+  const [isPlaying, setIsPlaying] = useState<{[key: string]: boolean}>({});
+  const [isMuted, setIsMuted] = useState<{[key: string]: boolean}>({});
+  
+  const containerRef = useRef<HTMLDivElement>(null);
+  const videoRefs = useRef<{[key: string]: HTMLVideoElement}>({});
 
-  // Simulate audition alerts every 8th post in work mode
-  useEffect(() => {
-    if (activeTab === 'foryou' && userMode === 'work') {
-      const timer = setInterval(() => {
-        setShowAuditionAlert(true);
-        setTimeout(() => setShowAuditionAlert(false), 5000);
-      }, 15000); // Show every 15 seconds for demo
-      
-      return () => clearInterval(timer);
-    }
-  }, [activeTab, userMode]);
-
-  // Update content based on tab and mode
+  // Update content based on tab
   useEffect(() => {
     if (activeTab === 'foryou') {
       setFeedContent(mockForYouContent);
     } else if (activeTab === 'following') {
       setFeedContent(mockFollowingContent);
     }
-  }, [activeTab, userMode]);
+    setCurrentPostIndex(0);
+  }, [activeTab]);
+
+  // Handle keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (activeTab === 'live') return;
+      
+      if (e.key === 'ArrowDown' || e.key === ' ') {
+        e.preventDefault();
+        scrollToNext();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        scrollToPrevious();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentPostIndex, feedContent.length, activeTab]);
+
+  // Handle wheel scrolling
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      if (activeTab === 'live' || isScrolling) return;
+      
+      e.preventDefault();
+      
+      if (e.deltaY > 0) {
+        scrollToNext();
+      } else if (e.deltaY < 0) {
+        scrollToPrevious();
+      }
+    };
+
+    const container = containerRef.current;
+    if (container) {
+      container.addEventListener('wheel', handleWheel, { passive: false });
+      return () => container.removeEventListener('wheel', handleWheel);
+    }
+  }, [currentPostIndex, feedContent.length, activeTab, isScrolling]);
+
+  // Handle touch events
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (activeTab === 'live') return;
+    setTouchStartY(e.touches[0].clientY);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (activeTab === 'live' || isScrolling) return;
+    
+    const touchEndY = e.changedTouches[0].clientY;
+    const diff = touchStartY - touchEndY;
+    
+    if (Math.abs(diff) > 50) { // Minimum swipe distance
+      if (diff > 0) {
+        scrollToNext();
+      } else {
+        scrollToPrevious();
+      }
+    }
+  };
+
+  const scrollToNext = () => {
+    if (currentPostIndex < feedContent.length - 1 && !isScrolling) {
+      setIsScrolling(true);
+      setCurrentPostIndex(prev => prev + 1);
+      setTimeout(() => setIsScrolling(false), 500);
+    }
+  };
+
+  const scrollToPrevious = () => {
+    if (currentPostIndex > 0 && !isScrolling) {
+      setIsScrolling(true);
+      setCurrentPostIndex(prev => prev - 1);
+      setTimeout(() => setIsScrolling(false), 500);
+    }
+  };
+
+  const toggleVideoPlayback = (postId: string) => {
+    const video = videoRefs.current[postId];
+    if (video) {
+      if (isPlaying[postId]) {
+        video.pause();
+      } else {
+        video.play();
+      }
+      setIsPlaying(prev => ({ ...prev, [postId]: !prev[postId] }));
+    }
+  };
+
+  const toggleVideoMute = (postId: string) => {
+    const video = videoRefs.current[postId];
+    if (video) {
+      video.muted = !video.muted;
+      setIsMuted(prev => ({ ...prev, [postId]: !prev[postId] }));
+    }
+  };
 
   const toggleMode = () => {
     setUserMode(userMode === 'work' ? 'fan' : 'work');
   };
 
   const renderModeToggle = () => (
-    <div className="flex items-center justify-center mb-6">
-      <div className="bg-white rounded-full p-1 shadow-sm border border-neutral-200">
+    <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-30">
+      <div className="bg-black/20 backdrop-blur-md rounded-full p-1">
         <div className="flex items-center">
           <button
             onClick={toggleMode}
             className={`flex items-center px-4 py-2 rounded-full text-sm font-medium transition-all ${
               userMode === 'work'
                 ? 'bg-blue-600 text-white shadow-md'
-                : 'text-neutral-600 hover:text-neutral-800'
+                : 'text-white/70 hover:text-white'
             }`}
           >
             <Briefcase size={16} className="mr-2" />
-            Work Mode
+            Work
           </button>
           <button
             onClick={toggleMode}
             className={`flex items-center px-4 py-2 rounded-full text-sm font-medium transition-all ${
               userMode === 'fan'
                 ? 'bg-purple-600 text-white shadow-md'
-                : 'text-neutral-600 hover:text-neutral-800'
+                : 'text-white/70 hover:text-white'
             }`}
           >
             <Sparkles size={16} className="mr-2" />
-            Fan Mode
+            Fan
           </button>
         </div>
       </div>
@@ -261,7 +355,7 @@ const HomePage: React.FC = () => {
   );
 
   const renderTabNavigation = () => (
-    <div className="bg-white sticky top-16 z-10 border-b border-neutral-200 mb-6">
+    <div className="fixed top-16 left-0 right-0 z-30 bg-black/20 backdrop-blur-md border-b border-white/10">
       <div className="flex items-center justify-center">
         <div className="flex space-x-1 p-1">
           {[
@@ -275,9 +369,9 @@ const HomePage: React.FC = () => {
               className={`flex items-center px-6 py-3 rounded-lg text-sm font-medium transition-all ${
                 activeTab === tab.id
                   ? userMode === 'work'
-                    ? 'bg-blue-100 text-blue-800 border border-blue-200'
-                    : 'bg-purple-100 text-purple-800 border border-purple-200'
-                  : 'text-neutral-600 hover:text-neutral-800 hover:bg-neutral-50'
+                    ? 'bg-blue-600/80 text-white border border-blue-400/50'
+                    : 'bg-purple-600/80 text-white border border-purple-400/50'
+                  : 'text-white/70 hover:text-white hover:bg-white/10'
               }`}
             >
               <tab.icon size={16} className="mr-2" />
@@ -292,162 +386,177 @@ const HomePage: React.FC = () => {
     </div>
   );
 
-  const renderAuditionAlert = () => (
-    <AnimatePresence>
-      {showAuditionAlert && (
-        <motion.div
-          initial={{ opacity: 0, y: 20, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: -20, scale: 0.95 }}
-          transition={{ duration: 0.3 }}
-          className="mb-6"
-        >
-          <div className="bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 rounded-xl p-6 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-20 h-20 bg-amber-100 rounded-full -mr-10 -mt-10 opacity-50"></div>
-            
-            <div className="flex items-start justify-between">
-              <div className="flex items-center mb-3">
-                <div className="w-10 h-10 bg-amber-500 rounded-full flex items-center justify-center mr-3">
-                  <Zap size={20} className="text-white" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-amber-900">🎯 AUDITION ALERT</h3>
-                  <p className="text-sm text-amber-700">Perfect match for your skills</p>
-                </div>
+  const renderFullScreenPost = (content: any, index: number) => (
+    <div 
+      key={content.id}
+      className="relative w-full h-screen flex-shrink-0 bg-black overflow-hidden"
+    >
+      {/* Background Media */}
+      <div className="absolute inset-0">
+        {content.media.type === 'video' ? (
+          <video
+            ref={(el) => {
+              if (el) videoRefs.current[content.id] = el;
+            }}
+            src={content.media.url}
+            poster={content.media.thumbnail}
+            className="w-full h-full object-cover"
+            loop
+            muted={isMuted[content.id] !== false}
+            playsInline
+            autoPlay={index === currentPostIndex}
+          />
+        ) : content.media.type === 'audio' ? (
+          <div className="w-full h-full bg-gradient-to-br from-primary-900 via-secondary-800 to-accent-900 flex items-center justify-center relative">
+            <img
+              src={content.media.thumbnail}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover opacity-30"
+            />
+            <div className="relative z-10 text-center text-white p-8">
+              <div className="w-32 h-32 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6 backdrop-blur-sm">
+                <Headphones size={48} />
               </div>
+              <h3 className="text-2xl font-bold mb-4">{content.caption.split('.')[0]}</h3>
               
-              <button
-                onClick={() => setShowAuditionAlert(false)}
-                className="text-amber-600 hover:text-amber-800"
-              >
-                ×
-              </button>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <h4 className="font-semibold text-neutral-800 mb-2">
-                  {mockAuditionAlerts[currentAuditionIndex].title}
-                </h4>
-                <div className="space-y-1 text-sm text-neutral-600">
-                  <div className="flex items-center">
-                    <DollarSign size={14} className="mr-1" />
-                    {mockAuditionAlerts[currentAuditionIndex].budget}
-                  </div>
-                  <div className="flex items-center">
-                    <MapPin size={14} className="mr-1" />
-                    {mockAuditionAlerts[currentAuditionIndex].location}
-                  </div>
-                  <div className="flex items-center">
-                    <Clock size={14} className="mr-1" />
-                    {mockAuditionAlerts[currentAuditionIndex].deadline}
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex flex-col justify-center">
-                <button className="w-full bg-amber-500 hover:bg-amber-600 text-white font-medium py-3 px-4 rounded-lg transition-colors mb-2">
-                  APPLY NOW
-                </button>
-                <button className="w-full border border-amber-300 text-amber-700 hover:bg-amber-50 font-medium py-2 px-4 rounded-lg transition-colors text-sm">
-                  Save for Later
-                </button>
+              {/* Audio Visualizer */}
+              <div className="flex items-center justify-center space-x-1 mb-6">
+                {[...Array(40)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="w-1 bg-white/60 rounded-full animate-pulse"
+                    style={{
+                      height: `${Math.random() * 40 + 20}px`,
+                      animationDelay: `${i * 0.05}s`,
+                      animationDuration: `${0.5 + Math.random() * 0.5}s`
+                    }}
+                  />
+                ))}
               </div>
             </div>
           </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
+        ) : (
+          <img
+            src={content.media.url}
+            alt=""
+            className="w-full h-full object-cover"
+          />
+        )}
+        
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
+      </div>
 
-  const renderForYouFeed = () => (
-    <div className="space-y-6">
-      {userMode === 'work' && renderAuditionAlert()}
-      
-      {feedContent.map((content, index) => (
-        <div key={content.id} className="relative">
-          {/* Rising Talent Badge */}
-          {content.isRisingTalent && userMode === 'work' && (
-            <div className="absolute -top-3 left-4 z-10">
-              <div className="bg-gradient-to-r from-amber-400 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center shadow-lg">
-                <Star size={12} className="mr-1" />
-                RISING TALENT
-              </div>
+      {/* Content Overlay */}
+      <div className="absolute inset-0 flex flex-col justify-between p-4 text-white z-10">
+        {/* Top Section - User Info */}
+        <div className="flex items-center justify-between pt-20">
+          <div className="flex items-center">
+            <div className="relative">
+              <img
+                src={content.userAvatar}
+                alt={content.username}
+                className="w-12 h-12 rounded-full object-cover border-2 border-white/50"
+              />
+              {content.isRisingTalent && userMode === 'work' && (
+                <div className="absolute -top-1 -right-1 w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center">
+                  <Crown size={12} className="text-white" />
+                </div>
+              )}
             </div>
-          )}
-          
-          {/* Mode-specific border styling */}
-          <div className={`rounded-xl overflow-hidden ${
-            userMode === 'work' 
-              ? 'border-2 border-blue-200 shadow-blue-100' 
-              : 'border-2 border-purple-200 shadow-purple-100'
-          } shadow-lg`}>
-            <ContentCard {...content} />
+            <div className="ml-3">
+              <div className="flex items-center">
+                <h3 className="font-semibold text-lg">{content.username}</h3>
+                {content.isRisingTalent && userMode === 'work' && (
+                  <Star size={16} className="ml-2 text-amber-400" />
+                )}
+              </div>
+              <p className="text-white/80 text-sm">{content.profession}</p>
+            </div>
           </div>
           
-          {/* Trust Score for Work Mode */}
-          {userMode === 'work' && (
-            <div className="mt-2 flex items-center justify-between px-4">
-              <div className="flex items-center text-sm text-neutral-600">
-                <Award size={14} className="mr-1" />
-                Trust Score: <span className="font-medium ml-1">{content.trustScore}/5.0</span>
-              </div>
-              <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
-                View Portfolio
-              </button>
-            </div>
-          )}
+          <button className="px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-medium border border-white/30">
+            {content.isFollowing ? 'Following' : 'Follow'}
+          </button>
         </div>
-      ))}
-    </div>
-  );
 
-  const renderFollowingFeed = () => (
-    <div className="space-y-6">
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-        <div className="flex items-center">
-          <Heart size={16} className="text-blue-600 mr-2" />
-          <span className="text-sm font-medium text-blue-800">
-            Loyalty Feed - Chronological order, no algorithms
-          </span>
+        {/* Bottom Section - Caption & Actions */}
+        <div className="pb-20">
+          <div className="flex items-end justify-between">
+            {/* Left - Caption */}
+            <div className="flex-1 mr-4">
+              <p className="text-white text-lg leading-relaxed mb-4">
+                {content.caption}
+              </p>
+              
+              {userMode === 'work' && content.trustScore && (
+                <div className="flex items-center bg-black/30 backdrop-blur-sm px-3 py-2 rounded-full w-fit">
+                  <Award size={16} className="text-amber-400 mr-2" />
+                  <span className="text-sm font-medium">Trust Score: {content.trustScore}/5.0</span>
+                </div>
+              )}
+            </div>
+
+            {/* Right - Action Buttons */}
+            <div className="flex flex-col items-center space-y-6">
+              <button className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                <Heart size={24} className={content.isLiked ? 'text-red-500 fill-current' : 'text-white'} />
+              </button>
+              <span className="text-sm font-medium">{content.likes}</span>
+              
+              <button className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                <MessageCircle size={24} className="text-white" />
+              </button>
+              <span className="text-sm font-medium">{content.comments}</span>
+              
+              <button className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                <Bookmark size={24} className={content.isSaved ? 'text-yellow-400 fill-current' : 'text-white'} />
+              </button>
+              
+              <button className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                <Share2 size={24} className="text-white" />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
-      
-      {mockFollowingContent.map((content) => (
-        <div key={content.id} className="relative">
-          {/* Timestamp for Following Feed */}
-          <div className="flex items-center justify-between mb-2 px-4">
-            <span className="text-sm text-neutral-500">{content.timestamp}</span>
-            {content.isCastingCall && (
-              <div className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
-                Casting Call
-              </div>
-            )}
-          </div>
+
+      {/* Video Controls */}
+      {content.media.type === 'video' && (
+        <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex flex-col space-y-4 z-20">
+          <button
+            onClick={() => toggleVideoPlayback(content.id)}
+            className="w-12 h-12 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white"
+          >
+            {isPlaying[content.id] ? <Pause size={24} /> : <Play size={24} />}
+          </button>
           
-          <ContentCard {...content} />
-          
-          {/* Casting Call Details */}
-          {content.isCastingCall && (
-            <div className="mt-3 mx-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center text-sm text-green-700">
-                  <DollarSign size={14} className="mr-1" />
-                  Budget: {content.budget}
-                </div>
-                <button className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700">
-                  Apply Now
-                </button>
-              </div>
-            </div>
-          )}
+          <button
+            onClick={() => toggleVideoMute(content.id)}
+            className="w-12 h-12 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white"
+          >
+            {isMuted[content.id] ? <VolumeX size={24} /> : <Volume2 size={24} />}
+          </button>
         </div>
-      ))}
+      )}
+
+      {/* Navigation Hints */}
+      {index < feedContent.length - 1 && (
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex items-center text-white/60 animate-bounce">
+          <ChevronDown size={20} />
+        </div>
+      )}
+      
+      {index > 0 && (
+        <div className="absolute top-32 left-1/2 transform -translate-x-1/2 flex items-center text-white/60">
+          <ChevronUp size={20} />
+        </div>
+      )}
     </div>
   );
 
   const renderLiveFeed = () => (
-    <div>
+    <div className="max-w-screen-md mx-auto px-4 py-6">
       {/* Live Stream Categories */}
       <div className="flex space-x-2 mb-6 overflow-x-auto pb-2">
         {['All', 'Auditions', 'Workshops', 'Behind the Scenes', 'Q&A'].map((category) => (
@@ -467,7 +576,7 @@ const HomePage: React.FC = () => {
       </div>
       
       {/* Live Streams Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {mockLiveStreams.map((stream) => (
           <motion.div
             key={stream.id}
@@ -535,71 +644,48 @@ const HomePage: React.FC = () => {
           </motion.div>
         ))}
       </div>
-      
-      {/* Live Stream Stats */}
-      <div className="mt-8 bg-gradient-to-r from-red-50 to-pink-50 rounded-xl p-6">
-        <h3 className="text-lg font-semibold text-neutral-800 mb-4">Live Right Now</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-red-600">
-              {mockLiveStreams.length}
-            </div>
-            <div className="text-sm text-neutral-600">Active Streams</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-red-600">
-              {mockLiveStreams.reduce((sum, stream) => sum + stream.viewers, 0).toLocaleString()}
-            </div>
-            <div className="text-sm text-neutral-600">Total Viewers</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-red-600">12</div>
-            <div className="text-sm text-neutral-600">Auditions Live</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-red-600">8</div>
-            <div className="text-sm text-neutral-600">Workshops</div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className="min-h-screen bg-black text-white overflow-hidden">
       {/* Mode Toggle */}
-      {renderModeToggle()}
+      {(activeTab === 'foryou' || activeTab === 'following') && renderModeToggle()}
       
       {/* Tab Navigation */}
       {renderTabNavigation()}
       
       {/* Content Area */}
-      <div className="max-w-screen-md mx-auto px-4 pb-6">
-        <AnimatePresence mode="wait">
+      {activeTab === 'live' ? (
+        <div className="pt-32 bg-neutral-50 min-h-screen">
+          {renderLiveFeed()}
+        </div>
+      ) : (
+        <div 
+          ref={containerRef}
+          className="relative h-screen overflow-hidden"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
           <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
+            className="flex flex-col h-full"
+            animate={{ 
+              y: `${-currentPostIndex * 100}vh` 
+            }}
+            transition={{ 
+              type: "spring", 
+              stiffness: 300, 
+              damping: 30,
+              duration: 0.5
+            }}
           >
-            {activeTab === 'foryou' && renderForYouFeed()}
-            {activeTab === 'following' && renderFollowingFeed()}
-            {activeTab === 'live' && renderLiveFeed()}
+            {feedContent.map((content, index) => renderFullScreenPost(content, index))}
           </motion.div>
-        </AnimatePresence>
-      </div>
-      
-      {/* Loading indicator for infinite scroll */}
-      {(activeTab === 'foryou' || activeTab === 'following') && (
-        <div className="text-center py-8">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            className="inline-block w-8 h-8 border-4 border-neutral-300 border-t-primary-600 rounded-full animate-spin"
-          ></motion.div>
-          <p className="mt-2 text-neutral-500 text-sm">Loading more content...</p>
+          
+          {/* Post Counter */}
+          <div className="fixed bottom-4 left-4 z-30 bg-black/50 backdrop-blur-sm rounded-full px-3 py-1 text-white text-sm">
+            {currentPostIndex + 1} / {feedContent.length}
+          </div>
         </div>
       )}
     </div>
