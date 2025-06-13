@@ -233,7 +233,7 @@ const MarketplacePage: React.FC = () => {
         {/* Marketplace Core */}
         <div>
           {/* Filters Bar */}
-          <div className="bg-white sticky top-16 z-10 border-b border-neutral-200 mb-6">
+          <div className="bg-white sticky top-0 z-10 border-b border-neutral-200 mb-6">
             <div className="flex items-center space-x-4 py-3">
               <button
                 onClick={() => setSelectedCategory('all')}
