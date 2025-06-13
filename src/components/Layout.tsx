@@ -1,5 +1,4 @@
 import React from 'react';
-import Navbar from './navigation/Navbar';
 import BottomNav from './navigation/BottomNav';
 import Sidebar from './navigation/Sidebar';
 import { useLocation } from 'react-router-dom';
@@ -14,10 +13,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   
   return (
     <div className="min-h-screen bg-neutral-50 text-neutral-800 flex flex-col">
-      <Navbar />
-      
-      <div className="flex flex-1 pt-16"> {/* pt-16 to account for navbar height */}
-        <div className="hidden md:block w-64 fixed h-full pt-2">
+      <div className="flex flex-1">
+        <div className="hidden md:block w-64 fixed h-full">
           <Sidebar />
         </div>
         

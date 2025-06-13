@@ -459,7 +459,7 @@ const HomePage: React.FC = () => {
   });
 
   const renderModeToggle = () => (
-    <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-30">
+    <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-30">
       <div className="bg-black/20 backdrop-blur-md rounded-full p-1">
         <div className="flex items-center">
           <button
@@ -490,7 +490,7 @@ const HomePage: React.FC = () => {
   );
 
   const renderTabNavigation = () => (
-    <div className="fixed top-16 left-0 right-0 z-30 bg-black/20 backdrop-blur-md border-b border-white/10">
+    <div className="fixed top-0 left-0 right-0 z-30 bg-black/20 backdrop-blur-md border-b border-white/10">
       <div className="flex items-center justify-center">
         <div className="flex space-x-1 p-1">
           {[
@@ -585,7 +585,7 @@ const HomePage: React.FC = () => {
       {/* Content Overlay */}
       <div className="absolute inset-0 flex flex-col justify-between p-4 text-white z-10">
         {/* Top Section - User Info */}
-        <div className="flex items-center justify-between pt-20">
+        <div className="flex items-center justify-between pt-4">
           <div className="flex items-center">
             <div className="relative">
               <img
@@ -683,7 +683,7 @@ const HomePage: React.FC = () => {
       )}
       
       {index > 0 && (
-        <div className="absolute top-32 left-1/2 transform -translate-x-1/2 flex items-center text-white/60">
+        <div className="absolute top-16 left-1/2 transform -translate-x-1/2 flex items-center text-white/60">
           <ChevronUp size={20} />
         </div>
       )}
@@ -1051,7 +1051,7 @@ const HomePage: React.FC = () => {
       
       {/* Content Area */}
       {activeTab === 'live' ? (
-        <div className="pt-32">
+        <div className="pt-16">
           {renderLiveFeed()}
         </div>
       ) : (
