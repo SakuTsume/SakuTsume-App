@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import LiveStreamSection from '../components/shared/LiveStreamSection';
 import { 
   UserPlus, MessageCircle, Share2, Link, MapPin, Mail, Calendar, 
   Star, Play, Pause, Volume2, VolumeX, Heart, Bookmark, 
@@ -173,7 +174,7 @@ const mockPortfolio = [
   }
 ];
 
-type ProfileTab = 'reels' | 'portfolio' | 'shop' | 'about';
+type ProfileTab = 'reels' | 'portfolio' | 'shop' | 'live' | 'about';
 
 const ProfilePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -550,6 +551,7 @@ const ProfilePage: React.FC = () => {
               { id: 'reels', label: 'REELS', icon: Video },
               { id: 'portfolio', label: 'PORTFOLIO', icon: Award },
               { id: 'shop', label: 'SHOP', icon: ShoppingBag },
+              { id: 'live', label: 'LIVE', icon: Play },
               { id: 'about', label: 'ABOUT', icon: PenTool },
             ].map((tab) => (
               <button
@@ -563,12 +565,15 @@ const ProfilePage: React.FC = () => {
               >
                 <tab.icon size={16} className="mr-2" />
                 {tab.label}
+                {tab.id === 'live' && (
+                  <span className="ml-2 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                )}
               </button>
             ))}
           </div>
           
           {/* Tab Content */}
-          <div className="p-6">
+          <div className={activeTab === 'live' ? '' : 'p-6'}>
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeTab}
@@ -754,6 +759,11 @@ const ProfilePage: React.FC = () => {
                       ))}
                     </div>
                   </div>
+                )}
+                
+                {/* Live Tab */}
+                {activeTab === 'live' && (
+                  <LiveStreamSection />
                 )}
                 
                 {/* About Tab */}
