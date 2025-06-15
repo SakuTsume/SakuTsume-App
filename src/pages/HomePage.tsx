@@ -508,67 +508,60 @@ const HomePage: React.FC = () => {
   });
 
   const renderTabNavigation = () => (
-    <div className="fixed top-0 left-0 right-0 z-30 bg-black/20 backdrop-blur-md border-b border-white/10">
-      <div className="flex items-center justify-between px-4 py-2">
+    <div className="fixed top-0 left-0 right-0 z-30">
+      <div className="flex items-center justify-between px-4 py-2 h-12">
         {/* Left: Mode Toggle */}
-        <div className="bg-black/20 backdrop-blur-md rounded-full p-1">
-          <div className="flex items-center">
-            <button
-              onClick={toggleMode}
-              className={`flex items-center px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                userMode === 'work'
-                  ? 'bg-blue-600 text-white shadow-md'
-                  : 'text-white/70 hover:text-white'
-              }`}
-            >
-              <Briefcase size={16} className="mr-2" />
-              Work
-            </button>
-            <button
-              onClick={toggleMode}
-              className={`flex items-center px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                userMode === 'fan'
-                  ? 'bg-purple-600 text-white shadow-md'
-                  : 'text-white/70 hover:text-white'
-              }`}
-            >
-              <Sparkles size={16} className="mr-2" />
-              Fan
-            </button>
-          </div>
+        <div className="flex items-center">
+          <button
+            onClick={toggleMode}
+            className={`flex items-center px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+              userMode === 'work'
+                ? 'bg-blue-600 text-white'
+                : 'text-white/60'
+            }`}
+          >
+            <Briefcase size={12} className="mr-1" />
+            Work
+          </button>
+          <button
+            onClick={toggleMode}
+            className={`flex items-center px-3 py-1.5 rounded-full text-xs font-medium transition-all ml-1 ${
+              userMode === 'fan'
+                ? 'bg-purple-600 text-white'
+                : 'text-white/60'
+            }`}
+          >
+            <Sparkles size={12} className="mr-1" />
+            Fan
+          </button>
         </div>
 
         {/* Center: Tab Navigation */}
-        <div className="flex items-center justify-center">
-          <div className="flex space-x-1 p-1">
-            {[
-              { id: 'foryou', label: 'For You', icon: TrendingUp },
-              { id: 'following', label: 'Following', icon: Users },
-              { id: 'live', label: 'Live', icon: Play },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as HomeTab)}
-                className={`flex items-center px-6 py-3 rounded-lg text-sm font-medium transition-all ${
-                  activeTab === tab.id
-                    ? userMode === 'work'
-                      ? 'bg-blue-600/80 text-white border border-blue-400/50'
-                      : 'bg-purple-600/80 text-white border border-purple-400/50'
-                    : 'text-white/70 hover:text-white hover:bg-white/10'
-                }`}
-              >
-                <tab.icon size={16} className="mr-2" />
-                {tab.label}
-                {tab.id === 'live' && (
-                  <span className="ml-2 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-                )}
-              </button>
-            ))}
-          </div>
+        <div className="flex items-center">
+          {[
+            { id: 'foryou', label: 'For You' },
+            { id: 'following', label: 'Following' },
+            { id: 'live', label: 'Live' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as HomeTab)}
+              className={`px-4 py-1 text-white transition-all ${
+                activeTab === tab.id
+                  ? 'font-bold text-lg'
+                  : 'font-normal text-base text-white/70'
+              }`}
+            >
+              {tab.label}
+              {tab.id === 'live' && (
+                <span className="ml-1 w-1.5 h-1.5 bg-red-500 rounded-full inline-block animate-pulse"></span>
+              )}
+            </button>
+          ))}
         </div>
 
         {/* Right: Spacer to balance layout */}
-        <div className="w-32"></div>
+        <div className="w-20"></div>
       </div>
     </div>
   );
@@ -637,7 +630,7 @@ const HomePage: React.FC = () => {
       {/* Content Overlay */}
       <div className="absolute inset-0 flex flex-col justify-between p-4 text-white z-10">
         {/* Top Section - User Info */}
-        <div className="flex items-center justify-between pt-16">
+        <div className="flex items-center justify-between pt-12">
           <div className="flex items-center">
             <div className="relative">
               <img
@@ -735,7 +728,7 @@ const HomePage: React.FC = () => {
       )}
       
       {index > 0 && index < 3 && (
-        <div className="absolute top-20 left-1/2 transform -translate-x-1/2 flex items-center text-white/60">
+        <div className="absolute top-16 left-1/2 transform -translate-x-1/2 flex items-center text-white/60">
           <ChevronUp size={20} />
         </div>
       )}
@@ -1100,7 +1093,7 @@ const HomePage: React.FC = () => {
       
       {/* Content Area */}
       {activeTab === 'live' ? (
-        <div className="pt-16">
+        <div className="pt-12">
           {renderLiveFeed()}
         </div>
       ) : (
