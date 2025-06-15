@@ -508,7 +508,7 @@ const HomePage: React.FC = () => {
   });
 
   const renderTabNavigation = () => (
-    <div className="fixed top-0 left-0 right-0 z-30">
+    <div className="fixed top-0 left-0 right-0 z-50">
       <div className="flex items-center justify-between px-4 py-2 h-12">
         {/* Left: Mode Toggle */}
         <div className="flex items-center">
