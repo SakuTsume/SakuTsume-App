@@ -23,7 +23,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </main>
       </div>
       
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-10">
+      {/* Bottom Navigation - Always show on mobile, but with higher z-index for HomePage */}
+      <div className={`md:hidden fixed bottom-0 left-0 right-0 ${isHomePage ? 'z-50' : 'z-10'}`}>
         <BottomNav />
       </div>
     </div>
