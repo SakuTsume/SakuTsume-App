@@ -448,7 +448,7 @@ const HomePage: React.FC = () => {
   };
 
   const scrollToNext = () => {
-    if (!isScrolling) {
+    if (!isScrolling && currentPostIndex < feedContent.length - 1) {
       setIsScrolling(true);
       setCurrentPostIndex(prev => prev + 1);
       setTimeout(() => setIsScrolling(false), 500);
@@ -621,6 +621,7 @@ const HomePage: React.FC = () => {
             <Briefcase size={16} className="mr-2" />
             Work
           </button>
+          
           <button
             onClick={toggleMode}
             className={`flex-1 flex items-center justify-center px-3 py-2 rounded-lg text-sm font-medium transition-all ${
@@ -696,8 +697,8 @@ const HomePage: React.FC = () => {
   const renderReelPost = (content: any, index: number) => (
     <div 
       key={content.id}
-      className="w-full max-w-sm mx-auto bg-black rounded-lg overflow-hidden mb-4"
-      style={{ aspectRatio: '9/16' }}
+      className="w-full bg-black rounded-lg overflow-hidden"
+      style={{ aspectRatio: '9/16', height: 'calc(100vh - 120px)' }}
     >
       {/* Background Media */}
       <div className="relative w-full h-full">
@@ -753,6 +754,21 @@ const HomePage: React.FC = () => {
         
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
+
+        {/* Rising Talent Overlay */}
+        {content.isRisingTalent && userMode === 'work' && (
+          <div className="absolute top-3 left-3 bg-gradient-to-r from-amber-400 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center shadow-lg">
+            <Star size={12} className="mr-1" />
+            RISING TALENT
+          </div>
+        )}
+        
+        {/* Casting Call Overlay */}
+        {content.isCastingCall && (
+          <div className="absolute top-3 right-3 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium">
+            CASTING CALL
+          </div>
+        )}
 
         {/* Content Overlay */}
         <div className="absolute inset-0 flex flex-col justify-between p-4 text-white z-10">
@@ -1221,9 +1237,10 @@ const HomePage: React.FC = () => {
             <div className="flex justify-center px-4 py-6">
               <div 
                 ref={containerRef}
-                className="w-full max-w-sm"
+                className="w-full max-w-sm overflow-hidden"
                 onTouchStart={handleTouchStart}
                 onTouchEnd={handleTouchEnd}
+                style={{ height: 'calc(100vh - 120px)' }}
               >
                 <motion.div
                   animate={{ 
@@ -1235,9 +1252,13 @@ const HomePage: React.FC = () => {
                     damping: 30,
                     duration: 0.5
                   }}
-                  className="space-y-4"
+                  className="h-full"
                 >
-                  {feedContent.map((content, index) => renderReelPost(content, index))}
+                  {feedContent.map((content, index) => (
+                    <div key={content.id} className="h-full flex-shrink-0">
+                      {renderReelPost(content, index)}
+                    </div>
+                  ))}
                 </motion.div>
               </div>
             </div>
