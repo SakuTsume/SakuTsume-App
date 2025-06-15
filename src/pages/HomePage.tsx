@@ -9,8 +9,10 @@ import {
   UserPlus, Bell, Coffee, Headphones, Camera, Film,
   ChevronUp, ChevronDown, VolumeX, Pause, Search,
   Settings, Maximize, MoreHorizontal, UserCheck,
-  Gift, ThumbsUp, Send, Smile
+  Gift, ThumbsUp, Send, Smile, Home, PlusSquare, User,
+  ShoppingBag
 } from 'lucide-react';
+import { NavLink } from 'react-router-dom';
 
 // Types
 type HomeTab = 'foryou' | 'following' | 'live';
@@ -507,11 +509,139 @@ const HomePage: React.FC = () => {
     return matchesCategory && matchesSearch;
   });
 
+  const renderSidebar = () => (
+    <div className="hidden md:flex w-64 bg-black border-r border-neutral-800 flex-col h-screen fixed left-0 top-0 z-40">
+      {/* Logo */}
+      <div className="p-4 border-b border-neutral-800">
+        <div className="flex items-center space-x-2">
+          <img src="/sakutsume-icon.svg" alt="SakuTsume" className="h-8 w-8" />
+          <span className="text-xl font-display font-semibold text-white">SakuTsume</span>
+        </div>
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 p-4 space-y-2">
+        <NavLink
+          to="/"
+          className={({ isActive }) =>
+            `flex items-center px-4 py-3 rounded-lg transition-colors ${
+              isActive
+                ? 'bg-white text-black'
+                : 'text-white hover:bg-neutral-800'
+            }`
+          }
+          end
+        >
+          <Home size={20} className="mr-4" />
+          <span className="font-medium">For You</span>
+        </NavLink>
+
+        <NavLink
+          to="/search"
+          className={({ isActive }) =>
+            `flex items-center px-4 py-3 rounded-lg transition-colors ${
+              isActive
+                ? 'bg-white text-black'
+                : 'text-white hover:bg-neutral-800'
+            }`
+          }
+        >
+          <Search size={20} className="mr-4" />
+          <span className="font-medium">Search</span>
+        </NavLink>
+
+        <NavLink
+          to="/create"
+          className={({ isActive }) =>
+            `flex items-center px-4 py-3 rounded-lg transition-colors ${
+              isActive
+                ? 'bg-white text-black'
+                : 'text-white hover:bg-neutral-800'
+            }`
+          }
+        >
+          <PlusSquare size={20} className="mr-4" />
+          <span className="font-medium">Create</span>
+        </NavLink>
+
+        <NavLink
+          to="/profile/me"
+          className={({ isActive }) =>
+            `flex items-center px-4 py-3 rounded-lg transition-colors ${
+              isActive
+                ? 'bg-white text-black'
+                : 'text-white hover:bg-neutral-800'
+            }`
+          }
+        >
+          <User size={20} className="mr-4" />
+          <span className="font-medium">Profile</span>
+        </NavLink>
+
+        <NavLink
+          to="/network"
+          className={({ isActive }) =>
+            `flex items-center px-4 py-3 rounded-lg transition-colors ${
+              isActive
+                ? 'bg-white text-black'
+                : 'text-white hover:bg-neutral-800'
+            }`
+          }
+        >
+          <Users size={20} className="mr-4" />
+          <span className="font-medium">Network</span>
+        </NavLink>
+
+        <NavLink
+          to="/marketplace"
+          className={({ isActive }) =>
+            `flex items-center px-4 py-3 rounded-lg transition-colors ${
+              isActive
+                ? 'bg-white text-black'
+                : 'text-white hover:bg-neutral-800'
+            }`
+          }
+        >
+          <ShoppingBag size={20} className="mr-4" />
+          <span className="font-medium">Market</span>
+        </NavLink>
+      </nav>
+
+      {/* Mode Toggle at Bottom */}
+      <div className="p-4 border-t border-neutral-800">
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={toggleMode}
+            className={`flex-1 flex items-center justify-center px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+              userMode === 'work'
+                ? 'bg-blue-600 text-white'
+                : 'text-white/60 hover:text-white hover:bg-neutral-800'
+            }`}
+          >
+            <Briefcase size={16} className="mr-2" />
+            Work
+          </button>
+          <button
+            onClick={toggleMode}
+            className={`flex-1 flex items-center justify-center px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+              userMode === 'fan'
+                ? 'bg-purple-600 text-white'
+                : 'text-white/60 hover:text-white hover:bg-neutral-800'
+            }`}
+          >
+            <Sparkles size={16} className="mr-2" />
+            Fan
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
   const renderTabNavigation = () => (
-    <div className="fixed top-0 left-0 right-0 z-50">
-      <div className="flex items-center justify-between px-4 py-2 h-12">
-        {/* Left: Mode Toggle */}
-        <div className="flex items-center">
+    <div className="fixed top-0 left-0 right-0 z-50 md:left-64">
+      <div className="flex items-center justify-center px-4 py-2 h-12 bg-black/80 backdrop-blur-sm md:bg-transparent md:backdrop-blur-none">
+        {/* Mobile: Mode Toggle */}
+        <div className="flex items-center md:hidden absolute left-4">
           <button
             onClick={toggleMode}
             className={`flex items-center px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
@@ -536,7 +666,7 @@ const HomePage: React.FC = () => {
           </button>
         </div>
 
-        {/* Center: Tab Navigation */}
+        {/* Tab Navigation */}
         <div className="flex items-center">
           {[
             { id: 'foryou', label: 'For You' },
@@ -559,20 +689,18 @@ const HomePage: React.FC = () => {
             </button>
           ))}
         </div>
-
-        {/* Right: Spacer to balance layout */}
-        <div className="w-20"></div>
       </div>
     </div>
   );
 
-  const renderFullScreenPost = (content: any, index: number) => (
+  const renderReelPost = (content: any, index: number) => (
     <div 
       key={content.id}
-      className="relative w-full h-screen flex-shrink-0 bg-black overflow-hidden"
+      className="w-full max-w-sm mx-auto bg-black rounded-lg overflow-hidden mb-4"
+      style={{ aspectRatio: '9/16' }}
     >
       {/* Background Media */}
-      <div className="absolute inset-0">
+      <div className="relative w-full h-full">
         {content.media.type === 'video' ? (
           <video
             ref={(el) => {
@@ -625,113 +753,100 @@ const HomePage: React.FC = () => {
         
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
-      </div>
 
-      {/* Content Overlay */}
-      <div className="absolute inset-0 flex flex-col justify-between p-4 text-white z-10">
-        {/* Top Section - User Info */}
-        <div className="flex items-center justify-between pt-12">
-          <div className="flex items-center">
-            <div className="relative">
-              <img
-                src={content.userAvatar}
-                alt={content.username}
-                className="w-12 h-12 rounded-full object-cover border-2 border-white/50"
-              />
-              {content.isRisingTalent && userMode === 'work' && (
-                <div className="absolute -top-1 -right-1 w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center">
-                  <Crown size={12} className="text-white" />
-                </div>
-              )}
-            </div>
-            <div className="ml-3">
-              <div className="flex items-center">
-                <h3 className="font-semibold text-lg">{content.username}</h3>
+        {/* Content Overlay */}
+        <div className="absolute inset-0 flex flex-col justify-between p-4 text-white z-10">
+          {/* Top Section - User Info */}
+          <div className="flex items-center justify-between pt-12 md:pt-4">
+            <div className="flex items-center">
+              <div className="relative">
+                <img
+                  src={content.userAvatar}
+                  alt={content.username}
+                  className="w-10 h-10 rounded-full object-cover border-2 border-white/50"
+                />
                 {content.isRisingTalent && userMode === 'work' && (
-                  <Star size={16} className="ml-2 text-amber-400" />
+                  <div className="absolute -top-1 -right-1 w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center">
+                    <Crown size={10} className="text-white" />
+                  </div>
                 )}
               </div>
-              <p className="text-white/80 text-sm">{content.profession}</p>
-            </div>
-          </div>
-          
-          <button className="px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-medium border border-white/30">
-            {content.isFollowing ? 'Following' : 'Follow'}
-          </button>
-        </div>
-
-        {/* Bottom Section - Caption & Actions */}
-        <div className="pb-20">
-          <div className="flex items-end justify-between">
-            {/* Left - Caption */}
-            <div className="flex-1 mr-4">
-              <p className="text-white text-lg leading-relaxed mb-4">
-                {content.caption}
-              </p>
-              
-              {userMode === 'work' && content.trustScore && (
-                <div className="flex items-center bg-black/30 backdrop-blur-sm px-3 py-2 rounded-full w-fit">
-                  <Award size={16} className="text-amber-400 mr-2" />
-                  <span className="text-sm font-medium">Trust Score: {content.trustScore}/5.0</span>
+              <div className="ml-3">
+                <div className="flex items-center">
+                  <h3 className="font-semibold text-sm">{content.username}</h3>
+                  {content.isRisingTalent && userMode === 'work' && (
+                    <Star size={12} className="ml-1 text-amber-400" />
+                  )}
                 </div>
-              )}
+                <p className="text-white/80 text-xs">{content.profession}</p>
+              </div>
             </div>
+            
+            <button className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-xs font-medium border border-white/30">
+              {content.isFollowing ? 'Following' : 'Follow'}
+            </button>
+          </div>
 
-            {/* Right - Action Buttons */}
-            <div className="flex flex-col items-center space-y-6">
-              <button className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                <Heart size={24} className={content.isLiked ? 'text-red-500 fill-current' : 'text-white'} />
-              </button>
-              <span className="text-sm font-medium">{content.likes}</span>
-              
-              <button className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                <MessageCircle size={24} className="text-white" />
-              </button>
-              <span className="text-sm font-medium">{content.comments}</span>
-              
-              <button className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                <Bookmark size={24} className={content.isSaved ? 'text-yellow-400 fill-current' : 'text-white'} />
-              </button>
-              
-              <button className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                <Share2 size={24} className="text-white" />
-              </button>
+          {/* Bottom Section - Caption & Actions */}
+          <div className="pb-4">
+            <div className="flex items-end justify-between">
+              {/* Left - Caption */}
+              <div className="flex-1 mr-4">
+                <p className="text-white text-sm leading-relaxed mb-2">
+                  {content.caption}
+                </p>
+                
+                {userMode === 'work' && content.trustScore && (
+                  <div className="flex items-center bg-black/30 backdrop-blur-sm px-2 py-1 rounded-full w-fit">
+                    <Award size={12} className="text-amber-400 mr-1" />
+                    <span className="text-xs font-medium">Trust Score: {content.trustScore}/5.0</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Right - Action Buttons */}
+              <div className="flex flex-col items-center space-y-4">
+                <button className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                  <Heart size={18} className={content.isLiked ? 'text-red-500 fill-current' : 'text-white'} />
+                </button>
+                <span className="text-xs font-medium">{content.likes}</span>
+                
+                <button className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                  <MessageCircle size={18} className="text-white" />
+                </button>
+                <span className="text-xs font-medium">{content.comments}</span>
+                
+                <button className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                  <Bookmark size={18} className={content.isSaved ? 'text-yellow-400 fill-current' : 'text-white'} />
+                </button>
+                
+                <button className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                  <Share2 size={18} className="text-white" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
+
+        {/* Video Controls */}
+        {content.media.type === 'video' && (
+          <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex flex-col space-y-2 z-20">
+            <button
+              onClick={() => toggleVideoPlayback(content.id)}
+              className="w-8 h-8 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white"
+            >
+              {isPlaying[content.id] ? <Pause size={16} /> : <Play size={16} />}
+            </button>
+            
+            <button
+              onClick={() => toggleVideoMute(content.id)}
+              className="w-8 h-8 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white"
+            >
+              {isMuted[content.id] ? <VolumeX size={16} /> : <Volume2 size={16} />}
+            </button>
+          </div>
+        )}
       </div>
-
-      {/* Video Controls */}
-      {content.media.type === 'video' && (
-        <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex flex-col space-y-4 z-20">
-          <button
-            onClick={() => toggleVideoPlayback(content.id)}
-            className="w-12 h-12 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white"
-          >
-            {isPlaying[content.id] ? <Pause size={24} /> : <Play size={24} />}
-          </button>
-          
-          <button
-            onClick={() => toggleVideoMute(content.id)}
-            className="w-12 h-12 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white"
-          >
-            {isMuted[content.id] ? <VolumeX size={24} /> : <Volume2 size={24} />}
-          </button>
-        </div>
-      )}
-
-      {/* Navigation Hints - Only show for first few posts */}
-      {index === 0 && (
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex items-center text-white/60 animate-bounce">
-          <ChevronDown size={20} />
-        </div>
-      )}
-      
-      {index > 0 && index < 3 && (
-        <div className="absolute top-16 left-1/2 transform -translate-x-1/2 flex items-center text-white/60">
-          <ChevronUp size={20} />
-        </div>
-      )}
     </div>
   );
 
@@ -1087,38 +1202,48 @@ const HomePage: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-black text-white overflow-hidden">
-      {/* Tab Navigation with Mode Toggle */}
+    <div className="min-h-screen bg-black text-white">
+      {/* Desktop Sidebar */}
+      {renderSidebar()}
+      
+      {/* Tab Navigation */}
       {renderTabNavigation()}
       
       {/* Content Area */}
-      {activeTab === 'live' ? (
-        <div className="pt-12">
-          {renderLiveFeed()}
-        </div>
-      ) : (
-        <div 
-          ref={containerRef}
-          className="relative h-screen overflow-hidden"
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
-        >
-          <motion.div
-            className="flex flex-col h-full"
-            animate={{ 
-              y: `${-currentPostIndex * 100}vh` 
-            }}
-            transition={{ 
-              type: "spring", 
-              stiffness: 300, 
-              damping: 30,
-              duration: 0.5
-            }}
-          >
-            {feedContent.map((content, index) => renderFullScreenPost(content, index))}
-          </motion.div>
-        </div>
-      )}
+      <div className="md:ml-64">
+        {activeTab === 'live' ? (
+          <div className="pt-12">
+            {renderLiveFeed()}
+          </div>
+        ) : (
+          <div className="pt-12 min-h-screen">
+            {/* Main Content Container */}
+            <div className="flex justify-center px-4 py-6">
+              <div 
+                ref={containerRef}
+                className="w-full max-w-sm"
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd}
+              >
+                <motion.div
+                  animate={{ 
+                    y: `${-currentPostIndex * 100}%` 
+                  }}
+                  transition={{ 
+                    type: "spring", 
+                    stiffness: 300, 
+                    damping: 30,
+                    duration: 0.5
+                  }}
+                  className="space-y-4"
+                >
+                  {feedContent.map((content, index) => renderReelPost(content, index))}
+                </motion.div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
