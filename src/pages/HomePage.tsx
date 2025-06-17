@@ -1,18 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Search, Play, Pause, Volume2, VolumeX, Heart, MessageCircle, 
-  Share2, Bookmark, MoreVertical, User, Crown, Star, Award,
-  Mic, Filter, TrendingUp, Users, Clock, Zap, ChevronDown,
-  ChevronUp, Eye, ThumbsUp, Send, Gift, Sparkles, Fire,
-  Camera, Video, Music, Headphones, Globe, MapPin, Calendar,
-  Bell, Settings, Menu, X, Plus, ArrowRight, ChevronLeft,
-  ChevronRight, Shuffle, Repeat, SkipBack, SkipForward,
-  Download, Upload, Edit, Trash2, Flag, UserCheck, UserX,
-  MessageSquare, Phone, VideoIcon, Mail, Link, Copy,
-  ExternalLink, Maximize, Minimize, RotateCcw, RefreshCw,
-  PauseCircle, PlayCircle, StopCircle, FastForward, Rewind
-} from 'lucide-react';
+import { Search, Play, Pause, Volume2, VolumeX, Heart, MessageCircle, Share2, Bookmark, MoreVertical, User, Crown, Star, Award, Mic, Filter, TrendingUp, Users, Clock, Zap, ChevronDown, ChevronUp, Eye, ThumbsUp, Send, Gift, Sparkles, Siren as Fire, Camera, Video, Music, Headphones, Globe, MapPin, Calendar, Bell, Settings, Menu, X, Plus, ArrowRight, ChevronLeft, ChevronRight, Shuffle, Repeat, SkipBack, SkipForward, Download, Upload, Edit, Trash2, Flag, UserCheck, UserX, MessageSquare, Phone, VideoIcon, Mail, Link, Copy, ExternalLink, Maximize, Minimize, RotateCcw, RefreshCw, PauseCircle, PlayCircle, StopCircle, FastForward, Rewind } from 'lucide-react';
 import Navbar from '../components/navigation/Navbar';
 import ContentCard from '../components/shared/ContentCard';
 
