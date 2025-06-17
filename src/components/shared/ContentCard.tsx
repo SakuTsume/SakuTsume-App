@@ -24,12 +24,9 @@ interface ContentCardProps {
   isFollowing?: boolean;
   isCastingCall?: boolean;
   budget?: string;
-  onLike?: (contentId: string, isLiked: boolean) => void;
-  onSave?: (contentId: string, isSaved: boolean) => void;
 }
 
 const ContentCard: React.FC<ContentCardProps> = ({
-  id,
   username,
   userAvatar,
   profession,
@@ -45,21 +42,7 @@ const ContentCard: React.FC<ContentCardProps> = ({
   timestamp,
   isFollowing = false,
   isCastingCall = false,
-  onLike,
-  onSave,
 }) => {
-  const handleLike = () => {
-    if (onLike) {
-      onLike(id, !isLiked);
-    }
-  };
-
-  const handleSave = () => {
-    if (onSave) {
-      onSave(id, !isSaved);
-    }
-  };
-
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -176,21 +159,12 @@ const ContentCard: React.FC<ContentCardProps> = ({
       {/* Actions */}
       <div className="flex items-center justify-between p-4">
         <div className="flex space-x-4">
-          <motion.button 
-            onClick={handleLike}
-            whileTap={{ scale: 0.9 }}
-            className={`flex items-center space-x-1 transition-colors ${
-              isLiked ? 'text-accent-400' : 'text-neutral-600 hover:text-accent-400'
-            }`}
-          >
-            <motion.div
-              animate={isLiked ? { scale: [1, 1.2, 1] } : { scale: 1 }}
-              transition={{ duration: 0.3 }}
-            >
-              <Heart size={20} fill={isLiked ? '#FF3366' : 'none'} />
-            </motion.div>
+          <button className={`flex items-center space-x-1 transition-colors ${
+            isLiked ? 'text-accent-400' : 'text-neutral-600 hover:text-accent-400'
+          }`}>
+            <Heart size={20} fill={isLiked ? '#FF3366' : 'none'} />
             <span className="font-medium">{likes.toLocaleString()}</span>
-          </motion.button>
+          </button>
           
           <button className="flex items-center space-x-1 text-neutral-600 hover:text-primary-600 transition-colors">
             <MessageCircle size={20} />
@@ -202,20 +176,11 @@ const ContentCard: React.FC<ContentCardProps> = ({
           </button>
         </div>
         
-        <motion.button 
-          onClick={handleSave}
-          whileTap={{ scale: 0.9 }}
-          className={`transition-colors ${
-            isSaved ? 'text-primary-800' : 'text-neutral-600 hover:text-primary-800'
-          }`}
-        >
-          <motion.div
-            animate={isSaved ? { scale: [1, 1.2, 1] } : { scale: 1 }}
-            transition={{ duration: 0.3 }}
-          >
-            <Bookmark size={20} fill={isSaved ? '#5E17EB' : 'none'} />
-          </motion.div>
-        </motion.button>
+        <button className={`transition-colors ${
+          isSaved ? 'text-primary-800' : 'text-neutral-600 hover:text-primary-800'
+        }`}>
+          <Bookmark size={20} fill={isSaved ? '#5E17EB' : 'none'} />
+        </button>
       </div>
       
       {/* Caption */}
