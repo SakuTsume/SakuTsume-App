@@ -449,32 +449,6 @@ const HomePage: React.FC = () => {
   // Render TikTok-style reel interface
   const renderReelInterface = (reels: any[]) => (
     <div className="relative h-screen overflow-hidden">
-      {/* Left Sidebar Navigation */}
-      <div className="fixed left-4 top-1/2 transform -translate-y-1/2 z-30 flex flex-col space-y-6">
-        <div className="bg-black/20 backdrop-blur-md rounded-full p-3">
-          <div className="flex flex-col space-y-4">
-            <button className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-white hover:bg-white/30 transition-colors">
-              <Home size={24} />
-            </button>
-            <button className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white/70 hover:bg-white/20 transition-colors">
-              <Compass size={24} />
-            </button>
-            <button className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white/70 hover:bg-white/20 transition-colors">
-              <Users size={24} />
-            </button>
-            <button className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white/70 hover:bg-white/20 transition-colors">
-              <Radio size={24} />
-            </button>
-            <button className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white/70 hover:bg-white/20 transition-colors">
-              <User size={24} />
-            </button>
-            <button className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white/70 hover:bg-white/20 transition-colors">
-              <Settings size={24} />
-            </button>
-          </div>
-        </div>
-      </div>
-      
       {/* Mode Toggle - Only show on For You tab */}
       {activeTab === 'for-you' && (
         <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-30">
