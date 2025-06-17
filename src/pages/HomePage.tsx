@@ -451,7 +451,7 @@ const HomePage: React.FC = () => {
     <div className="relative h-screen overflow-hidden">
       {/* Mode Toggle - Only show on For You tab */}
       {activeTab === 'for-you' && (
-        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50">
+        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-40">
           <div className="flex bg-black/40 backdrop-blur-md rounded-full p-1">
             <button
               onClick={() => setUserMode('work')}
@@ -479,7 +479,7 @@ const HomePage: React.FC = () => {
       
       {/* Following Tab Header */}
       {activeTab === 'following' && (
-        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50">
+        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-40">
           <div className="bg-black/40 backdrop-blur-md rounded-full px-6 py-2">
             <span className="text-white font-medium">Following • Reverse chronological • Zero ads</span>
           </div>
@@ -940,8 +940,8 @@ const HomePage: React.FC = () => {
   
   return (
     <div className="min-h-screen bg-black">
-      {/* Top Navigation - HIGHEST Z-INDEX */}
-      <div className="bg-black border-b border-gray-800 sticky top-0 z-[9999]">
+      {/* Top Navigation - MAXIMUM Z-INDEX FOR FULLSCREEN VISIBILITY */}
+      <div className="bg-black border-b border-gray-800 fixed top-0 left-0 right-0 z-[99999]">
         <div className="max-w-screen-xl mx-auto px-4">
           <div className="flex items-center justify-center space-x-8">
             {[
@@ -968,20 +968,22 @@ const HomePage: React.FC = () => {
         </div>
       </div>
       
-      {/* Tab Content */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={activeTab}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          {activeTab === 'for-you' && renderReelInterface(currentReels)}
-          {activeTab === 'following' && renderReelInterface(currentReels)}
-          {activeTab === 'live' && renderLiveFeed()}
-        </motion.div>
-      </AnimatePresence>
+      {/* Tab Content - Adjusted for fixed navigation */}
+      <div className="pt-16"> {/* Added padding-top to account for fixed navigation */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {activeTab === 'for-you' && renderReelInterface(currentReels)}
+            {activeTab === 'following' && renderReelInterface(currentReels)}
+            {activeTab === 'live' && renderLiveFeed()}
+          </motion.div>
+        </AnimatePresence>
+      </div>
       
       {/* Commercial Ads for Fan Mode */}
       {userMode === 'fan' && activeTab === 'for-you' && (
