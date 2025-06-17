@@ -360,7 +360,7 @@ const HomePage: React.FC = () => {
   const [isScrolling, setIsScrolling] = useState(false);
   const [touchStartY, setTouchStartY] = useState(0);
   const [isPlaying, setIsPlaying] = useState<{[key: string]: boolean}>({});
-  const [isMuted, setIsMuted] = useState<{[key: string]: boolean}>({});
+  const [showPlayButton, setShowPlayButton] = useState<{[key: string]: boolean}>({});
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStream, setSelectedStream] = useState<LiveStream | null>(null);
@@ -463,23 +463,22 @@ const HomePage: React.FC = () => {
     }
   };
 
-  const toggleVideoPlayback = (postId: string) => {
+  const handleVideoTap = (postId: string) => {
     const video = videoRefs.current[postId];
     if (video) {
       if (isPlaying[postId]) {
         video.pause();
+        setIsPlaying(prev => ({ ...prev, [postId]: false }));
       } else {
         video.play();
+        setIsPlaying(prev => ({ ...prev, [postId]: true }));
       }
-      setIsPlaying(prev => ({ ...prev, [postId]: !prev[postId] }));
-    }
-  };
-
-  const toggleVideoMute = (postId: string) => {
-    const video = videoRefs.current[postId];
-    if (video) {
-      video.muted = !video.muted;
-      setIsMuted(prev => ({ ...prev, [postId]: !prev[postId] }));
+      
+      // Show play button briefly
+      setShowPlayButton(prev => ({ ...prev, [postId]: true }));
+      setTimeout(() => {
+        setShowPlayButton(prev => ({ ...prev, [postId]: false }));
+      }, 1000);
     }
   };
 
@@ -703,18 +702,41 @@ const HomePage: React.FC = () => {
       {/* Background Media */}
       <div className="relative w-full h-full">
         {content.media.type === 'video' ? (
-          <video
-            ref={(el) => {
-              if (el) videoRefs.current[content.id] = el;
-            }}
-            src={content.media.url}
-            poster={content.media.thumbnail}
-            className="w-full h-full object-cover"
-            loop
-            muted={isMuted[content.id] !== false}
-            playsInline
-            autoPlay={index === currentPostIndex}
-          />
+          <div className="relative w-full h-full">
+            <video
+              ref={(el) => {
+                if (el) videoRefs.current[content.id] = el;
+              }}
+              src={content.media.url}
+              poster={content.media.thumbnail}
+              className="w-full h-full object-cover"
+              loop
+              muted
+              playsInline
+              autoPlay={index === currentPostIndex}
+            />
+            
+            {/* Tap area for play/pause */}
+            <div 
+              className="absolute inset-0 flex items-center justify-center"
+              onClick={() => handleVideoTap(content.id)}
+            >
+              {/* Temporary play button that appears on tap */}
+              <AnimatePresence>
+                {showPlayButton[content.id] && (
+                  <motion.div
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="w-16 h-16 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white pointer-events-none"
+                  >
+                    {isPlaying[content.id] ? <Pause size={24} /> : <Play size={24} />}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
         ) : content.media.type === 'audio' ? (
           <div className="w-full h-full bg-gradient-to-br from-primary-900 via-secondary-800 to-accent-900 flex items-center justify-center relative">
             <img
@@ -843,25 +865,6 @@ const HomePage: React.FC = () => {
             </div>
           </div>
         </div>
-
-        {/* Video Controls */}
-        {content.media.type === 'video' && (
-          <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex flex-col space-y-2 z-20">
-            <button
-              onClick={() => toggleVideoPlayback(content.id)}
-              className="w-8 h-8 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white"
-            >
-              {isPlaying[content.id] ? <Pause size={16} /> : <Play size={16} />}
-            </button>
-            
-            <button
-              onClick={() => toggleVideoMute(content.id)}
-              className="w-8 h-8 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white"
-            >
-              {isMuted[content.id] ? <VolumeX size={16} /> : <Volume2 size={16} />}
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );
