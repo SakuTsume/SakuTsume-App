@@ -8,7 +8,7 @@ import {
   Award, CheckCircle, Globe, Camera, Video, Mic, PenTool,
   ShoppingBag, Package, DollarSign, ArrowRight, Filter,
   MoreHorizontal, Eye, ThumbsUp, MessageSquare, Users,
-  Settings, Share
+  Settings, Share, Lock, Grid3X3, FileText
 } from 'lucide-react';
 
 // Mock profile data with enhanced structure
@@ -74,7 +74,10 @@ When I'm not in the booth, you'll find me playing indie horror games for inspira
       description: 'Spine-chilling villain voice for indie horror game',
       views: 2847,
       likes: 156,
-      isPinned: true
+      isPinned: true,
+      isPrivate: false,
+      isFavorited: true,
+      isLiked: true
     },
     {
       id: '2',
@@ -85,7 +88,10 @@ When I'm not in the booth, you'll find me playing indie horror games for inspira
       description: 'From shy schoolgirl to fierce warrior',
       views: 1923,
       likes: 89,
-      isPinned: true
+      isPinned: true,
+      isPrivate: false,
+      isFavorited: false,
+      isLiked: true
     },
     {
       id: '3',
@@ -96,11 +102,14 @@ When I'm not in the booth, you'll find me playing indie horror games for inspira
       description: 'My home studio setup and recording process',
       views: 3421,
       likes: 203,
-      isPinned: true
+      isPinned: true,
+      isPrivate: false,
+      isFavorited: true,
+      isLiked: false
     }
   ],
   
-  // Additional content
+  // Additional content with new properties
   allContent: [
     {
       id: '4',
@@ -112,7 +121,10 @@ When I'm not in the booth, you'll find me playing indie horror games for inspira
       views: 1456,
       likes: 67,
       category: 'Commercial',
-      isPinned: false
+      isPinned: false,
+      isPrivate: true,
+      isFavorited: false,
+      isLiked: true
     },
     {
       id: '5',
@@ -124,7 +136,25 @@ When I'm not in the booth, you'll find me playing indie horror games for inspira
       views: 892,
       likes: 34,
       category: 'Audiobook',
-      isPinned: false
+      isPinned: false,
+      isPrivate: false,
+      isFavorited: true,
+      isLiked: false
+    },
+    {
+      id: '6',
+      type: 'video',
+      url: 'https://example.com/maya-practice.mp4',
+      thumbnail: 'https://images.pexels.com/photos/3062541/pexels-photo-3062541.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      title: 'Voice Practice Session',
+      description: 'Working on new character voices',
+      views: 234,
+      likes: 12,
+      category: 'Practice',
+      isPinned: false,
+      isPrivate: true,
+      isFavorited: false,
+      isLiked: false
     }
   ]
 };
@@ -181,11 +211,13 @@ const mockPortfolio = [
   }
 ];
 
-type ProfileTab = 'reels' | 'portfolio' | 'shop' | 'about';
+type ProfileTab = 'content' | 'portfolio' | 'shop' | 'about';
+type ContentSubTab = 'my-content' | 'private-content' | 'favorited-content' | 'liked-content';
 
 const ProfilePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [activeTab, setActiveTab] = useState<ProfileTab>('reels');
+  const [activeTab, setActiveTab] = useState<ProfileTab>('content');
+  const [activeContentTab, setActiveContentTab] = useState<ContentSubTab>('my-content');
   const [profile, setProfile] = useState(mockProfile);
   const [isFollowing, setIsFollowing] = useState(false);
   const [bioExpanded, setBioExpanded] = useState(false);
@@ -237,12 +269,54 @@ const ProfilePage: React.FC = () => {
     return num.toString();
   };
   
-  const allContent = [...profile.topThree, ...profile.allContent];
-  const filteredContent = contentFilter === 'All' 
-    ? allContent 
-    : allContent.filter(item => item.category === contentFilter || item.isPinned);
+  // Filter content based on active content tab
+  const getFilteredContent = () => {
+    const allContent = [...profile.topThree, ...profile.allContent];
+    
+    switch (activeContentTab) {
+      case 'my-content':
+        return allContent.filter(item => !item.isPrivate);
+      case 'private-content':
+        return allContent.filter(item => item.isPrivate);
+      case 'favorited-content':
+        return allContent.filter(item => item.isFavorited);
+      case 'liked-content':
+        return allContent.filter(item => item.isLiked);
+      default:
+        return allContent;
+    }
+  };
   
+  const filteredContent = getFilteredContent();
   const contentCategories = ['All', 'Animation', 'Gaming', 'Commercial', 'Audiobook'];
+  
+  // Content sub-tabs configuration
+  const contentSubTabs = [
+    { 
+      id: 'my-content' as ContentSubTab, 
+      label: 'My Content', 
+      icon: Grid3X3,
+      count: [...profile.topThree, ...profile.allContent].filter(item => !item.isPrivate).length
+    },
+    { 
+      id: 'private-content' as ContentSubTab, 
+      label: 'Private', 
+      icon: Lock,
+      count: [...profile.topThree, ...profile.allContent].filter(item => item.isPrivate).length
+    },
+    { 
+      id: 'favorited-content' as ContentSubTab, 
+      label: 'Favorited', 
+      icon: Bookmark,
+      count: [...profile.topThree, ...profile.allContent].filter(item => item.isFavorited).length
+    },
+    { 
+      id: 'liked-content' as ContentSubTab, 
+      label: 'Liked', 
+      icon: Heart,
+      count: [...profile.topThree, ...profile.allContent].filter(item => item.isLiked).length
+    }
+  ];
   
   return (
     <div className="min-h-screen bg-neutral-50">
@@ -608,7 +682,7 @@ const ProfilePage: React.FC = () => {
         <div className="bg-white rounded-xl border border-neutral-200 mb-8">
           <div className="flex border-b border-neutral-200">
             {[
-              { id: 'reels', label: 'REELS', icon: Video },
+              { id: 'content', label: 'CONTENT', icon: Video },
               { id: 'portfolio', label: 'PORTFOLIO', icon: Award },
               { id: 'shop', label: 'SHOP', icon: ShoppingBag },
               { id: 'about', label: 'ABOUT', icon: PenTool },
@@ -638,9 +712,34 @@ const ProfilePage: React.FC = () => {
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3 }}
               >
-                {/* Reels Tab */}
-                {activeTab === 'reels' && (
+                {/* Content Tab */}
+                {activeTab === 'content' && (
                   <div>
+                    {/* Content Sub-tabs */}
+                    <div className="flex space-x-1 mb-6 bg-neutral-100 p-1 rounded-lg">
+                      {contentSubTabs.map((subTab) => (
+                        <button
+                          key={subTab.id}
+                          onClick={() => setActiveContentTab(subTab.id)}
+                          className={`flex-1 flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                            activeContentTab === subTab.id
+                              ? 'bg-white text-primary-800 shadow-sm'
+                              : 'text-neutral-600 hover:text-neutral-800'
+                          }`}
+                        >
+                          <subTab.icon size={14} className="mr-1.5" />
+                          {subTab.label}
+                          <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-xs ${
+                            activeContentTab === subTab.id
+                              ? 'bg-primary-100 text-primary-800'
+                              : 'bg-neutral-200 text-neutral-600'
+                          }`}>
+                            {subTab.count}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+
                     {/* Content Filters */}
                     <div className="flex items-center justify-between mb-6">
                       <div className="flex space-x-2 overflow-x-auto">
@@ -665,48 +764,75 @@ const ProfilePage: React.FC = () => {
                     </div>
                     
                     {/* Content Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {filteredContent.map((content) => (
-                        <div key={content.id} className="relative group">
-                          <div className="aspect-[9/16] bg-neutral-900 rounded-lg overflow-hidden">
-                            <img
-                              src={content.thumbnail}
-                              alt={content.title}
-                              className="w-full h-full object-cover"
-                            />
-                            
-                            {/* Pinned indicator */}
-                            {content.isPinned && (
-                              <div className="absolute top-2 left-2 bg-amber-500 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center">
-                                <Crown size={12} className="mr-1" />
-                                Pinned
-                              </div>
-                            )}
-                            
-                            {/* Play button overlay */}
-                            <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                              <button className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center">
-                                <Play size={20} className="text-neutral-800" />
-                              </button>
-                            </div>
-                            
-                            {/* Stats overlay */}
-                            <div className="absolute bottom-2 left-2 right-2">
-                              <h4 className="text-white font-medium text-sm mb-1">{content.title}</h4>
-                              <div className="flex items-center justify-between text-white/80 text-xs">
-                                <div className="flex items-center space-x-3">
-                                  <span>{content.views.toLocaleString()} views</span>
-                                  <span>{content.likes} likes</span>
-                                </div>
-                                {content.type === 'audio' && (
-                                  <Mic size={12} />
+                    {filteredContent.length > 0 ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {filteredContent.map((content) => (
+                          <div key={content.id} className="relative group">
+                            <div className="aspect-[9/16] bg-neutral-900 rounded-lg overflow-hidden">
+                              <img
+                                src={content.thumbnail}
+                                alt={content.title}
+                                className="w-full h-full object-cover"
+                              />
+                              
+                              {/* Content indicators */}
+                              <div className="absolute top-2 left-2 flex space-x-1">
+                                {content.isPinned && (
+                                  <div className="bg-amber-500 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center">
+                                    <Crown size={12} className="mr-1" />
+                                    Pinned
+                                  </div>
                                 )}
+                                {content.isPrivate && (
+                                  <div className="bg-neutral-800 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center">
+                                    <Lock size={12} className="mr-1" />
+                                    Private
+                                  </div>
+                                )}
+                              </div>
+                              
+                              {/* Play button overlay */}
+                              <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center">
+                                  <Play size={20} className="text-neutral-800" />
+                                </button>
+                              </div>
+                              
+                              {/* Stats overlay */}
+                              <div className="absolute bottom-2 left-2 right-2">
+                                <h4 className="text-white font-medium text-sm mb-1">{content.title}</h4>
+                                <div className="flex items-center justify-between text-white/80 text-xs">
+                                  <div className="flex items-center space-x-3">
+                                    <span>{content.views.toLocaleString()} views</span>
+                                    <span>{content.likes} likes</span>
+                                  </div>
+                                  <div className="flex items-center space-x-1">
+                                    {content.isFavorited && <Bookmark size={12} fill="white" />}
+                                    {content.isLiked && <Heart size={12} fill="white" />}
+                                    {content.type === 'audio' && <Mic size={12} />}
+                                  </div>
+                                </div>
                               </div>
                             </div>
                           </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-12">
+                        <div className="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                          <FileText size={24} className="text-neutral-500" />
                         </div>
-                      ))}
-                    </div>
+                        <h3 className="text-lg font-medium text-neutral-800 mb-2">
+                          No content found
+                        </h3>
+                        <p className="text-neutral-600">
+                          {activeContentTab === 'private-content' && 'No private content available.'}
+                          {activeContentTab === 'favorited-content' && 'No favorited content yet.'}
+                          {activeContentTab === 'liked-content' && 'No liked content yet.'}
+                          {activeContentTab === 'my-content' && 'No public content available.'}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 )}
                 
