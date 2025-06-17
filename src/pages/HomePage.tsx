@@ -10,7 +10,7 @@ import {
   ChevronUp, ChevronDown, VolumeX, Pause, Search,
   Settings, Maximize, MoreHorizontal, UserCheck,
   Gift, ThumbsUp, Send, Smile, Home, PlusSquare, User,
-  ShoppingBag
+  ShoppingBag, X
 } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 
@@ -46,6 +46,19 @@ interface AuditionAlert {
   company: string;
   type: string;
   urgent?: boolean;
+}
+
+interface Comment {
+  id: string;
+  user: {
+    name: string;
+    avatar: string;
+    verified?: boolean;
+  };
+  text: string;
+  time: string;
+  likes: number;
+  isLiked: boolean;
 }
 
 // Generate infinite content function
@@ -207,6 +220,70 @@ const generateContent = (startId: number, count: number) => {
   return generated;
 };
 
+// Mock comments data
+const generateComments = (postId: string): Comment[] => {
+  const mockComments: Comment[] = [
+    {
+      id: '1',
+      user: {
+        name: 'GameDevStudio',
+        avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=600',
+        verified: true,
+      },
+      text: 'This is absolutely incredible! The emotion in your voice really brings the character to life. Would love to work with you on our upcoming project! 🎮',
+      time: '2h',
+      likes: 12,
+      isLiked: false,
+    },
+    {
+      id: '2',
+      user: {
+        name: 'VoiceActorFan',
+        avatar: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=600',
+      },
+      text: 'Chills! Literal chills! How do you get your voice to sound so menacing? Any tips for aspiring voice actors?',
+      time: '1h',
+      likes: 8,
+      isLiked: true,
+    },
+    {
+      id: '3',
+      user: {
+        name: 'HorrorGameDev',
+        avatar: 'https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=600',
+      },
+      text: 'Perfect for horror games! The way you control your breathing and tone is masterful. Following for more content! 👻',
+      time: '45m',
+      likes: 5,
+      isLiked: false,
+    },
+    {
+      id: '4',
+      user: {
+        name: 'AudioEngineer_Pro',
+        avatar: 'https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&cs=tinysrgb&w=600',
+      },
+      text: 'The audio quality is pristine! What mic setup are you using? The clarity is amazing.',
+      time: '30m',
+      likes: 3,
+      isLiked: false,
+    },
+    {
+      id: '5',
+      user: {
+        name: 'IndieFilmMaker',
+        avatar: 'https://images.pexels.com/photos/1036623/pexels-photo-1036623.jpeg?auto=compress&cs=tinysrgb&w=600',
+      },
+      text: 'This gave me goosebumps! Would you be interested in voicing a character for our upcoming horror short film?',
+      time: '15m',
+      likes: 7,
+      isLiked: false,
+    },
+  ];
+  
+  return mockComments;
+};
+
 // Enhanced live streams data with Twitch-like features
 const mockLiveStreams: LiveStream[] = [
   {
@@ -366,6 +443,12 @@ const HomePage: React.FC = () => {
   const [selectedStream, setSelectedStream] = useState<LiveStream | null>(null);
   const [showStreamModal, setShowStreamModal] = useState(false);
   
+  // Comment section state
+  const [showComments, setShowComments] = useState(false);
+  const [activePostComments, setActivePostComments] = useState<string | null>(null);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [newComment, setNewComment] = useState('');
+  
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<{[key: string]: HTMLVideoElement}>({});
 
@@ -390,7 +473,7 @@ const HomePage: React.FC = () => {
   // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (activeTab === 'live') return;
+      if (activeTab === 'live' || showComments) return;
       
       if (e.key === 'ArrowDown' || e.key === ' ') {
         e.preventDefault();
@@ -403,12 +486,12 @@ const HomePage: React.FC = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentPostIndex, activeTab]);
+  }, [currentPostIndex, activeTab, showComments]);
 
   // Handle wheel scrolling
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
-      if (activeTab === 'live' || isScrolling) return;
+      if (activeTab === 'live' || isScrolling || showComments) return;
       
       e.preventDefault();
       
@@ -424,16 +507,16 @@ const HomePage: React.FC = () => {
       container.addEventListener('wheel', handleWheel, { passive: false });
       return () => container.removeEventListener('wheel', handleWheel);
     }
-  }, [currentPostIndex, activeTab, isScrolling]);
+  }, [currentPostIndex, activeTab, isScrolling, showComments]);
 
   // Handle touch events
   const handleTouchStart = (e: React.TouchEvent) => {
-    if (activeTab === 'live') return;
+    if (activeTab === 'live' || showComments) return;
     setTouchStartY(e.touches[0].clientY);
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
-    if (activeTab === 'live' || isScrolling) return;
+    if (activeTab === 'live' || isScrolling || showComments) return;
     
     const touchEndY = e.changedTouches[0].clientY;
     const diff = touchStartY - touchEndY;
@@ -494,6 +577,51 @@ const HomePage: React.FC = () => {
   const closeStreamModal = () => {
     setShowStreamModal(false);
     setSelectedStream(null);
+  };
+
+  // Comment functions
+  const openComments = (postId: string) => {
+    setActivePostComments(postId);
+    setComments(generateComments(postId));
+    setShowComments(true);
+  };
+
+  const closeComments = () => {
+    setShowComments(false);
+    setActivePostComments(null);
+    setComments([]);
+    setNewComment('');
+  };
+
+  const handleAddComment = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newComment.trim()) {
+      const comment: Comment = {
+        id: Date.now().toString(),
+        user: {
+          name: 'You',
+          avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=600',
+        },
+        text: newComment,
+        time: 'now',
+        likes: 0,
+        isLiked: false,
+      };
+      setComments(prev => [comment, ...prev]);
+      setNewComment('');
+    }
+  };
+
+  const toggleCommentLike = (commentId: string) => {
+    setComments(prev => prev.map(comment => 
+      comment.id === commentId 
+        ? { 
+            ...comment, 
+            isLiked: !comment.isLiked,
+            likes: comment.isLiked ? comment.likes - 1 : comment.likes + 1
+          }
+        : comment
+    ));
   };
 
   const categories = ['All', 'Voice Acting', 'Education', 'Behind the Scenes', 'Just Chatting', 'Film Analysis', 'Game Development', 'Theater', 'Music Production'];
@@ -849,7 +977,10 @@ const HomePage: React.FC = () => {
                 </button>
                 <span className="text-xs font-medium">{content.likes}</span>
                 
-                <button className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                <button 
+                  onClick={() => openComments(content.id)}
+                  className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center"
+                >
                   <MessageCircle size={18} className="text-white" />
                 </button>
                 <span className="text-xs font-medium">{content.comments}</span>
@@ -867,6 +998,135 @@ const HomePage: React.FC = () => {
         </div>
       </div>
     </div>
+  );
+
+  const renderCommentSection = () => (
+    <AnimatePresence>
+      {showComments && (
+        <>
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 z-50"
+            onClick={closeComments}
+          />
+          
+          {/* Comment Panel */}
+          <motion.div
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-white z-50 flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-neutral-200">
+              <h3 className="text-lg font-semibold text-neutral-800">Comments</h3>
+              <button
+                onClick={closeComments}
+                className="p-2 rounded-full hover:bg-neutral-100 text-neutral-600"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            {/* Comments List */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              {comments.map((comment) => (
+                <motion.div
+                  key={comment.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex space-x-3"
+                >
+                  <img
+                    src={comment.user.avatar}
+                    alt={comment.user.name}
+                    className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                  />
+                  
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center space-x-2 mb-1">
+                      <span className="font-medium text-sm text-neutral-800">
+                        {comment.user.name}
+                      </span>
+                      {comment.user.verified && (
+                        <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
+                          <CheckCircle size={10} className="text-white" />
+                        </div>
+                      )}
+                      <span className="text-xs text-neutral-500">{comment.time}</span>
+                    </div>
+                    
+                    <p className="text-sm text-neutral-700 mb-2">{comment.text}</p>
+                    
+                    <div className="flex items-center space-x-4">
+                      <button
+                        onClick={() => toggleCommentLike(comment.id)}
+                        className={`flex items-center space-x-1 text-xs ${
+                          comment.isLiked ? 'text-red-500' : 'text-neutral-500'
+                        }`}
+                      >
+                        <Heart size={12} className={comment.isLiked ? 'fill-current' : ''} />
+                        <span>{comment.likes}</span>
+                      </button>
+                      
+                      <button className="text-xs text-neutral-500 hover:text-neutral-700">
+                        Reply
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+              
+              {comments.length === 0 && (
+                <div className="text-center py-8">
+                  <MessageCircle size={48} className="text-neutral-300 mx-auto mb-4" />
+                  <p className="text-neutral-500">No comments yet</p>
+                  <p className="text-sm text-neutral-400">Be the first to comment!</p>
+                </div>
+              )}
+            </div>
+            
+            {/* Comment Input */}
+            <div className="p-4 border-t border-neutral-200">
+              <form onSubmit={handleAddComment} className="flex space-x-3">
+                <img
+                  src="https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=600"
+                  alt="Your avatar"
+                  className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                />
+                
+                <div className="flex-1 flex space-x-2">
+                  <input
+                    type="text"
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    placeholder="Add a comment..."
+                    className="flex-1 px-3 py-2 rounded-full bg-neutral-100 border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
+                  />
+                  
+                  <button
+                    type="submit"
+                    disabled={!newComment.trim()}
+                    className={`p-2 rounded-full ${
+                      newComment.trim()
+                        ? 'bg-primary-800 text-white'
+                        : 'bg-neutral-200 text-neutral-400'
+                    }`}
+                  >
+                    <Send size={16} />
+                  </button>
+                </div>
+              </form>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
   );
 
   const renderStreamModal = () => (
@@ -1268,6 +1528,9 @@ const HomePage: React.FC = () => {
           </div>
         )}
       </div>
+      
+      {/* Comment Section */}
+      {renderCommentSection()}
     </div>
   );
 };
