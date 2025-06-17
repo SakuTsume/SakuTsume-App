@@ -1,311 +1,1309 @@
 import React, { useState, useEffect, useRef } from 'react';
+import ContentCard from '../components/shared/ContentCard';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Search, Play, Pause, Volume2, VolumeX, Heart, MessageCircle, 
-  Share2, Bookmark, Star, Crown, Award, Users, Zap, Clock,
-  ChevronLeft, ChevronRight, Filter, TrendingUp, Calendar,
-  MapPin, Eye, ThumbsUp, MoreHorizontal, Mic, Video, Camera,
-  PlusCircle, Bell, Settings, User, Home, ShoppingBag, PenTool,
-  Globe, Headphones, Radio, Tv, Monitor, Smartphone, Gamepad2,
-  Music, Film, Palette, Code, Briefcase, GraduationCap, Coffee
+  Filter, TrendingUp, Award, Users, Play, Eye, Clock, 
+  Briefcase, Sparkles, Star, Zap, DollarSign, MapPin,
+  Calendar, ChevronRight, Volume2, Mic, Video, Heart,
+  MessageCircle, Share2, Bookmark, Crown, AlertCircle,
+  UserPlus, Bell, Coffee, Headphones, Camera, Film,
+  ChevronUp, ChevronDown, VolumeX, Pause, Search,
+  Settings, Maximize, MoreHorizontal, UserCheck,
+  Gift, ThumbsUp, Send, Smile, Home, PlusSquare, User,
+  ShoppingBag, Plus, CheckCircle
 } from 'lucide-react';
-import ContentCard from '../components/shared/ContentCard';
-import ProfilePreview from '../components/shared/ProfilePreview';
-import ServiceCard from '../components/shared/ServiceCard';
+import { NavLink } from 'react-router-dom';
 
-// Mock data for different content types
-const mockFeedContent = [
+// Types
+type HomeTab = 'foryou' | 'following' | 'live';
+type UserMode = 'work' | 'fan';
+
+interface LiveStream {
+  id: string;
+  streamer: {
+    name: string;
+    avatar: string;
+    verified: boolean;
+    followers: number;
+  };
+  title: string;
+  category: string;
+  viewers: number;
+  thumbnail: string;
+  isLive: boolean;
+  duration?: string;
+  tags: string[];
+  language: string;
+  mature?: boolean;
+}
+
+interface AuditionAlert {
+  id: string;
+  title: string;
+  budget: string;
+  location: string;
+  deadline: string;
+  company: string;
+  type: string;
+  urgent?: boolean;
+}
+
+interface Comment {
+  id: string;
+  user: {
+    name: string;
+    avatar: string;
+    verified?: boolean;
+  };
+  text: string;
+  time: string;
+  likes: number;
+  replies?: Comment[];
+}
+
+// Generate infinite content function
+const generateContent = (startId: number, count: number) => {
+  const baseContent = [
+    {
+      username: 'maya_rising_va',
+      userAvatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=600',
+      profession: 'Voice Actor',
+      media: {
+        type: 'video' as const,
+        url: 'https://example.com/horror-scream.mp4',
+        thumbnail: 'https://images.pexels.com/photos/7991579/pexels-photo-7991579.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      },
+      caption: 'Spine-chilling villain voice for indie horror game 🎭 What do you think of this character? #VoiceActing #Horror #IndieGame',
+      likes: 342,
+      comments: 28,
+      isLiked: false,
+      isSaved: false,
+      isRisingTalent: true,
+      trustScore: 4.2,
+      workMode: true,
+    },
+    {
+      username: 'alex_cinematics',
+      userAvatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=600',
+      profession: 'Cinematographer',
+      media: {
+        type: 'image' as const,
+        url: 'https://images.pexels.com/photos/3062541/pexels-photo-3062541.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      },
+      caption: 'Golden hour magic on our latest short film. Sometimes the best shots happen when you least expect them ✨ #Cinematography #GoldenHour',
+      likes: 156,
+      comments: 42,
+      isLiked: true,
+      isSaved: false,
+      isRisingTalent: false,
+      trustScore: 4.8,
+      workMode: true,
+    },
+    {
+      username: 'sarah_actress_pro',
+      userAvatar: 'https://images.pexels.com/photos/1036623/pexels-photo-1036623.jpeg?auto=compress&cs=tinysrgb&w=600',
+      profession: 'Actress',
+      media: {
+        type: 'video' as const,
+        url: 'https://example.com/demo-reel.mp4',
+        thumbnail: 'https://images.pexels.com/photos/7991579/pexels-photo-7991579.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      },
+      caption: 'New scene from my showreel! Working with @director_jane was an incredible experience. Can\'t wait to share the full project 🎬',
+      likes: 498,
+      comments: 56,
+      isLiked: false,
+      isSaved: true,
+      timestamp: '2 hours ago',
+      isFollowing: true,
+    },
+    {
+      username: 'studiox_casting',
+      userAvatar: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=600',
+      profession: 'Casting Director',
+      media: {
+        type: 'image' as const,
+        url: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      },
+      caption: '🚨 CASTING CALL: Cyberpunk Detective for upcoming web series. Looking for strong dramatic range and tech-savvy character work. Apply by Friday! #CastingCall #Cyberpunk',
+      likes: 89,
+      comments: 23,
+      isLiked: false,
+      isSaved: false,
+      timestamp: '4 hours ago',
+      isFollowing: true,
+      isCastingCall: true,
+      budget: '$3,000',
+    },
+    {
+      username: 'tom_sound_design',
+      userAvatar: 'https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&cs=tinysrgb&w=600',
+      profession: 'Sound Designer',
+      media: {
+        type: 'audio' as const,
+        url: 'https://example.com/ambient-track.mp3',
+        thumbnail: 'https://images.pexels.com/photos/3783471/pexels-photo-3783471.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      },
+      caption: 'Ambient soundscape for a psychological thriller. Layered field recordings with synthetic textures 🎧 #SoundDesign #FilmAudio',
+      likes: 234,
+      comments: 31,
+      isLiked: false,
+      isSaved: false,
+      isRisingTalent: false,
+      trustScore: 4.6,
+      workMode: true,
+    },
+    {
+      username: 'indie_film_collective',
+      userAvatar: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=600',
+      profession: 'Film Collective',
+      media: {
+        type: 'video' as const,
+        url: 'https://example.com/behind-scenes.mp4',
+        thumbnail: 'https://images.pexels.com/photos/3062541/pexels-photo-3062541.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      },
+      caption: 'Behind the scenes of our latest indie horror film. The practical effects team outdid themselves! 🎬 #IndieFilm #Horror #BTS',
+      likes: 678,
+      comments: 89,
+      isLiked: true,
+      isSaved: false,
+      timestamp: '1 hour ago',
+      isFollowing: true,
+    },
+    {
+      username: 'music_composer_pro',
+      userAvatar: 'https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=600',
+      profession: 'Music Composer',
+      media: {
+        type: 'audio' as const,
+        url: 'https://example.com/epic-score.mp3',
+        thumbnail: 'https://images.pexels.com/photos/4195504/pexels-photo-4195504.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      },
+      caption: 'Epic orchestral score for upcoming fantasy film. 60-piece orchestra recorded at Abbey Road Studios 🎼 #FilmScore #Orchestra',
+      likes: 445,
+      comments: 67,
+      isLiked: false,
+      isSaved: true,
+      isRisingTalent: true,
+      trustScore: 4.9,
+      workMode: true,
+    },
+    {
+      username: 'animation_studio_x',
+      userAvatar: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=600',
+      profession: 'Animation Studio',
+      media: {
+        type: 'video' as const,
+        url: 'https://example.com/animation-reel.mp4',
+        thumbnail: 'https://images.pexels.com/photos/5063095/pexels-photo-5063095.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      },
+      caption: 'Character animation showcase from our latest 2D animated series. Hand-drawn frame by frame! ✨ #Animation #2D #CharacterDesign',
+      likes: 892,
+      comments: 134,
+      isLiked: true,
+      isSaved: false,
+      isRisingTalent: false,
+      trustScore: 4.7,
+      workMode: true,
+    },
+  ];
+
+  const generated = [];
+  for (let i = 0; i < count; i++) {
+    const baseIndex = i % baseContent.length;
+    const content = { ...baseContent[baseIndex] };
+    content.id = `${startId + i}`;
+    // Randomize some values to make content feel fresh
+    content.likes = Math.floor(Math.random() * 1000) + 50;
+    content.comments = Math.floor(Math.random() * 100) + 5;
+    generated.push(content);
+  }
+  return generated;
+};
+
+// Enhanced live streams data with Twitch-like features
+const mockLiveStreams: LiveStream[] = [
   {
     id: '1',
-    username: 'maya_va',
-    userAvatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=600',
-    profession: 'Voice Actor',
-    media: {
-      type: 'video' as const,
-      url: 'https://example.com/maya-horror-demo.mp4',
-      thumbnail: 'https://images.pexels.com/photos/7991579/pexels-photo-7991579.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    streamer: {
+      name: 'Maya VA',
+      avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=600',
+      verified: true,
+      followers: 12400,
     },
-    caption: 'Just finished recording for a new horror game! The villain voice was so much fun to create. What do you think? 🎭 #VoiceActing #Horror #GameDev',
-    likes: 2847,
-    comments: 156,
-    isLiked: false,
-    isSaved: false,
-    isRisingTalent: true,
-    trustScore: 4.8,
-    workMode: true,
-    timestamp: '2 hours ago',
-    isFollowing: false,
-  },
-  {
-    id: '2',
-    username: 'alexcine',
-    userAvatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=600',
-    profession: 'Cinematographer',
-    media: {
-      type: 'image' as const,
-      url: 'https://images.pexels.com/photos/3062541/pexels-photo-3062541.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-    },
-    caption: 'Golden hour magic on set today ✨ Sometimes the best shots happen when you least expect them. #Cinematography #GoldenHour #FilmMaking',
-    likes: 1923,
-    comments: 89,
-    isLiked: true,
-    isSaved: false,
-    trustScore: 4.9,
-    workMode: true,
-    timestamp: '4 hours ago',
-    isFollowing: true,
-  },
-  {
-    id: '3',
-    username: 'soundscape_sam',
-    userAvatar: 'https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&cs=tinysrgb&w=600',
-    profession: 'Sound Designer',
-    media: {
-      type: 'audio' as const,
-      url: 'https://example.com/ambient-forest.mp3',
-    },
-    caption: 'Created this ambient forest soundscape for an indie film. Layered 12 different natural sounds to get the perfect atmosphere 🌲🎵 #SoundDesign #FilmAudio #Nature',
-    likes: 1456,
-    comments: 67,
-    isLiked: false,
-    isSaved: true,
-    trustScore: 4.7,
-    workMode: true,
-    timestamp: '6 hours ago',
-    isFollowing: false,
-  },
-];
-
-const mockLiveStreams = [
-  {
-    id: '1',
-    title: 'Voice Acting Workshop: Character Development',
-    streamer: 'Maya Thompson',
-    avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=600',
-    viewers: 234,
-    category: 'Education',
+    title: 'Open Auditions - Horror Characters | Live Feedback & Tips',
+    category: 'Voice Acting',
+    viewers: 1247,
     thumbnail: 'https://images.pexels.com/photos/7504837/pexels-photo-7504837.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
     isLive: true,
-    duration: '1:23:45'
+    tags: ['Horror', 'Auditions', 'Voice Acting', 'Interactive'],
+    language: 'English',
   },
   {
     id: '2',
-    title: 'Behind the Scenes: Indie Film Production',
-    streamer: 'Alex Rodriguez',
-    avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=600',
-    viewers: 567,
-    category: 'Film',
-    thumbnail: 'https://images.pexels.com/photos/3062541/pexels-photo-3062541.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    streamer: {
+      name: 'StudioX',
+      avatar: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=600',
+      verified: true,
+      followers: 8900,
+    },
+    title: 'Voice Acting Workshop - Emotion Delivery Masterclass',
+    category: 'Education',
+    viewers: 842,
+    thumbnail: 'https://images.pexels.com/photos/3783471/pexels-photo-3783471.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
     isLive: true,
-    duration: '2:15:30'
+    tags: ['Workshop', 'Education', 'Voice Acting'],
+    language: 'English',
   },
   {
     id: '3',
-    title: 'Music Composition Live Session',
-    streamer: 'Sarah Kim',
-    avatar: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=600',
-    viewers: 189,
-    category: 'Music',
+    streamer: {
+      name: 'Tom Sound',
+      avatar: 'https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&cs=tinysrgb&w=600',
+      verified: false,
+      followers: 3200,
+    },
+    title: 'Game Dubbing Session - Behind the Scenes Magic',
+    category: 'Behind the Scenes',
+    viewers: 593,
+    thumbnail: 'https://images.pexels.com/photos/3062541/pexels-photo-3062541.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    isLive: true,
+    tags: ['Game Audio', 'Dubbing', 'BTS'],
+    language: 'English',
+  },
+  {
+    id: '4',
+    streamer: {
+      name: 'Anime Club',
+      avatar: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=600',
+      verified: true,
+      followers: 15600,
+    },
+    title: 'Fan Q&A - Voice Acting Journey & Industry Secrets',
+    category: 'Just Chatting',
+    viewers: 2431,
+    thumbnail: 'https://images.pexels.com/photos/4195504/pexels-photo-4195504.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    isLive: true,
+    tags: ['Q&A', 'Community', 'Anime'],
+    language: 'English',
+  },
+  {
+    id: '5',
+    streamer: {
+      name: 'FilmCraft Pro',
+      avatar: 'https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=600',
+      verified: true,
+      followers: 7800,
+    },
+    title: 'Cinematography Breakdown - Analyzing Famous Scenes',
+    category: 'Film Analysis',
+    viewers: 1156,
+    thumbnail: 'https://images.pexels.com/photos/3062541/pexels-photo-3062541.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    isLive: true,
+    tags: ['Cinematography', 'Analysis', 'Education'],
+    language: 'English',
+  },
+  {
+    id: '6',
+    streamer: {
+      name: 'IndieGameDev',
+      avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=600',
+      verified: false,
+      followers: 4500,
+    },
+    title: 'Live Game Development - Creating Character Voices',
+    category: 'Game Development',
+    viewers: 678,
+    thumbnail: 'https://images.pexels.com/photos/5063095/pexels-photo-5063095.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    isLive: true,
+    tags: ['Game Dev', 'Character Design', 'Voice'],
+    language: 'English',
+  },
+  {
+    id: '7',
+    streamer: {
+      name: 'TheaterPro',
+      avatar: 'https://images.pexels.com/photos/1036623/pexels-photo-1036623.jpeg?auto=compress&cs=tinysrgb&w=600',
+      verified: false,
+      followers: 2100,
+    },
+    title: 'Stage Acting Techniques for Voice Work',
+    category: 'Theater',
+    viewers: 234,
+    thumbnail: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    isLive: true,
+    tags: ['Theater', 'Acting', 'Techniques'],
+    language: 'English',
+  },
+  {
+    id: '8',
+    streamer: {
+      name: 'MusicComposer',
+      avatar: 'https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&cs=tinysrgb&w=600',
+      verified: true,
+      followers: 9300,
+    },
+    title: 'Composing Film Scores Live - Horror Theme Creation',
+    category: 'Music Production',
+    viewers: 1890,
     thumbnail: 'https://images.pexels.com/photos/3783471/pexels-photo-3783471.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
     isLive: true,
-    duration: '0:45:12'
+    tags: ['Music', 'Film Score', 'Horror', 'Composition'],
+    language: 'English',
   },
 ];
 
-const mockTrendingProfiles = [
+const mockAuditionAlerts: AuditionAlert[] = [
   {
-    id: 'trending1',
-    name: 'Emma Watson',
-    avatar: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=600',
-    profession: 'Film Director',
-    bio: 'Award-winning director specializing in narrative storytelling and character-driven films.',
-    skills: ['Direction', 'Screenwriting', 'Cinematography'],
-    following: false,
-    rating: 4.9,
-  },
-  {
-    id: 'trending2',
-    name: 'Marcus Johnson',
-    avatar: 'https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=600',
-    profession: 'Music Producer',
-    bio: 'Electronic music producer and sound engineer with 10+ years in the industry.',
-    skills: ['Music Production', 'Sound Engineering', 'Mixing'],
-    following: true,
-    rating: 4.8,
+    id: '1',
+    title: 'Sci-Fi Hero Voice - AAA Game',
+    budget: '$2,000 - $5,000',
+    location: 'Remote',
+    deadline: '3 days left',
+    company: 'Nebula Games',
+    type: 'Voice Acting',
+    urgent: true,
   },
 ];
 
-const mockFeaturedServices = [
+// Mock comments data
+const mockComments: Comment[] = [
   {
-    id: 'service1',
-    title: 'Professional Voice Over for Commercials',
-    provider: {
-      name: 'Voice Pro Studio',
-      avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=600',
-      rating: 4.9,
+    id: '1',
+    user: {
+      name: 'alex_director',
+      avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=600',
+      verified: true,
     },
-    category: 'Voice Acting',
-    image: 'https://images.pexels.com/photos/7504837/pexels-photo-7504837.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-    price: 250,
-    deliveryTime: '24 hours',
-    featured: true,
+    text: 'This is absolutely incredible! The emotion in your voice gives me chills every time.',
+    time: '2h',
+    likes: 24,
   },
   {
-    id: 'service2',
-    title: 'Custom Film Score Composition',
-    provider: {
-      name: 'Melody Makers',
+    id: '2',
+    user: {
+      name: 'sarah_va',
       avatar: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=600',
-      rating: 4.8,
     },
-    category: 'Music',
-    image: 'https://images.pexels.com/photos/3783471/pexels-photo-3783471.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-    price: 800,
-    deliveryTime: '5-7 days',
-    featured: false,
+    text: 'Goals! How do you get such clear audio quality? 🎤',
+    time: '1h',
+    likes: 12,
+  },
+  {
+    id: '3',
+    user: {
+      name: 'indie_studio',
+      avatar: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=600',
+      verified: true,
+    },
+    text: 'We need to work together! DMing you now 🔥',
+    time: '45m',
+    likes: 8,
+  },
+  {
+    id: '4',
+    user: {
+      name: 'voice_fan_2024',
+      avatar: 'https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=600',
+    },
+    text: 'Been following your work for months. You just keep getting better!',
+    time: '30m',
+    likes: 15,
+  },
+  {
+    id: '5',
+    user: {
+      name: 'horror_game_dev',
+      avatar: 'https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&cs=tinysrgb&w=600',
+    },
+    text: 'Perfect for our upcoming horror project. Sent you a collaboration request!',
+    time: '15m',
+    likes: 6,
   },
 ];
-
-// Categories for content filtering
-const contentCategories = [
-  { id: 'all', label: 'For You', icon: Home },
-  { id: 'voice', label: 'Voice Acting', icon: Mic },
-  { id: 'film', label: 'Film & Video', icon: Video },
-  { id: 'music', label: 'Music', icon: Music },
-  { id: 'art', label: 'Visual Arts', icon: Palette },
-  { id: 'writing', label: 'Writing', icon: PenTool },
-  { id: 'tech', label: 'Tech & Gaming', icon: Code },
-];
-
-type HomeTab = 'feed' | 'live' | 'discover' | 'trending';
 
 const HomePage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<HomeTab>('feed');
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [workMode, setWorkMode] = useState(false);
+  const [activeTab, setActiveTab] = useState<HomeTab>('foryou');
+  const [userMode, setUserMode] = useState<UserMode>('work');
+  const [currentPostIndex, setCurrentPostIndex] = useState(0);
+  const [feedContent, setFeedContent] = useState(() => generateContent(1, 20)); // Start with 20 posts
+  const [isScrolling, setIsScrolling] = useState(false);
+  const [touchStartY, setTouchStartY] = useState(0);
+  const [isPlaying, setIsPlaying] = useState<{[key: string]: boolean}>({});
+  const [isMuted, setIsMuted] = useState<{[key: string]: boolean}>({});
+  const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
-  const [liveSearchQuery, setLiveSearchQuery] = useState('');
+  const [selectedStream, setSelectedStream] = useState<LiveStream | null>(null);
+  const [showStreamModal, setShowStreamModal] = useState(false);
+  const [showComments, setShowComments] = useState<{[key: string]: boolean}>({});
+  const [newComment, setNewComment] = useState('');
+  const [expandedDescriptions, setExpandedDescriptions] = useState<{[key: string]: boolean}>({});
   
-  // Auto-scroll for trending content
-  const [currentTrending, setCurrentTrending] = useState(0);
-  
+  const containerRef = useRef<HTMLDivElement>(null);
+  const videoRefs = useRef<{[key: string]: HTMLVideoElement}>({});
+
+  // Load more content when approaching the end
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTrending((prev) => (prev + 1) % mockTrendingProfiles.length);
-    }, 5000);
+    if (currentPostIndex >= feedContent.length - 3) {
+      const newContent = generateContent(feedContent.length + 1, 10);
+      setFeedContent(prev => [...prev, ...newContent]);
+    }
+  }, [currentPostIndex, feedContent.length]);
+
+  // Update content based on tab
+  useEffect(() => {
+    if (activeTab === 'foryou') {
+      setFeedContent(generateContent(1, 20));
+    } else if (activeTab === 'following') {
+      setFeedContent(generateContent(1, 15));
+    }
+    setCurrentPostIndex(0);
+  }, [activeTab]);
+
+  // Handle keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (activeTab === 'live') return;
+      
+      if (e.key === 'ArrowDown' || e.key === ' ') {
+        e.preventDefault();
+        scrollToNext();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        scrollToPrevious();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentPostIndex, activeTab]);
+
+  // Handle wheel scrolling
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      if (activeTab === 'live' || isScrolling) return;
+      
+      e.preventDefault();
+      
+      if (e.deltaY > 0) {
+        scrollToNext();
+      } else if (e.deltaY < 0) {
+        scrollToPrevious();
+      }
+    };
+
+    const container = containerRef.current;
+    if (container) {
+      container.addEventListener('wheel', handleWheel, { passive: false });
+      return () => container.removeEventListener('wheel', handleWheel);
+    }
+  }, [currentPostIndex, activeTab, isScrolling]);
+
+  // Handle touch events
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (activeTab === 'live') return;
+    setTouchStartY(e.touches[0].clientY);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (activeTab === 'live' || isScrolling) return;
     
-    return () => clearInterval(timer);
-  }, []);
-  
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('Searching for:', searchQuery);
+    const touchEndY = e.changedTouches[0].clientY;
+    const diff = touchStartY - touchEndY;
+    
+    if (Math.abs(diff) > 50) { // Minimum swipe distance
+      if (diff > 0) {
+        scrollToNext();
+      } else {
+        scrollToPrevious();
+      }
+    }
   };
 
-  const handleLiveSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('Searching live streams for:', liveSearchQuery);
+  const scrollToNext = () => {
+    if (!isScrolling && currentPostIndex < feedContent.length - 1) {
+      setIsScrolling(true);
+      setCurrentPostIndex(prev => prev + 1);
+      setTimeout(() => setIsScrolling(false), 500);
+    }
   };
-  
-  const filteredContent = selectedCategory === 'all' 
-    ? mockFeedContent 
-    : mockFeedContent.filter(content => {
-        // Simple category filtering logic
-        if (selectedCategory === 'voice') return content.profession.includes('Voice');
-        if (selectedCategory === 'film') return content.profession.includes('Cinematographer') || content.profession.includes('Director');
-        if (selectedCategory === 'music') return content.profession.includes('Sound') || content.profession.includes('Music');
-        return true;
-      });
 
-  const renderFeedTab = () => (
-    <div className="space-y-6">
-      {/* Category Filter */}
-      <div className="bg-white rounded-xl p-4 shadow-sm border border-neutral-200">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold text-neutral-800">Explore Categories</h3>
-          <div className="flex items-center">
-            <span className="text-sm text-neutral-600 mr-3">Work Mode</span>
-            <button
-              onClick={() => setWorkMode(!workMode)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                workMode ? 'bg-primary-800' : 'bg-neutral-300'
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  workMode ? 'translate-x-6' : 'translate-x-1'
-                }`}
-              />
-            </button>
-          </div>
-        </div>
-        
-        <div className="flex space-x-3 overflow-x-auto hide-scrollbar">
-          {contentCategories.map((category) => (
-            <button
-              key={category.id}
-              onClick={() => setSelectedCategory(category.id)}
-              className={`flex items-center px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-                selectedCategory === category.id
-                  ? 'bg-primary-800 text-white'
-                  : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
-              }`}
-            >
-              <category.icon size={16} className="mr-2" />
-              {category.label}
-            </button>
-          ))}
+  const scrollToPrevious = () => {
+    if (currentPostIndex > 0 && !isScrolling) {
+      setIsScrolling(true);
+      setCurrentPostIndex(prev => prev - 1);
+      setTimeout(() => setIsScrolling(false), 500);
+    }
+  };
+
+  const toggleVideoPlayback = (postId: string) => {
+    const video = videoRefs.current[postId];
+    if (video) {
+      if (isPlaying[postId]) {
+        video.pause();
+      } else {
+        video.play();
+      }
+      setIsPlaying(prev => ({ ...prev, [postId]: !prev[postId] }));
+    }
+  };
+
+  const toggleVideoMute = (postId: string) => {
+    const video = videoRefs.current[postId];
+    if (video) {
+      video.muted = !video.muted;
+      setIsMuted(prev => ({ ...prev, [postId]: !prev[postId] }));
+    }
+  };
+
+  const toggleMode = () => {
+    setUserMode(userMode === 'work' ? 'fan' : 'work');
+  };
+
+  const openStreamModal = (stream: LiveStream) => {
+    setSelectedStream(stream);
+    setShowStreamModal(true);
+  };
+
+  const closeStreamModal = () => {
+    setShowStreamModal(false);
+    setSelectedStream(null);
+  };
+
+  const toggleComments = (postId: string) => {
+    setShowComments(prev => ({
+      ...prev,
+      [postId]: !prev[postId]
+    }));
+  };
+
+  const handleAddComment = (postId: string) => {
+    if (newComment.trim()) {
+      // In a real app, this would add the comment to the backend
+      console.log('Adding comment:', newComment, 'to post:', postId);
+      setNewComment('');
+    }
+  };
+
+  const toggleDescription = (postId: string) => {
+    setExpandedDescriptions(prev => ({
+      ...prev,
+      [postId]: !prev[postId]
+    }));
+  };
+
+  const truncateText = (text: string, maxLength: number = 80) => {
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '...';
+  };
+
+  const categories = ['All', 'Voice Acting', 'Education', 'Behind the Scenes', 'Just Chatting', 'Film Analysis', 'Game Development', 'Theater', 'Music Production'];
+
+  const filteredStreams = mockLiveStreams.filter(stream => {
+    const matchesCategory = selectedCategory === 'All' || stream.category === selectedCategory;
+    const matchesSearch = searchQuery === '' || 
+      stream.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      stream.streamer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      stream.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    return matchesCategory && matchesSearch;
+  });
+
+  const renderSidebar = () => (
+    <div className="hidden md:flex w-64 bg-black border-r border-neutral-800 flex-col h-screen fixed left-0 top-0 z-40">
+      {/* Logo */}
+      <div className="p-4 border-b border-neutral-800">
+        <div className="flex items-center space-x-2">
+          <img src="/sakutsume-icon.svg" alt="SakuTsume" className="h-8 w-8" />
+          <span className="text-xl font-display font-semibold text-white">SakuTsume</span>
         </div>
       </div>
-      
-      {/* Content Feed */}
-      <div className="space-y-6">
-        {filteredContent.map((content) => (
-          <ContentCard
-            key={content.id}
-            {...content}
-            workMode={workMode}
-          />
-        ))}
+
+      {/* Navigation */}
+      <nav className="flex-1 p-4 space-y-2">
+        <NavLink
+          to="/"
+          className={({ isActive }) =>
+            `flex items-center px-4 py-3 rounded-lg transition-colors ${
+              isActive
+                ? 'bg-white text-black'
+                : 'text-white hover:bg-neutral-800'
+            }`
+          }
+          end
+        >
+          <Home size={20} className="mr-4" />
+          <span className="font-medium">For You</span>
+        </NavLink>
+
+        <NavLink
+          to="/search"
+          className={({ isActive }) =>
+            `flex items-center px-4 py-3 rounded-lg transition-colors ${
+              isActive
+                ? 'bg-white text-black'
+                : 'text-white hover:bg-neutral-800'
+            }`
+          }
+        >
+          <Search size={20} className="mr-4" />
+          <span className="font-medium">Search</span>
+        </NavLink>
+
+        <NavLink
+          to="/create"
+          className={({ isActive }) =>
+            `flex items-center px-4 py-3 rounded-lg transition-colors ${
+              isActive
+                ? 'bg-white text-black'
+                : 'text-white hover:bg-neutral-800'
+            }`
+          }
+        >
+          <PlusSquare size={20} className="mr-4" />
+          <span className="font-medium">Create</span>
+        </NavLink>
+
+        <NavLink
+          to="/profile/me"
+          className={({ isActive }) =>
+            `flex items-center px-4 py-3 rounded-lg transition-colors ${
+              isActive
+                ? 'bg-white text-black'
+                : 'text-white hover:bg-neutral-800'
+            }`
+          }
+        >
+          <User size={20} className="mr-4" />
+          <span className="font-medium">Profile</span>
+        </NavLink>
+
+        <NavLink
+          to="/network"
+          className={({ isActive }) =>
+            `flex items-center px-4 py-3 rounded-lg transition-colors ${
+              isActive
+                ? 'bg-white text-black'
+                : 'text-white hover:bg-neutral-800'
+            }`
+          }
+        >
+          <Users size={20} className="mr-4" />
+          <span className="font-medium">Network</span>
+        </NavLink>
+
+        <NavLink
+          to="/marketplace"
+          className={({ isActive }) =>
+            `flex items-center px-4 py-3 rounded-lg transition-colors ${
+              isActive
+                ? 'bg-white text-black'
+                : 'text-white hover:bg-neutral-800'
+            }`
+          }
+        >
+          <ShoppingBag size={20} className="mr-4" />
+          <span className="font-medium">Market</span>
+        </NavLink>
+      </nav>
+
+      {/* Mode Toggle at Bottom */}
+      <div className="p-4 border-t border-neutral-800">
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={toggleMode}
+            className={`flex-1 flex items-center justify-center px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+              userMode === 'work'
+                ? 'bg-blue-600 text-white'
+                : 'text-white/60 hover:text-white hover:bg-neutral-800'
+            }`}
+          >
+            <Briefcase size={16} className="mr-2" />
+            Work
+          </button>
+          
+          <button
+            onClick={toggleMode}
+            className={`flex-1 flex items-center justify-center px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+              userMode === 'fan'
+                ? 'bg-purple-600 text-white'
+                : 'text-white/60 hover:text-white hover:bg-neutral-800'
+            }`}
+          >
+            <Sparkles size={16} className="mr-2" />
+            Fan
+          </button>
+        </div>
       </div>
     </div>
   );
 
-  const renderLiveTab = () => (
+  const renderTabNavigation = () => (
+    <div className="fixed top-0 left-0 right-0 z-50 md:left-64">
+      <div className="flex items-center justify-center px-4 py-2 h-12 bg-black/80 backdrop-blur-sm md:bg-transparent md:backdrop-blur-none">
+        {/* Mobile: Mode Toggle */}
+        <div className="flex items-center md:hidden absolute left-4">
+          <button
+            onClick={toggleMode}
+            className={`flex items-center px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+              userMode === 'work'
+                ? 'bg-blue-600 text-white'
+                : 'text-white/60'
+            }`}
+          >
+            <Briefcase size={12} className="mr-1" />
+            Work
+          </button>
+          <button
+            onClick={toggleMode}
+            className={`flex items-center px-3 py-1.5 rounded-full text-xs font-medium transition-all ml-1 ${
+              userMode === 'fan'
+                ? 'bg-purple-600 text-white'
+                : 'text-white/60'
+            }`}
+          >
+            <Sparkles size={12} className="mr-1" />
+            Fan
+          </button>
+        </div>
+
+        {/* Tab Navigation */}
+        <div className="flex items-center">
+          {[
+            { id: 'foryou', label: 'For You' },
+            { id: 'following', label: 'Following' },
+            { id: 'live', label: 'Live' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as HomeTab)}
+              className={`px-4 py-1 text-white transition-all ${
+                activeTab === tab.id
+                  ? 'font-bold text-lg'
+                  : 'font-normal text-base text-white/70'
+              }`}
+            >
+              {tab.label}
+              {tab.id === 'live' && (
+                <span className="ml-1 w-1.5 h-1.5 bg-red-500 rounded-full inline-block animate-pulse"></span>
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderCommentSection = (postId: string) => (
+    <AnimatePresence>
+      {showComments[postId] && (
+        <motion.div
+          initial={{ x: '100%' }}
+          animate={{ x: 0 }}
+          exit={{ x: '100%' }}
+          transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+          className="fixed top-0 right-0 w-80 h-full bg-black/95 backdrop-blur-md z-50 flex flex-col border-l border-neutral-800"
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between p-4 border-b border-neutral-800">
+            <h3 className="text-white font-semibold">Comments</h3>
+            <button
+              onClick={() => toggleComments(postId)}
+              className="text-white/60 hover:text-white"
+            >
+              ×
+            </button>
+          </div>
+
+          {/* Comments List */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {mockComments.map((comment) => (
+              <div key={comment.id} className="flex space-x-3">
+                <img
+                  src={comment.user.avatar}
+                  alt={comment.user.name}
+                  className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                />
+                <div className="flex-1">
+                  <div className="flex items-center space-x-2 mb-1">
+                    <span className="text-white font-medium text-sm">{comment.user.name}</span>
+                    {comment.user.verified && (
+                      <CheckCircle size={12} className="text-blue-400" />
+                    )}
+                    <span className="text-white/40 text-xs">{comment.time}</span>
+                  </div>
+                  <p className="text-white/80 text-sm leading-relaxed">{comment.text}</p>
+                  <div className="flex items-center space-x-4 mt-2">
+                    <button className="flex items-center space-x-1 text-white/60 hover:text-white">
+                      <Heart size={12} />
+                      <span className="text-xs">{comment.likes}</span>
+                    </button>
+                    <button className="text-white/60 hover:text-white text-xs">Reply</button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Comment Input */}
+          <div className="p-4 border-t border-neutral-800">
+            <div className="flex space-x-3">
+              <img
+                src="https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=600"
+                alt="You"
+                className="w-8 h-8 rounded-full object-cover"
+              />
+              <div className="flex-1">
+                <input
+                  type="text"
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  placeholder="Add a comment..."
+                  className="w-full bg-transparent text-white placeholder-white/40 border-b border-white/20 focus:border-white/60 outline-none pb-2"
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      handleAddComment(postId);
+                    }
+                  }}
+                />
+                <div className="flex items-center justify-between mt-2">
+                  <div className="flex space-x-3">
+                    <button className="text-white/60 hover:text-white">
+                      <Smile size={16} />
+                    </button>
+                  </div>
+                  <button
+                    onClick={() => handleAddComment(postId)}
+                    disabled={!newComment.trim()}
+                    className={`px-4 py-1 rounded-full text-sm font-medium ${
+                      newComment.trim()
+                        ? 'bg-white text-black'
+                        : 'bg-white/20 text-white/40'
+                    }`}
+                  >
+                    Post
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+
+  const renderReelPost = (content: any, index: number) => (
+    <div 
+      key={content.id}
+      className="w-full bg-black rounded-lg overflow-hidden"
+      style={{ aspectRatio: '9/16', height: 'calc(100vh - 120px)' }}
+    >
+      {/* Background Media */}
+      <div className="relative w-full h-full">
+        {content.media.type === 'video' ? (
+          <video
+            ref={(el) => {
+              if (el) videoRefs.current[content.id] = el;
+            }}
+            src={content.media.url}
+            poster={content.media.thumbnail}
+            className="w-full h-full object-cover"
+            loop
+            muted={isMuted[content.id] !== false}
+            playsInline
+            autoPlay={index === currentPostIndex}
+            onClick={() => toggleVideoPlayback(content.id)}
+          />
+        ) : content.media.type === 'audio' ? (
+          <div className="w-full h-full bg-gradient-to-br from-primary-900 via-secondary-800 to-accent-900 flex items-center justify-center relative">
+            <img
+              src={content.media.thumbnail}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover opacity-30"
+            />
+            <div className="relative z-10 text-center text-white p-8">
+              <div className="w-32 h-32 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6 backdrop-blur-sm">
+                <Headphones size={48} />
+              </div>
+              <h3 className="text-2xl font-bold mb-4">{content.caption.split('.')[0]}</h3>
+              
+              {/* Audio Visualizer */}
+              <div className="flex items-center justify-center space-x-1 mb-6">
+                {[...Array(40)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="w-1 bg-white/60 rounded-full animate-pulse"
+                    style={{
+                      height: `${Math.random() * 40 + 20}px`,
+                      animationDelay: `${i * 0.05}s`,
+                      animationDuration: `${0.5 + Math.random() * 0.5}s`
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <img
+            src={content.media.url}
+            alt=""
+            className="w-full h-full object-cover"
+          />
+        )}
+        
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
+
+        {/* Rising Talent Overlay */}
+        {content.isRisingTalent && userMode === 'work' && (
+          <div className="absolute top-3 left-3 bg-gradient-to-r from-amber-400 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-medium flex items-center shadow-lg">
+            <Star size={12} className="mr-1" />
+            RISING TALENT
+          </div>
+        )}
+        
+        {/* Casting Call Overlay */}
+        {content.isCastingCall && (
+          <div className="absolute top-3 right-3 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium">
+            CASTING CALL
+          </div>
+        )}
+
+        {/* Content Overlay */}
+        <div className="absolute inset-0 flex flex-col justify-between text-white z-10">
+          {/* Bottom Section - Ultra Compact Profile & Actions */}
+          <div className="mt-auto p-2">
+            <div className="flex items-end justify-between">
+              {/* Left - Profile & Caption */}
+              <div className="flex-1 mr-2">
+                {/* Profile Info - Ultra Compact */}
+                <div className="flex items-center mb-1">
+                  <img
+                    src={content.userAvatar}
+                    alt={content.username}
+                    className="w-6 h-6 rounded-full object-cover mr-2"
+                  />
+                  <div className="flex items-center">
+                    <span className="font-semibold text-sm">{content.username}</span>
+                    {/* Plus Follow Button */}
+                    {!content.isFollowing && (
+                      <button className="ml-2 w-4 h-4 bg-white rounded-full flex items-center justify-center">
+                        <Plus size={10} className="text-black" />
+                      </button>
+                    )}
+                    {content.isRisingTalent && userMode === 'work' && (
+                      <Star size={10} className="ml-1 text-amber-400" />
+                    )}
+                  </div>
+                </div>
+                
+                {/* Caption - Compact with View More */}
+                <div className="text-white text-xs leading-relaxed">
+                  {expandedDescriptions[content.id] ? (
+                    <div>
+                      <p>{content.caption}</p>
+                      <button
+                        onClick={() => toggleDescription(content.id)}
+                        className="text-white/60 mt-1"
+                      >
+                        View less
+                      </button>
+                    </div>
+                  ) : (
+                    <div>
+                      <p>{truncateText(content.caption, 60)}</p>
+                      {content.caption.length > 60 && (
+                        <button
+                          onClick={() => toggleDescription(content.id)}
+                          className="text-white/60 mt-1"
+                        >
+                          View more
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+                
+                {userMode === 'work' && content.trustScore && (
+                  <div className="flex items-center bg-black/30 backdrop-blur-sm px-2 py-0.5 rounded-full w-fit mt-1">
+                    <Award size={8} className="text-amber-400 mr-1" />
+                    <span className="text-xs font-medium">{content.trustScore}/5.0</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Right - Action Buttons - Ultra Compact */}
+              <div className="flex flex-col items-center space-y-2">
+                <button className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                  <Heart size={14} className={content.isLiked ? 'text-red-500 fill-current' : 'text-white'} />
+                </button>
+                <span className="text-xs font-medium">{content.likes > 999 ? `${(content.likes/1000).toFixed(1)}K` : content.likes}</span>
+                
+                <button 
+                  onClick={() => toggleComments(content.id)}
+                  className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center"
+                >
+                  <MessageCircle size={14} className="text-white" />
+                </button>
+                <span className="text-xs font-medium">{content.comments}</span>
+                
+                <button className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                  <Bookmark size={14} className={content.isSaved ? 'text-yellow-400 fill-current' : 'text-white'} />
+                </button>
+                
+                <button className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                  <Share2 size={14} className="text-white" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Temporary Play Button on Tap */}
+        {content.media.type === 'video' && isPlaying[content.id] === false && (
+          <motion.div
+            initial={{ opacity: 1, scale: 1 }}
+            animate={{ opacity: 0, scale: 1.2 }}
+            transition={{ duration: 1, delay: 0.5 }}
+            className="absolute inset-0 flex items-center justify-center pointer-events-none"
+          >
+            <div className="w-16 h-16 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center">
+              <Play size={24} className="text-white ml-1" />
+            </div>
+          </motion.div>
+        )}
+      </div>
+
+      {/* Comment Section */}
+      {renderCommentSection(content.id)}
+    </div>
+  );
+
+  const renderStreamModal = () => (
+    <AnimatePresence>
+      {showStreamModal && selectedStream && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
+          onClick={closeStreamModal}
+        >
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.8, opacity: 0 }}
+            className="bg-neutral-900 rounded-xl overflow-hidden max-w-6xl w-full max-h-[90vh] flex"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Main Stream Area */}
+            <div className="flex-1 flex flex-col">
+              {/* Video Player */}
+              <div className="relative bg-black aspect-video">
+                <img
+                  src={selectedStream.thumbnail}
+                  alt={selectedStream.title}
+                  className="w-full h-full object-cover"
+                />
+                
+                {/* Stream Overlay */}
+                <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                  <button className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-colors">
+                    <Play size={32} className="ml-1" />
+                  </button>
+                </div>
+                
+                {/* Live Badge */}
+                <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center">
+                  <span className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></span>
+                  LIVE
+                </div>
+                
+                {/* Viewer Count */}
+                <div className="absolute top-4 right-4 bg-black/70 text-white px-3 py-1 rounded-full text-sm flex items-center">
+                  <Eye size={14} className="mr-1" />
+                  {selectedStream.viewers.toLocaleString()}
+                </div>
+                
+                {/* Controls */}
+                <div className="absolute bottom-4 right-4 flex space-x-2">
+                  <button className="w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white">
+                    <Volume2 size={18} />
+                  </button>
+                  <button className="w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white">
+                    <Settings size={18} />
+                  </button>
+                  <button className="w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white">
+                    <Maximize size={18} />
+                  </button>
+                </div>
+              </div>
+              
+              {/* Stream Info */}
+              <div className="p-6 bg-neutral-800">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex-1">
+                    <h2 className="text-xl font-bold text-white mb-2">{selectedStream.title}</h2>
+                    <div className="flex items-center space-x-4 text-neutral-400 text-sm">
+                      <span>{selectedStream.category}</span>
+                      <span>•</span>
+                      <span>{selectedStream.language}</span>
+                    </div>
+                  </div>
+                  
+                  <button
+                    onClick={closeStreamModal}
+                    className="w-8 h-8 bg-neutral-700 rounded-full flex items-center justify-center text-neutral-400 hover:text-white"
+                  >
+                    ×
+                  </button>
+                </div>
+                
+                {/* Streamer Info */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <img
+                      src={selectedStream.streamer.avatar}
+                      alt={selectedStream.streamer.name}
+                      className="w-12 h-12 rounded-full mr-3"
+                    />
+                    <div>
+                      <div className="flex items-center">
+                        <h3 className="font-semibold text-white">{selectedStream.streamer.name}</h3>
+                        {selectedStream.streamer.verified && (
+                          <Crown size={16} className="ml-2 text-purple-400" />
+                        )}
+                      </div>
+                      <p className="text-neutral-400 text-sm">{selectedStream.streamer.followers.toLocaleString()} followers</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex space-x-2">
+                    <button className="px-4 py-2 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700">
+                      <UserCheck size={16} className="mr-2 inline" />
+                      Follow
+                    </button>
+                    <button className="px-4 py-2 bg-neutral-700 text-white rounded-lg font-medium hover:bg-neutral-600">
+                      <Gift size={16} className="mr-2 inline" />
+                      Subscribe
+                    </button>
+                  </div>
+                </div>
+                
+                {/* Tags */}
+                <div className="flex flex-wrap gap-2 mt-4">
+                  {selectedStream.tags.map((tag, index) => (
+                    <span
+                      key={index}
+                      className="px-3 py-1 bg-neutral-700 text-neutral-300 rounded-full text-sm"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+            
+            {/* Chat Sidebar */}
+            <div className="w-80 bg-neutral-800 flex flex-col">
+              {/* Chat Header */}
+              <div className="p-4 border-b border-neutral-700">
+                <h3 className="font-semibold text-white">Stream Chat</h3>
+                <p className="text-neutral-400 text-sm">{selectedStream.viewers.toLocaleString()} viewers</p>
+              </div>
+              
+              {/* Chat Messages */}
+              <div className="flex-1 p-4 space-y-3 overflow-y-auto">
+                {/* Mock chat messages */}
+                {[
+                  { user: 'VoiceActorFan', message: 'Amazing tips! Thank you!', color: 'text-blue-400' },
+                  { user: 'NewbieDubber', message: 'How do you get such clear audio?', color: 'text-green-400' },
+                  { user: 'ProVA_Mike', message: 'Great technique demonstration 👏', color: 'text-purple-400' },
+                  { user: 'AudioEnthusiast', message: 'This is so helpful for beginners', color: 'text-yellow-400' },
+                  { user: 'GameDevStudio', message: 'We should collaborate!', color: 'text-red-400' },
+                ].map((msg, index) => (
+                  <div key={index} className="text-sm">
+                    <span className={`font-medium ${msg.color}`}>{msg.user}: </span>
+                    <span className="text-neutral-300">{msg.message}</span>
+                  </div>
+                ))}
+              </div>
+              
+              {/* Chat Input */}
+              <div className="p-4 border-t border-neutral-700">
+                <div className="flex space-x-2">
+                  <input
+                    type="text"
+                    placeholder="Say something..."
+                    className="flex-1 px-3 py-2 bg-neutral-700 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  />
+                  <button className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center text-white hover:bg-purple-700">
+                    <Send size={16} />
+                  </button>
+                </div>
+                
+                <div className="flex items-center justify-between mt-2">
+                  <div className="flex space-x-2">
+                    <button className="w-8 h-8 bg-neutral-700 rounded-lg flex items-center justify-center text-neutral-400 hover:text-white">
+                      <Smile size={14} />
+                    </button>
+                    <button className="w-8 h-8 bg-neutral-700 rounded-lg flex items-center justify-center text-neutral-400 hover:text-white">
+                      <Gift size={14} />
+                    </button>
+                  </div>
+                  
+                  <button className="text-xs text-neutral-500 hover:text-neutral-300">
+                    Chat Rules
+                  </button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+
+  const renderLiveFeed = () => (
     <div className="w-full bg-neutral-900 text-white min-h-screen">
-      {/* Live Header with Search */}
+      {/* Header Section */}
       <div className="bg-neutral-800 border-b border-neutral-700 p-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-6">
-            <div className="flex-1 max-w-2xl mx-auto">
-              <form onSubmit={handleLiveSearch}>
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Search live streams, creators, or topics..."
-                    value={liveSearchQuery}
-                    onChange={(e) => setLiveSearchQuery(e.target.value)}
-                    className="w-full py-4 pl-12 pr-4 rounded-full bg-neutral-700 border border-neutral-600 text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-lg"
-                  />
-                  <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-neutral-400">
-                    <Search size={24} />
-                  </div>
-                </div>
-              </form>
+            <div>
+              <h1 className="text-3xl font-bold mb-2">Live Streams</h1>
+              <p className="text-neutral-400">Discover live entertainment content from creators worldwide</p>
             </div>
             
-            <button className="ml-6 px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-full font-medium flex items-center transition-colors">
-              <Radio size={20} className="mr-2" />
-              Go Live
-            </button>
+            <div className="flex items-center space-x-4">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search streams..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-64 px-4 py-2 pl-10 bg-neutral-700 border border-neutral-600 rounded-lg text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+                <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400" />
+              </div>
+              
+              <button className="px-4 py-2 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 flex items-center">
+                <Video size={16} className="mr-2" />
+                Go Live
+              </button>
+            </div>
           </div>
           
-          {/* Quick Categories */}
-          <div className="flex space-x-3 overflow-x-auto hide-scrollbar">
-            {['All', 'Voice Acting', 'Film Making', 'Music Production', 'Art & Design', 'Gaming', 'Education'].map((category) => (
+          {/* Category Filters */}
+          <div className="flex space-x-2 overflow-x-auto pb-2">
+            {categories.map((category) => (
               <button
                 key={category}
-                className="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap bg-neutral-700 hover:bg-neutral-600 text-neutral-200 transition-colors"
+                onClick={() => setSelectedCategory(category)}
+                className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+                  selectedCategory === category
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-neutral-700 text-neutral-300 hover:bg-neutral-600'
+                }`}
               >
                 {category}
               </button>
@@ -316,215 +1314,168 @@ const HomePage: React.FC = () => {
       
       {/* Live Streams Grid */}
       <div className="max-w-7xl mx-auto p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {mockLiveStreams.map((stream) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {filteredStreams.map((stream) => (
             <motion.div
               key={stream.id}
               whileHover={{ scale: 1.02 }}
-              className="bg-neutral-800 rounded-xl overflow-hidden border border-neutral-700 hover:border-neutral-600 transition-colors cursor-pointer"
+              className="bg-neutral-800 rounded-xl overflow-hidden cursor-pointer group"
+              onClick={() => openStreamModal(stream)}
             >
-              <div className="relative">
+              {/* Thumbnail */}
+              <div className="relative aspect-video">
                 <img
                   src={stream.thumbnail}
                   alt={stream.title}
-                  className="w-full h-48 object-cover"
+                  className="w-full h-full object-cover"
                 />
                 
-                {/* Live indicator */}
-                <div className="absolute top-3 left-3 bg-red-600 text-white px-2 py-1 rounded-md text-xs font-bold flex items-center">
-                  <div className="w-2 h-2 bg-white rounded-full mr-1 animate-pulse"></div>
+                {/* Live Badge */}
+                <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-medium flex items-center">
+                  <span className="w-1.5 h-1.5 bg-white rounded-full mr-1 animate-pulse"></span>
                   LIVE
                 </div>
                 
-                {/* Duration */}
-                <div className="absolute top-3 right-3 bg-black/70 text-white px-2 py-1 rounded-md text-xs">
-                  {stream.duration}
+                {/* Viewer Count */}
+                <div className="absolute top-2 right-2 bg-black/70 text-white px-2 py-1 rounded text-xs flex items-center">
+                  <Eye size={12} className="mr-1" />
+                  {stream.viewers.toLocaleString()}
                 </div>
                 
-                {/* Viewer count */}
-                <div className="absolute bottom-3 right-3 bg-black/70 text-white px-2 py-1 rounded-md text-xs flex items-center">
-                  <Eye size={12} className="mr-1" />
-                  {stream.viewers}
+                {/* Duration for non-live content */}
+                <div className="absolute bottom-2 right-2 bg-black/70 text-white px-2 py-1 rounded text-xs">
+                  {Math.floor(Math.random() * 3) + 1}:{String(Math.floor(Math.random() * 60)).padStart(2, '0')}:{String(Math.floor(Math.random() * 60)).padStart(2, '0')}
+                </div>
+                
+                {/* Hover Overlay */}
+                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                    <Play size={20} className="text-white ml-1" />
+                  </div>
                 </div>
               </div>
               
+              {/* Stream Info */}
               <div className="p-4">
+                {/* Streamer Info */}
                 <div className="flex items-center mb-3">
                   <img
-                    src={stream.avatar}
-                    alt={stream.streamer}
-                    className="w-10 h-10 rounded-full mr-3"
+                    src={stream.streamer.avatar}
+                    alt={stream.streamer.name}
+                    className="w-8 h-8 rounded-full mr-2"
                   />
-                  <div>
-                    <h3 className="font-medium text-white">{stream.streamer}</h3>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center">
+                      <span className="font-medium text-white text-sm truncate">
+                        {stream.streamer.name}
+                      </span>
+                      {stream.streamer.verified && (
+                        <Crown size={12} className="ml-1 text-purple-400 flex-shrink-0" />
+                      )}
+                    </div>
                     <span className="text-xs text-neutral-400">{stream.category}</span>
                   </div>
+                  
+                  <button className="p-1 rounded hover:bg-neutral-700 text-neutral-400 hover:text-white">
+                    <MoreHorizontal size={16} />
+                  </button>
                 </div>
                 
-                <h4 className="text-white font-medium mb-2 line-clamp-2">{stream.title}</h4>
+                {/* Title */}
+                <h3 className="font-medium text-white text-sm line-clamp-2 mb-2 leading-tight">
+                  {stream.title}
+                </h3>
                 
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-neutral-400">{stream.viewers} viewers</span>
-                  <button className="px-3 py-1 bg-primary-600 hover:bg-primary-700 text-white rounded-md text-xs font-medium transition-colors">
-                    Watch
-                  </button>
+                {/* Tags */}
+                <div className="flex flex-wrap gap-1 mb-3">
+                  {stream.tags.slice(0, 2).map((tag, index) => (
+                    <span
+                      key={index}
+                      className="px-2 py-1 bg-neutral-700 text-neutral-300 rounded text-xs"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                  {stream.tags.length > 2 && (
+                    <span className="px-2 py-1 bg-neutral-700 text-neutral-300 rounded text-xs">
+                      +{stream.tags.length - 2}
+                    </span>
+                  )}
+                </div>
+                
+                {/* Stats */}
+                <div className="flex items-center justify-between text-xs text-neutral-400">
+                  <span>{stream.viewers.toLocaleString()} viewers</span>
+                  <span>{stream.language}</span>
                 </div>
               </div>
             </motion.div>
           ))}
         </div>
-      </div>
-    </div>
-  );
-
-  const renderDiscoverTab = () => (
-    <div className="space-y-8">
-      {/* Search Section */}
-      <div className="bg-white rounded-xl p-6 shadow-sm border border-neutral-200">
-        <h3 className="text-lg font-semibold mb-4">Discover New Talent</h3>
-        <form onSubmit={handleSearch} className="relative">
-          <input
-            type="text"
-            placeholder="Search for creators, skills, or services..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full py-3 pl-12 pr-4 rounded-full bg-neutral-100 border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          />
-          <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-neutral-500">
-            <Search size={20} />
-          </div>
-        </form>
-      </div>
-      
-      {/* Featured Profiles */}
-      <div>
-        <h3 className="text-xl font-semibold mb-4">Featured Creators</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {mockTrendingProfiles.map((profile) => (
-            <ProfilePreview
-              key={profile.id}
-              {...profile}
-            />
-          ))}
-        </div>
-      </div>
-      
-      {/* Featured Services */}
-      <div>
-        <h3 className="text-xl font-semibold mb-4">Featured Services</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {mockFeaturedServices.map((service) => (
-            <ServiceCard
-              key={service.id}
-              {...service}
-            />
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderTrendingTab = () => (
-    <div className="space-y-8">
-      {/* Trending Header */}
-      <div className="bg-gradient-to-r from-primary-600 to-secondary-500 rounded-xl p-6 text-white">
-        <div className="flex items-center mb-4">
-          <TrendingUp size={24} className="mr-3" />
-          <h2 className="text-2xl font-bold">What's Trending</h2>
-        </div>
-        <p className="text-primary-100">
-          Discover the hottest content and creators in the entertainment industry right now.
-        </p>
-      </div>
-      
-      {/* Trending Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div>
-          <h3 className="text-xl font-semibold mb-4">Trending Creators</h3>
-          <div className="space-y-4">
-            {mockTrendingProfiles.map((profile, index) => (
-              <motion.div
-                key={profile.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <ProfilePreview {...profile} />
-              </motion.div>
-            ))}
-          </div>
-        </div>
         
-        <div>
-          <h3 className="text-xl font-semibold mb-4">Hot Services</h3>
-          <div className="space-y-4">
-            {mockFeaturedServices.map((service, index) => (
-              <motion.div
-                key={service.id}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <ServiceCard {...service} />
-              </motion.div>
-            ))}
+        {filteredStreams.length === 0 && (
+          <div className="text-center py-12">
+            <div className="w-16 h-16 bg-neutral-700 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Video size={24} className="text-neutral-400" />
+            </div>
+            <h3 className="text-lg font-medium text-white mb-2">No streams found</h3>
+            <p className="text-neutral-400">Try adjusting your search or category filters</p>
           </div>
-        </div>
+        )}
       </div>
+      
+      {/* Stream Modal */}
+      {renderStreamModal()}
     </div>
   );
 
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* Navigation Tabs */}
+      {/* Desktop Sidebar */}
+      {renderSidebar()}
+      
+      {/* Tab Navigation */}
+      {renderTabNavigation()}
+      
+      {/* Content Area */}
       <div className="md:ml-64">
-        <div className="pt-12">
-          {activeTab === 'live' ? (
-            renderLiveTab()
-          ) : (
-            <div className="max-w-screen-lg mx-auto px-4 py-6">
-              {/* Tab Navigation */}
-              <div className="bg-white rounded-xl mb-6 shadow-sm border border-neutral-200">
-                <div className="flex">
-                  {[
-                    { id: 'feed', label: 'Feed', icon: Home },
-                    { id: 'live', label: 'Live', icon: Radio },
-                    { id: 'discover', label: 'Discover', icon: Search },
-                    { id: 'trending', label: 'Trending', icon: TrendingUp },
-                  ].map((tab) => (
-                    <button
-                      key={tab.id}
-                      onClick={() => setActiveTab(tab.id as HomeTab)}
-                      className={`flex-1 flex items-center justify-center px-4 py-3 font-medium text-sm transition-colors ${
-                        activeTab === tab.id
-                          ? 'text-primary-800 border-b-2 border-primary-800 bg-primary-50'
-                          : 'text-neutral-600 hover:text-neutral-800 hover:bg-neutral-50'
-                      }`}
-                    >
-                      <tab.icon size={16} className="mr-2" />
-                      {tab.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              
-              {/* Tab Content */}
-              <AnimatePresence mode="wait">
+        {activeTab === 'live' ? (
+          <div className="pt-12">
+            {renderLiveFeed()}
+          </div>
+        ) : (
+          <div className="pt-12 min-h-screen">
+            {/* Main Content Container */}
+            <div className="flex justify-center px-4 py-6">
+              <div 
+                ref={containerRef}
+                className="w-full max-w-sm overflow-hidden"
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd}
+                style={{ height: 'calc(100vh - 120px)' }}
+              >
                 <motion.div
-                  key={activeTab}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.3 }}
+                  animate={{ 
+                    y: `${-currentPostIndex * 100}%` 
+                  }}
+                  transition={{ 
+                    type: "spring", 
+                    stiffness: 300, 
+                    damping: 30,
+                    duration: 0.5
+                  }}
+                  className="h-full"
                 >
-                  {activeTab === 'feed' && renderFeedTab()}
-                  {activeTab === 'discover' && renderDiscoverTab()}
-                  {activeTab === 'trending' && renderTrendingTab()}
+                  {feedContent.map((content, index) => (
+                    <div key={content.id} className="h-full flex-shrink-0">
+                      {renderReelPost(content, index)}
+                    </div>
+                  ))}
                 </motion.div>
-              </AnimatePresence>
+              </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
