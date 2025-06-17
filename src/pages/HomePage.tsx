@@ -120,8 +120,8 @@ const mockLiveStreams = [
   },
 ];
 
-// Mock content for TikTok-style feeds
-const mockForYouContent = [
+// Mock content for For You and Following sections
+const mockContent = [
   {
     id: '1',
     username: 'maya_va',
@@ -185,49 +185,7 @@ const mockForYouContent = [
     isCastingCall: true,
     budget: '$500-1000',
   },
-  {
-    id: '4',
-    username: 'indie_director',
-    userAvatar: 'https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=600',
-    profession: 'Film Director',
-    media: {
-      type: 'image' as const,
-      url: 'https://images.pexels.com/photos/2873486/pexels-photo-2873486.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-    },
-    caption: 'Scouting locations for our next project. This abandoned warehouse has the perfect atmosphere for our thriller! 🎬 #FilmMaking #LocationScouting #Thriller',
-    likes: 543,
-    comments: 42,
-    isLiked: false,
-    isSaved: false,
-    trustScore: 4.6,
-    workMode: true,
-    timestamp: '8 hours ago',
-    isFollowing: false,
-  },
-  {
-    id: '5',
-    username: 'digital_artist_pro',
-    userAvatar: 'https://images.pexels.com/photos/1036623/pexels-photo-1036623.jpeg?auto=compress&cs=tinysrgb&w=600',
-    profession: 'Digital Artist',
-    media: {
-      type: 'video' as const,
-      url: 'https://example.com/art-timelapse.mp4',
-      thumbnail: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-    },
-    caption: 'Time-lapse of creating a fantasy character concept. From sketch to final render in 8 hours! ✨ #DigitalArt #ConceptArt #Fantasy',
-    likes: 1834,
-    comments: 156,
-    isLiked: true,
-    isSaved: true,
-    isRisingTalent: true,
-    trustScore: 4.9,
-    workMode: true,
-    timestamp: '12 hours ago',
-    isFollowing: false,
-  },
 ];
-
-const mockFollowingContent = mockForYouContent.filter(content => content.isFollowing);
 
 type HomeTab = 'for-you' | 'following' | 'live';
 
@@ -296,382 +254,382 @@ const HomePage: React.FC = () => {
         </div>
 
         {/* Tab Content */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-          >
-            {/* For You Tab - TikTok Style */}
-            {activeTab === 'for-you' && (
-              <div className="max-w-md mx-auto space-y-6 py-6">
-                {mockForYouContent.map((content) => (
-                  <ContentCard
-                    key={content.id}
-                    {...content}
-                  />
-                ))}
-              </div>
-            )}
+        <div className="max-w-screen-xl mx-auto px-4 py-6">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              {/* For You Tab */}
+              {activeTab === 'for-you' && (
+                <div className="max-w-md mx-auto space-y-6">
+                  {mockContent.map((content) => (
+                    <ContentCard
+                      key={content.id}
+                      {...content}
+                    />
+                  ))}
+                </div>
+              )}
 
-            {/* Following Tab - TikTok Style */}
-            {activeTab === 'following' && (
-              <div className="max-w-md mx-auto py-6">
-                {mockFollowingContent.length > 0 ? (
-                  <div className="space-y-6">
-                    {mockFollowingContent.map((content) => (
-                      <ContentCard
-                        key={content.id}
-                        {...content}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-12">
-                    <div className="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Users size={24} className="text-neutral-500" />
+              {/* Following Tab */}
+              {activeTab === 'following' && (
+                <div className="max-w-md mx-auto space-y-6">
+                  {mockContent.filter(content => content.isFollowing).map((content) => (
+                    <ContentCard
+                      key={content.id}
+                      {...content}
+                    />
+                  ))}
+                  
+                  {mockContent.filter(content => content.isFollowing).length === 0 && (
+                    <div className="text-center py-12">
+                      <div className="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Users size={24} className="text-neutral-500" />
+                      </div>
+                      <h3 className="text-lg font-medium text-neutral-800 mb-2">No posts yet</h3>
+                      <p className="text-neutral-600">Follow some creators to see their content here!</p>
                     </div>
-                    <h3 className="text-lg font-medium text-neutral-800 mb-2">No posts yet</h3>
-                    <p className="text-neutral-600">Follow some creators to see their content here!</p>
-                  </div>
-                )}
-              </div>
-            )}
+                  )}
+                </div>
+              )}
 
-            {/* Live Tab - Twitch Style */}
-            {activeTab === 'live' && (
-              <div className="max-w-screen-xl mx-auto px-4 py-6 space-y-6">
-                {/* Search and Filters */}
-                <div className="bg-white rounded-xl p-4 shadow-sm border border-neutral-200">
-                  <div className="flex items-center space-x-4 mb-4">
-                    <div className="flex-1 relative">
-                      <input
-                        type="text"
-                        placeholder="Search live streams..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full py-2 pl-10 pr-4 rounded-lg bg-neutral-100 border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      />
-                      <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-500" />
-                    </div>
-                    
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
-                        className="p-2 rounded-lg bg-neutral-100 text-neutral-600 hover:bg-neutral-200"
-                      >
-                        {viewMode === 'grid' ? <List size={18} /> : <Grid3X3 size={18} />}
-                      </button>
+              {/* Live Tab - Twitch-style */}
+              {activeTab === 'live' && (
+                <div className="space-y-6">
+                  {/* Search and Filters */}
+                  <div className="bg-white rounded-xl p-4 shadow-sm border border-neutral-200">
+                    <div className="flex items-center space-x-4 mb-4">
+                      <div className="flex-1 relative">
+                        <input
+                          type="text"
+                          placeholder="Search live streams..."
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className="w-full py-2 pl-10 pr-4 rounded-lg bg-neutral-100 border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        />
+                        <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-500" />
+                      </div>
                       
-                      <button
-                        onClick={() => setShowFilters(!showFilters)}
-                        className={`p-2 rounded-lg ${showFilters ? 'bg-primary-100 text-primary-800' : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'}`}
-                      >
-                        <Filter size={18} />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Advanced Filters */}
-                  {showFilters && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="border-t border-neutral-200 pt-4"
-                    >
-                      <div className="flex flex-wrap gap-2">
-                        <button className="px-3 py-1.5 bg-neutral-100 text-neutral-700 rounded-full text-sm hover:bg-neutral-200">
-                          English
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
+                          className="p-2 rounded-lg bg-neutral-100 text-neutral-600 hover:bg-neutral-200"
+                        >
+                          {viewMode === 'grid' ? <List size={18} /> : <Grid3X3 size={18} />}
                         </button>
-                        <button className="px-3 py-1.5 bg-neutral-100 text-neutral-700 rounded-full text-sm hover:bg-neutral-200">
-                          Recommended
-                        </button>
-                        <button className="px-3 py-1.5 bg-neutral-100 text-neutral-700 rounded-full text-sm hover:bg-neutral-200">
-                          New Streamers
-                        </button>
-                        <button className="px-3 py-1.5 bg-neutral-100 text-neutral-700 rounded-full text-sm hover:bg-neutral-200">
-                          Interactive
+                        
+                        <button
+                          onClick={() => setShowFilters(!showFilters)}
+                          className={`p-2 rounded-lg ${showFilters ? 'bg-primary-100 text-primary-800' : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'}`}
+                        >
+                          <Filter size={18} />
                         </button>
                       </div>
-                    </motion.div>
-                  )}
-                </div>
+                    </div>
 
-                {/* Categories */}
-                <div className="bg-white rounded-xl p-6 shadow-sm border border-neutral-200">
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-semibold text-neutral-800">Browse Categories</h2>
-                    <button className="text-primary-600 hover:text-primary-700 font-medium flex items-center">
-                      View All
-                      <ChevronRight size={16} className="ml-1" />
-                    </button>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
-                    {mockCategories.map((category) => (
-                      <motion.button
-                        key={category.id}
-                        onClick={() => setSelectedCategory(selectedCategory === category.name ? null : category.name)}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        className={`relative overflow-hidden rounded-lg aspect-[4/5] ${
-                          selectedCategory === category.name ? 'ring-2 ring-primary-500' : ''
-                        }`}
+                    {/* Advanced Filters */}
+                    {showFilters && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="border-t border-neutral-200 pt-4"
                       >
-                        <div className={`absolute inset-0 bg-gradient-to-br ${category.color} opacity-90`}></div>
-                        <div className="relative h-full flex flex-col items-center justify-center text-white p-3">
-                          <category.icon size={24} className="mb-2" />
-                          <h3 className="font-medium text-sm text-center">{category.name}</h3>
-                          <p className="text-xs opacity-90 mt-1">{category.viewers} viewers</p>
+                        <div className="flex flex-wrap gap-2">
+                          <button className="px-3 py-1.5 bg-neutral-100 text-neutral-700 rounded-full text-sm hover:bg-neutral-200">
+                            English
+                          </button>
+                          <button className="px-3 py-1.5 bg-neutral-100 text-neutral-700 rounded-full text-sm hover:bg-neutral-200">
+                            Recommended
+                          </button>
+                          <button className="px-3 py-1.5 bg-neutral-100 text-neutral-700 rounded-full text-sm hover:bg-neutral-200">
+                            New Streamers
+                          </button>
+                          <button className="px-3 py-1.5 bg-neutral-100 text-neutral-700 rounded-full text-sm hover:bg-neutral-200">
+                            Interactive
+                          </button>
                         </div>
-                      </motion.button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Featured Streams */}
-                {featuredStreams.length > 0 && (
-                  <div className="bg-white rounded-xl p-6 shadow-sm border border-neutral-200">
-                    <div className="flex items-center mb-4">
-                      <Crown size={20} className="text-amber-500 mr-2" />
-                      <h2 className="text-xl font-semibold text-neutral-800">Featured Streams</h2>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                      {featuredStreams.map((stream) => (
-                        <motion.div
-                          key={stream.id}
-                          whileHover={{ scale: 1.02 }}
-                          className="relative group cursor-pointer"
-                        >
-                          <div className="relative aspect-video rounded-lg overflow-hidden">
-                            <img
-                              src={stream.thumbnail}
-                              alt={stream.title}
-                              className="w-full h-full object-cover"
-                            />
-                            
-                            {/* Live indicator */}
-                            <div className="absolute top-3 left-3 bg-red-500 text-white px-2 py-1 rounded text-xs font-medium flex items-center">
-                              <span className="w-2 h-2 bg-white rounded-full mr-1 animate-pulse"></span>
-                              LIVE
-                            </div>
-                            
-                            {/* Viewer count */}
-                            <div className="absolute top-3 right-3 bg-black/70 text-white px-2 py-1 rounded text-xs flex items-center">
-                              <Eye size={12} className="mr-1" />
-                              {formatViewers(stream.viewers)}
-                            </div>
-                            
-                            {/* Duration */}
-                            <div className="absolute bottom-3 right-3 bg-black/70 text-white px-2 py-1 rounded text-xs">
-                              {stream.duration}
-                            </div>
-                            
-                            {/* Play overlay */}
-                            <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                              <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center">
-                                <Play size={24} className="text-neutral-800 ml-1" />
-                              </div>
-                            </div>
-                          </div>
-                          
-                          <div className="mt-3">
-                            <h3 className="font-medium text-neutral-800 line-clamp-2 mb-1">
-                              {stream.title}
-                            </h3>
-                            
-                            <div className="flex items-center mb-2">
-                              <img
-                                src={stream.streamer.avatar}
-                                alt={stream.streamer.name}
-                                className="w-6 h-6 rounded-full mr-2"
-                              />
-                              <span className="text-sm text-neutral-600 mr-2">{stream.streamer.name}</span>
-                              {stream.streamer.verified && (
-                                <Star size={14} className="text-purple-500 mr-1" fill="currentColor" />
-                              )}
-                              {stream.streamer.partner && (
-                                <Crown size={14} className="text-amber-500" />
-                              )}
-                            </div>
-                            
-                            <div className="flex items-center justify-between">
-                              <span className="text-sm text-primary-600 font-medium">{stream.category}</span>
-                              <div className="flex flex-wrap gap-1">
-                                {stream.tags.slice(0, 2).map((tag, index) => (
-                                  <span key={index} className="px-2 py-0.5 bg-neutral-100 text-neutral-600 text-xs rounded">
-                                    {tag}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Top Live Streams */}
-                <div className="bg-white rounded-xl p-6 shadow-sm border border-neutral-200">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center">
-                      <TrendingUp size={20} className="text-red-500 mr-2" />
-                      <h2 className="text-xl font-semibold text-neutral-800">
-                        {selectedCategory ? `${selectedCategory} Streams` : 'Top Live Streams Today'}
-                      </h2>
-                    </div>
-                    
-                    {selectedCategory && (
-                      <button
-                        onClick={() => setSelectedCategory(null)}
-                        className="text-neutral-600 hover:text-neutral-800 flex items-center"
-                      >
-                        <X size={16} className="mr-1" />
-                        Clear Filter
-                      </button>
+                      </motion.div>
                     )}
                   </div>
-                  
-                  {viewMode === 'grid' ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                      {topStreams.map((stream) => (
-                        <motion.div
-                          key={stream.id}
+
+                  {/* Categories */}
+                  <div className="bg-white rounded-xl p-6 shadow-sm border border-neutral-200">
+                    <div className="flex items-center justify-between mb-4">
+                      <h2 className="text-xl font-semibold text-neutral-800">Browse Categories</h2>
+                      <button className="text-primary-600 hover:text-primary-700 font-medium flex items-center">
+                        View All
+                        <ChevronRight size={16} className="ml-1" />
+                      </button>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+                      {mockCategories.map((category) => (
+                        <motion.button
+                          key={category.id}
+                          onClick={() => setSelectedCategory(selectedCategory === category.name ? null : category.name)}
                           whileHover={{ scale: 1.02 }}
-                          className="group cursor-pointer"
+                          whileTap={{ scale: 0.98 }}
+                          className={`relative overflow-hidden rounded-lg aspect-[4/5] ${
+                            selectedCategory === category.name ? 'ring-2 ring-primary-500' : ''
+                          }`}
                         >
-                          <div className="relative aspect-video rounded-lg overflow-hidden mb-3">
-                            <img
-                              src={stream.thumbnail}
-                              alt={stream.title}
-                              className="w-full h-full object-cover"
-                            />
-                            
-                            <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-0.5 rounded text-xs font-medium flex items-center">
-                              <span className="w-1.5 h-1.5 bg-white rounded-full mr-1 animate-pulse"></span>
-                              LIVE
-                            </div>
-                            
-                            <div className="absolute top-2 right-2 bg-black/70 text-white px-2 py-0.5 rounded text-xs flex items-center">
-                              <Eye size={10} className="mr-1" />
-                              {formatViewers(stream.viewers)}
-                            </div>
-                            
-                            <div className="absolute bottom-2 right-2 bg-black/70 text-white px-2 py-0.5 rounded text-xs">
-                              {stream.duration}
-                            </div>
-                            
-                            <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                              <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center">
-                                <Play size={16} className="text-neutral-800 ml-0.5" />
-                              </div>
-                            </div>
+                          <div className={`absolute inset-0 bg-gradient-to-br ${category.color} opacity-90`}></div>
+                          <div className="relative h-full flex flex-col items-center justify-center text-white p-3">
+                            <category.icon size={24} className="mb-2" />
+                            <h3 className="font-medium text-sm text-center">{category.name}</h3>
+                            <p className="text-xs opacity-90 mt-1">{category.viewers} viewers</p>
                           </div>
-                          
-                          <div>
-                            <h3 className="font-medium text-sm text-neutral-800 line-clamp-2 mb-1">
-                              {stream.title}
-                            </h3>
-                            
-                            <div className="flex items-center mb-1">
-                              <img
-                                src={stream.streamer.avatar}
-                                alt={stream.streamer.name}
-                                className="w-4 h-4 rounded-full mr-1"
-                              />
-                              <span className="text-xs text-neutral-600 mr-1">{stream.streamer.name}</span>
-                              {stream.streamer.verified && (
-                                <Star size={10} className="text-purple-500" fill="currentColor" />
-                              )}
-                            </div>
-                            
-                            <div className="flex items-center justify-between">
-                              <span className="text-xs text-primary-600">{stream.category}</span>
-                              <div className="flex gap-1">
-                                {stream.tags.slice(0, 1).map((tag, index) => (
-                                  <span key={index} className="px-1.5 py-0.5 bg-neutral-100 text-neutral-600 text-xs rounded">
-                                    {tag}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        </motion.div>
+                        </motion.button>
                       ))}
                     </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {topStreams.map((stream, index) => (
-                        <motion.div
-                          key={stream.id}
-                          whileHover={{ backgroundColor: '#f9fafb' }}
-                          className="flex items-center p-3 rounded-lg cursor-pointer"
-                        >
-                          <div className="flex items-center justify-center w-8 h-8 bg-neutral-100 rounded text-sm font-medium text-neutral-600 mr-3">
-                            {index + 1}
-                          </div>
-                          
-                          <div className="relative w-20 h-12 rounded overflow-hidden mr-3">
-                            <img
-                              src={stream.thumbnail}
-                              alt={stream.title}
-                              className="w-full h-full object-cover"
-                            />
-                            <div className="absolute top-1 left-1 bg-red-500 text-white px-1 py-0.5 rounded text-xs font-medium">
-                              LIVE
-                            </div>
-                          </div>
-                          
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-medium text-neutral-800 truncate">{stream.title}</h3>
-                            <div className="flex items-center text-sm text-neutral-600">
+                  </div>
+
+                  {/* Featured Streams */}
+                  {featuredStreams.length > 0 && (
+                    <div className="bg-white rounded-xl p-6 shadow-sm border border-neutral-200">
+                      <div className="flex items-center mb-4">
+                        <Crown size={20} className="text-amber-500 mr-2" />
+                        <h2 className="text-xl font-semibold text-neutral-800">Featured Streams</h2>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        {featuredStreams.map((stream) => (
+                          <motion.div
+                            key={stream.id}
+                            whileHover={{ scale: 1.02 }}
+                            className="relative group cursor-pointer"
+                          >
+                            <div className="relative aspect-video rounded-lg overflow-hidden">
                               <img
-                                src={stream.streamer.avatar}
-                                alt={stream.streamer.name}
-                                className="w-4 h-4 rounded-full mr-1"
+                                src={stream.thumbnail}
+                                alt={stream.title}
+                                className="w-full h-full object-cover"
                               />
-                              <span className="mr-2">{stream.streamer.name}</span>
-                              <span className="mr-2">•</span>
-                              <span className="text-primary-600">{stream.category}</span>
+                              
+                              {/* Live indicator */}
+                              <div className="absolute top-3 left-3 bg-red-500 text-white px-2 py-1 rounded text-xs font-medium flex items-center">
+                                <span className="w-2 h-2 bg-white rounded-full mr-1 animate-pulse"></span>
+                                LIVE
+                              </div>
+                              
+                              {/* Viewer count */}
+                              <div className="absolute top-3 right-3 bg-black/70 text-white px-2 py-1 rounded text-xs flex items-center">
+                                <Eye size={12} className="mr-1" />
+                                {formatViewers(stream.viewers)}
+                              </div>
+                              
+                              {/* Duration */}
+                              <div className="absolute bottom-3 right-3 bg-black/70 text-white px-2 py-1 rounded text-xs">
+                                {stream.duration}
+                              </div>
+                              
+                              {/* Play overlay */}
+                              <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center">
+                                  <Play size={24} className="text-neutral-800 ml-1" />
+                                </div>
+                              </div>
                             </div>
-                          </div>
-                          
-                          <div className="flex items-center text-sm text-neutral-600">
-                            <Eye size={14} className="mr-1" />
-                            {formatViewers(stream.viewers)}
-                          </div>
-                        </motion.div>
-                      ))}
+                            
+                            <div className="mt-3">
+                              <h3 className="font-medium text-neutral-800 line-clamp-2 mb-1">
+                                {stream.title}
+                              </h3>
+                              
+                              <div className="flex items-center mb-2">
+                                <img
+                                  src={stream.streamer.avatar}
+                                  alt={stream.streamer.name}
+                                  className="w-6 h-6 rounded-full mr-2"
+                                />
+                                <span className="text-sm text-neutral-600 mr-2">{stream.streamer.name}</span>
+                                {stream.streamer.verified && (
+                                  <Star size={14} className="text-purple-500 mr-1" fill="currentColor" />
+                                )}
+                                {stream.streamer.partner && (
+                                  <Crown size={14} className="text-amber-500" />
+                                )}
+                              </div>
+                              
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm text-primary-600 font-medium">{stream.category}</span>
+                                <div className="flex flex-wrap gap-1">
+                                  {stream.tags.slice(0, 2).map((tag, index) => (
+                                    <span key={index} className="px-2 py-0.5 bg-neutral-100 text-neutral-600 text-xs rounded">
+                                      {tag}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Top Live Streams */}
+                  <div className="bg-white rounded-xl p-6 shadow-sm border border-neutral-200">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center">
+                        <TrendingUp size={20} className="text-red-500 mr-2" />
+                        <h2 className="text-xl font-semibold text-neutral-800">
+                          {selectedCategory ? `${selectedCategory} Streams` : 'Top Live Streams Today'}
+                        </h2>
+                      </div>
+                      
+                      {selectedCategory && (
+                        <button
+                          onClick={() => setSelectedCategory(null)}
+                          className="text-neutral-600 hover:text-neutral-800 flex items-center"
+                        >
+                          <X size={16} className="mr-1" />
+                          Clear Filter
+                        </button>
+                      )}
+                    </div>
+                    
+                    {viewMode === 'grid' ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        {topStreams.map((stream) => (
+                          <motion.div
+                            key={stream.id}
+                            whileHover={{ scale: 1.02 }}
+                            className="group cursor-pointer"
+                          >
+                            <div className="relative aspect-video rounded-lg overflow-hidden mb-3">
+                              <img
+                                src={stream.thumbnail}
+                                alt={stream.title}
+                                className="w-full h-full object-cover"
+                              />
+                              
+                              <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-0.5 rounded text-xs font-medium flex items-center">
+                                <span className="w-1.5 h-1.5 bg-white rounded-full mr-1 animate-pulse"></span>
+                                LIVE
+                              </div>
+                              
+                              <div className="absolute top-2 right-2 bg-black/70 text-white px-2 py-0.5 rounded text-xs flex items-center">
+                                <Eye size={10} className="mr-1" />
+                                {formatViewers(stream.viewers)}
+                              </div>
+                              
+                              <div className="absolute bottom-2 right-2 bg-black/70 text-white px-2 py-0.5 rounded text-xs">
+                                {stream.duration}
+                              </div>
+                              
+                              <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center">
+                                  <Play size={16} className="text-neutral-800 ml-0.5" />
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div>
+                              <h3 className="font-medium text-sm text-neutral-800 line-clamp-2 mb-1">
+                                {stream.title}
+                              </h3>
+                              
+                              <div className="flex items-center mb-1">
+                                <img
+                                  src={stream.streamer.avatar}
+                                  alt={stream.streamer.name}
+                                  className="w-4 h-4 rounded-full mr-1"
+                                />
+                                <span className="text-xs text-neutral-600 mr-1">{stream.streamer.name}</span>
+                                {stream.streamer.verified && (
+                                  <Star size={10} className="text-purple-500" fill="currentColor" />
+                                )}
+                              </div>
+                              
+                              <div className="flex items-center justify-between">
+                                <span className="text-xs text-primary-600">{stream.category}</span>
+                                <div className="flex gap-1">
+                                  {stream.tags.slice(0, 1).map((tag, index) => (
+                                    <span key={index} className="px-1.5 py-0.5 bg-neutral-100 text-neutral-600 text-xs rounded">
+                                      {tag}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {topStreams.map((stream, index) => (
+                          <motion.div
+                            key={stream.id}
+                            whileHover={{ backgroundColor: '#f9fafb' }}
+                            className="flex items-center p-3 rounded-lg cursor-pointer"
+                          >
+                            <div className="flex items-center justify-center w-8 h-8 bg-neutral-100 rounded text-sm font-medium text-neutral-600 mr-3">
+                              {index + 1}
+                            </div>
+                            
+                            <div className="relative w-20 h-12 rounded overflow-hidden mr-3">
+                              <img
+                                src={stream.thumbnail}
+                                alt={stream.title}
+                                className="w-full h-full object-cover"
+                              />
+                              <div className="absolute top-1 left-1 bg-red-500 text-white px-1 py-0.5 rounded text-xs font-medium">
+                                LIVE
+                              </div>
+                            </div>
+                            
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-medium text-neutral-800 truncate">{stream.title}</h3>
+                              <div className="flex items-center text-sm text-neutral-600">
+                                <img
+                                  src={stream.streamer.avatar}
+                                  alt={stream.streamer.name}
+                                  className="w-4 h-4 rounded-full mr-1"
+                                />
+                                <span className="mr-2">{stream.streamer.name}</span>
+                                <span className="mr-2">•</span>
+                                <span className="text-primary-600">{stream.category}</span>
+                              </div>
+                            </div>
+                            
+                            <div className="flex items-center text-sm text-neutral-600">
+                              <Eye size={14} className="mr-1" />
+                              {formatViewers(stream.viewers)}
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* No results */}
+                  {filteredStreams.length === 0 && (
+                    <div className="bg-white rounded-xl p-12 text-center shadow-sm border border-neutral-200">
+                      <div className="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Radio size={24} className="text-neutral-500" />
+                      </div>
+                      <h3 className="text-lg font-medium text-neutral-800 mb-2">No live streams found</h3>
+                      <p className="text-neutral-600">
+                        {searchQuery 
+                          ? `No streams match "${searchQuery}". Try a different search term.`
+                          : selectedCategory
+                          ? `No live streams in ${selectedCategory} right now.`
+                          : 'No live streams available at the moment.'
+                        }
+                      </p>
                     </div>
                   )}
                 </div>
-
-                {/* No results */}
-                {filteredStreams.length === 0 && (
-                  <div className="bg-white rounded-xl p-12 text-center shadow-sm border border-neutral-200">
-                    <div className="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Radio size={24} className="text-neutral-500" />
-                    </div>
-                    <h3 className="text-lg font-medium text-neutral-800 mb-2">No live streams found</h3>
-                    <p className="text-neutral-600">
-                      {searchQuery 
-                        ? `No streams match "${searchQuery}". Try a different search term.`
-                        : selectedCategory
-                        ? `No live streams in ${selectedCategory} right now.`
-                        : 'No live streams available at the moment.'
-                      }
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
-          </motion.div>
-        </AnimatePresence>
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
     </div>
   );
