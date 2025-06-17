@@ -7,7 +7,8 @@ import {
   ChevronDown, ChevronUp, Edit3, Crown, Zap, Clock, 
   Award, CheckCircle, Globe, Camera, Video, Mic, PenTool,
   ShoppingBag, Package, DollarSign, ArrowRight, Filter,
-  MoreHorizontal, Eye, ThumbsUp, MessageSquare
+  MoreHorizontal, Eye, ThumbsUp, MessageSquare, Users,
+  Settings, Share
 } from 'lucide-react';
 
 // Mock profile data with enhanced structure
@@ -17,6 +18,13 @@ const mockProfile = {
   profession: 'Voice Actor',
   avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=600',
   coverImage: 'https://images.pexels.com/photos/3783471/pexels-photo-3783471.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+  
+  // Profile stats
+  stats: {
+    followers: 2847,
+    following: 156,
+    posts: 42
+  },
   
   // Status and tags
   status: {
@@ -189,6 +197,9 @@ const ProfilePage: React.FC = () => {
   
   const videoRef = useRef<HTMLVideoElement>(null);
   
+  // Check if this is the user's own profile
+  const isOwnProfile = id === 'me';
+  
   // Auto-advance spotlight carousel
   useEffect(() => {
     const timer = setInterval(() => {
@@ -215,6 +226,15 @@ const ProfilePage: React.FC = () => {
       videoRef.current.muted = !isMuted;
       setIsMuted(!isMuted);
     }
+  };
+  
+  const formatNumber = (num: number) => {
+    if (num >= 1000000) {
+      return (num / 1000000).toFixed(1) + 'M';
+    } else if (num >= 1000) {
+      return (num / 1000).toFixed(1) + 'K';
+    }
+    return num.toString();
   };
   
   const allContent = [...profile.topThree, ...profile.allContent];
@@ -266,29 +286,70 @@ const ProfilePage: React.FC = () => {
               </div>
             </div>
             
-            {/* Right: Trust Score + Actions */}
+            {/* Right: Trust Score + Actions/Stats */}
             <div className="flex items-center space-x-3">
               <div className="flex items-center bg-amber-50 px-3 py-1.5 rounded-full">
                 <Star size={16} fill="#F59E0B" className="text-amber-500 mr-1" />
                 <span className="font-semibold text-amber-800">{profile.trustScore}</span>
               </div>
               
-              <button 
-                onClick={() => setIsFollowing(!isFollowing)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center ${
-                  isFollowing 
-                    ? 'bg-white text-primary-800 border border-primary-800' 
-                    : 'bg-primary-800 text-white'
-                }`}
-              >
-                <UserPlus size={16} className="mr-1" />
-                {isFollowing ? 'Following' : 'Follow'}
-              </button>
-              
-              <button className="px-4 py-2 rounded-lg text-sm font-medium bg-white border border-neutral-300 text-neutral-700 flex items-center">
-                <MessageCircle size={16} className="mr-1" />
-                Message
-              </button>
+              {isOwnProfile ? (
+                // Own Profile: Show Stats + Settings
+                <div className="flex items-center space-x-4">
+                  {/* Stats */}
+                  <div className="flex items-center space-x-4 text-sm">
+                    <div className="text-center">
+                      <div className="font-bold text-neutral-800">{formatNumber(profile.stats.posts)}</div>
+                      <div className="text-neutral-600">Posts</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="font-bold text-neutral-800">{formatNumber(profile.stats.followers)}</div>
+                      <div className="text-neutral-600">Followers</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="font-bold text-neutral-800">{formatNumber(profile.stats.following)}</div>
+                      <div className="text-neutral-600">Following</div>
+                    </div>
+                  </div>
+                  
+                  {/* Action Buttons */}
+                  <div className="flex items-center space-x-2">
+                    <button className="px-4 py-2 rounded-lg text-sm font-medium bg-primary-800 text-white flex items-center">
+                      <Edit3 size={16} className="mr-1" />
+                      Edit Profile
+                    </button>
+                    
+                    <button className="px-4 py-2 rounded-lg text-sm font-medium bg-white border border-neutral-300 text-neutral-700 flex items-center">
+                      <Share size={16} className="mr-1" />
+                      Share
+                    </button>
+                    
+                    <button className="p-2 rounded-lg bg-white border border-neutral-300 text-neutral-700">
+                      <Settings size={16} />
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                // Other's Profile: Show Follow/Message buttons
+                <div className="flex items-center space-x-3">
+                  <button 
+                    onClick={() => setIsFollowing(!isFollowing)}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center ${
+                      isFollowing 
+                        ? 'bg-white text-primary-800 border border-primary-800' 
+                        : 'bg-primary-800 text-white'
+                    }`}
+                  >
+                    <UserPlus size={16} className="mr-1" />
+                    {isFollowing ? 'Following' : 'Follow'}
+                  </button>
+                  
+                  <button className="px-4 py-2 rounded-lg text-sm font-medium bg-white border border-neutral-300 text-neutral-700 flex items-center">
+                    <MessageCircle size={16} className="mr-1" />
+                    Message
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -299,7 +360,7 @@ const ProfilePage: React.FC = () => {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold text-neutral-800">Top 3 Spotlight</h2>
-            {canEditTopThree && id === 'me' && (
+            {canEditTopThree && isOwnProfile && (
               <button className="flex items-center px-3 py-1.5 bg-primary-100 text-primary-800 rounded-lg text-sm font-medium">
                 <Edit3 size={14} className="mr-1" />
                 Edit Top 3
