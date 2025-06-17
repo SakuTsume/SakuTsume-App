@@ -182,42 +182,100 @@ const mockAuditionAlerts = [
   }
 ];
 
-const mockFollowingContent = [
+// Mock following content that looks like reels
+const mockFollowingReels = [
   {
     id: 'follow1',
-    type: 'reel',
     username: 'maya_va',
     userAvatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=600',
     profession: 'Voice Actor',
-    content: 'New RPG Villain Reel',
-    thumbnail: 'https://images.pexels.com/photos/7991579/pexels-photo-7991579.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    isVerified: true,
+    isRisingTalent: true,
+    trustScore: 4.8,
+    video: {
+      url: 'https://example.com/maya-rpg-villain.mp4',
+      thumbnail: 'https://images.pexels.com/photos/7991579/pexels-photo-7991579.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      duration: '1:30'
+    },
+    caption: 'New RPG Villain Reel - bringing darkness to life 🖤 #RPG #VillainVoice #VoiceActing',
+    music: {
+      title: 'Dark Fantasy',
+      artist: 'maya_va'
+    },
     likes: 142,
     comments: 12,
-    duration: '1:30',
-    timestamp: '2h ago'
+    shares: 8,
+    bookmarks: 23,
+    isLiked: false,
+    isBookmarked: false,
+    isFollowing: true,
+    timestamp: '2h ago',
+    contentType: 'reel'
   },
   {
     id: 'follow2',
-    type: 'casting',
     username: 'StudioX',
     userAvatar: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=600',
     profession: 'Animation Studio',
-    content: 'Cyberpunk Detective Casting Call',
-    budget: '$3,000',
-    deadline: '5 days left',
-    applicants: 34,
-    timestamp: '4h ago'
+    isVerified: true,
+    isRisingTalent: false,
+    trustScore: 4.9,
+    video: {
+      url: 'https://example.com/casting-call-preview.mp4',
+      thumbnail: 'https://images.pexels.com/photos/3062541/pexels-photo-3062541.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      duration: '0:45'
+    },
+    caption: 'Cyberpunk Detective Casting Call - Apply now! 🕵️‍♂️ #CastingCall #CyberpunkDetective #VoiceActing',
+    music: {
+      title: 'Cyberpunk Vibes',
+      artist: 'StudioX'
+    },
+    likes: 89,
+    comments: 34,
+    shares: 15,
+    bookmarks: 67,
+    isLiked: true,
+    isBookmarked: true,
+    isFollowing: true,
+    timestamp: '4h ago',
+    contentType: 'casting',
+    castingInfo: {
+      budget: '$3,000',
+      deadline: '5 days left',
+      applicants: 34
+    }
   },
   {
     id: 'follow3',
-    type: 'live',
     username: 'tom_sound',
     userAvatar: 'https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&cs=tinysrgb&w=600',
     profession: 'Sound Designer',
-    content: 'Live Studio Session',
-    viewers: 42,
-    isLive: true,
-    timestamp: 'Live now'
+    isVerified: false,
+    isRisingTalent: false,
+    trustScore: 4.5,
+    video: {
+      url: 'https://example.com/live-studio-session.mp4',
+      thumbnail: 'https://images.pexels.com/photos/4195504/pexels-photo-4195504.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      duration: 'LIVE'
+    },
+    caption: 'Live Studio Session - Creating sound effects for horror game 🎧 #LiveSession #SoundDesign #Horror',
+    music: {
+      title: 'Live Audio',
+      artist: 'tom_sound'
+    },
+    likes: 67,
+    comments: 23,
+    shares: 5,
+    bookmarks: 12,
+    isLiked: false,
+    isBookmarked: false,
+    isFollowing: true,
+    timestamp: 'Live now',
+    contentType: 'live',
+    liveInfo: {
+      viewers: 42,
+      isLive: true
+    }
   }
 ];
 
@@ -244,6 +302,59 @@ const mockCommercialAds = [
   }
 ];
 
+// Mock live streams data
+const mockLiveStreams = [
+  {
+    id: 'stream1',
+    streamer: 'Maya Voice Studio',
+    title: 'Live Voice Acting Session - Horror Characters',
+    viewers: 1234,
+    category: 'Voice Acting',
+    thumbnail: 'https://images.pexels.com/photos/7991579/pexels-photo-7991579.jpeg?auto=compress&cs=tinysrgb&w=400',
+    avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100',
+    language: 'English',
+    isLive: true
+  },
+  {
+    id: 'stream2',
+    streamer: 'StudioX Productions',
+    title: 'Voice Directing 101 - Workshop',
+    viewers: 842,
+    category: 'Workshops',
+    thumbnail: 'https://images.pexels.com/photos/3062541/pexels-photo-3062541.jpeg?auto=compress&cs=tinysrgb&w=400',
+    avatar: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=100',
+    language: 'Japanese',
+    isLive: true
+  },
+  {
+    id: 'stream3',
+    streamer: 'FilmCraft Studio',
+    title: 'Behind the Scenes: Indie Film Production',
+    viewers: 593,
+    category: 'Film Making',
+    thumbnail: 'https://images.pexels.com/photos/2873486/pexels-photo-2873486.jpeg?auto=compress&cs=tinysrgb&w=400',
+    avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100',
+    language: 'English',
+    isLive: true
+  },
+  {
+    id: 'stream4',
+    streamer: 'AnimeClub',
+    title: 'Anime Voice Acting Q&A Session',
+    viewers: 2400,
+    category: 'Just Chatting',
+    thumbnail: 'https://images.pexels.com/photos/4195504/pexels-photo-4195504.jpeg?auto=compress&cs=tinysrgb&w=400',
+    avatar: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=100',
+    language: 'English',
+    isLive: true
+  }
+];
+
+const mockOfflineChannels = [
+  { name: 'Jessica', lastSeen: '2h ago', avatar: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=100' },
+  { name: 'RPG_Casting', lastSeen: '1d ago', avatar: 'https://images.pexels.com/photos/1036623/pexels-photo-1036623.jpeg?auto=compress&cs=tinysrgb&w=100' }
+];
+
 type HomeTab = 'for-you' | 'following' | 'live';
 type UserMode = 'work' | 'fan';
 
@@ -255,12 +366,22 @@ const HomePage: React.FC = () => {
   const [isMuted, setIsMuted] = useState(true);
   const [showAuditionAlert, setShowAuditionAlert] = useState(false);
   const [auditionAlertIndex, setAuditionAlertIndex] = useState(0);
+  const [selectedCategory, setSelectedCategory] = useState('Browse');
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   
-  // Get reels based on current mode
-  const currentReels = userMode === 'work' ? mockWorkModeReels : mockFanModeReels;
+  // Get reels based on current mode and tab
+  const getCurrentReels = () => {
+    if (activeTab === 'following') {
+      return userMode === 'work' 
+        ? mockFollowingReels.filter(reel => reel.contentType === 'reel') // Only top 3 reels in work mode
+        : mockFollowingReels; // All content in fan mode
+    }
+    return userMode === 'work' ? mockWorkModeReels : mockFanModeReels;
+  };
+  
+  const currentReels = getCurrentReels();
   
   // Handle scroll for reel navigation
   useEffect(() => {
@@ -325,8 +446,8 @@ const HomePage: React.FC = () => {
     }
   };
   
-  // Render For You Feed
-  const renderForYouFeed = () => (
+  // Render TikTok-style reel interface
+  const renderReelInterface = (reels: any[]) => (
     <div className="relative h-screen overflow-hidden">
       {/* Left Sidebar Navigation */}
       <div className="fixed left-4 top-1/2 transform -translate-y-1/2 z-30 flex flex-col space-y-6">
@@ -354,31 +475,42 @@ const HomePage: React.FC = () => {
         </div>
       </div>
       
-      {/* Mode Toggle */}
-      <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-30">
-        <div className="flex bg-black/40 backdrop-blur-md rounded-full p-1">
-          <button
-            onClick={() => setUserMode('work')}
-            className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
-              userMode === 'work'
-                ? 'bg-blue-500 text-white'
-                : 'text-white/70 hover:text-white'
-            }`}
-          >
-            💼 WORK MODE
-          </button>
-          <button
-            onClick={() => setUserMode('fan')}
-            className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
-              userMode === 'fan'
-                ? 'bg-purple-500 text-white'
-                : 'text-white/70 hover:text-white'
-            }`}
-          >
-            🎭 FAN MODE
-          </button>
+      {/* Mode Toggle - Only show on For You tab */}
+      {activeTab === 'for-you' && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-30">
+          <div className="flex bg-black/40 backdrop-blur-md rounded-full p-1">
+            <button
+              onClick={() => setUserMode('work')}
+              className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
+                userMode === 'work'
+                  ? 'bg-blue-500 text-white'
+                  : 'text-white/70 hover:text-white'
+              }`}
+            >
+              💼 WORK MODE
+            </button>
+            <button
+              onClick={() => setUserMode('fan')}
+              className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
+                userMode === 'fan'
+                  ? 'bg-purple-500 text-white'
+                  : 'text-white/70 hover:text-white'
+              }`}
+            >
+              🎭 FAN MODE
+            </button>
+          </div>
         </div>
-      </div>
+      )}
+      
+      {/* Following Tab Header */}
+      {activeTab === 'following' && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-30">
+          <div className="bg-black/40 backdrop-blur-md rounded-full px-6 py-2">
+            <span className="text-white font-medium">Following • Reverse chronological • Zero ads</span>
+          </div>
+        </div>
+      )}
       
       {/* Reels Container */}
       <div
@@ -386,7 +518,7 @@ const HomePage: React.FC = () => {
         className="h-full overflow-y-scroll snap-y snap-mandatory scrollbar-hide"
         style={{ scrollBehavior: 'smooth' }}
       >
-        {currentReels.map((reel, index) => (
+        {reels.map((reel, index) => (
           <div key={reel.id} className="h-screen snap-start relative bg-black flex items-center justify-center">
             {/* Video */}
             <div className="relative w-full max-w-sm h-full">
@@ -419,6 +551,21 @@ const HomePage: React.FC = () => {
                 </div>
               )}
               
+              {/* Live Indicator */}
+              {reel.contentType === 'live' && (
+                <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center">
+                  <div className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></div>
+                  LIVE NOW
+                </div>
+              )}
+              
+              {/* Casting Call Indicator */}
+              {reel.contentType === 'casting' && (
+                <div className="absolute top-4 left-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold">
+                  CASTING CALL
+                </div>
+              )}
+              
               {/* Mute Button */}
               <button
                 onClick={toggleMute}
@@ -445,7 +592,7 @@ const HomePage: React.FC = () => {
                     <span className="text-white/70 text-sm">{reel.profession}</span>
                   </div>
                   
-                  {userMode === 'work' && (
+                  {userMode === 'work' && reel.trustScore && (
                     <div className="ml-auto flex items-center bg-amber-500/20 px-2 py-1 rounded-full">
                       <Award size={12} className="text-amber-400 mr-1" />
                       <span className="text-amber-400 text-xs font-medium">{reel.trustScore}</span>
@@ -454,6 +601,33 @@ const HomePage: React.FC = () => {
                 </div>
                 
                 <p className="text-white mb-3">{reel.caption}</p>
+                
+                {/* Casting Info */}
+                {reel.contentType === 'casting' && reel.castingInfo && (
+                  <div className="bg-green-500/20 rounded-lg p-3 mb-3">
+                    <div className="flex items-center justify-between text-white">
+                      <div className="flex items-center">
+                        <DollarSign size={16} className="mr-1" />
+                        <span className="font-semibold">{reel.castingInfo.budget}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <Clock size={16} className="mr-1" />
+                        <span className="text-sm">{reel.castingInfo.deadline}</span>
+                      </div>
+                    </div>
+                    <p className="text-white/80 text-sm mt-1">{reel.castingInfo.applicants} applicants</p>
+                  </div>
+                )}
+                
+                {/* Live Info */}
+                {reel.contentType === 'live' && reel.liveInfo && (
+                  <div className="bg-red-500/20 rounded-lg p-3 mb-3">
+                    <div className="flex items-center text-white">
+                      <Eye size={16} className="mr-1" />
+                      <span className="font-semibold">{reel.liveInfo.viewers} viewers</span>
+                    </div>
+                  </div>
+                )}
                 
                 {/* Music Info */}
                 <div className="flex items-center">
@@ -528,7 +702,7 @@ const HomePage: React.FC = () => {
         ))}
         
         {/* Insert Audition Alert every 8th post in Work Mode */}
-        {userMode === 'work' && showAuditionAlert && (
+        {userMode === 'work' && activeTab === 'for-you' && showAuditionAlert && (
           <div className="h-screen snap-start bg-gradient-to-br from-blue-900 to-purple-900 flex items-center justify-center p-6">
             <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
               <div className="text-center mb-6">
@@ -611,249 +785,180 @@ const HomePage: React.FC = () => {
     </div>
   );
   
-  // Render Following Feed
-  const renderFollowingFeed = () => (
-    <div className="max-w-2xl mx-auto p-4 space-y-4">
-      <div className="text-center py-4">
-        <h2 className="text-xl font-semibold text-gray-800 mb-2">Following</h2>
-        <p className="text-gray-600">Reverse chronological • No algorithms • Zero ads</p>
-      </div>
-      
-      {mockFollowingContent.map((item) => (
-        <div key={item.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+  // Render Twitch-style Live Feed
+  const renderLiveFeed = () => (
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-screen-xl mx-auto flex">
+        {/* Left Sidebar - Following Channels */}
+        <div className="w-80 bg-white border-r border-gray-200 h-screen overflow-y-auto">
           <div className="p-4">
-            <div className="flex items-center mb-3">
-              <img
-                src={item.userAvatar}
-                alt={item.username}
-                className="w-10 h-10 rounded-full mr-3"
-              />
-              <div className="flex-1">
-                <div className="flex items-center">
-                  <span className="font-semibold text-gray-800">{item.username}</span>
-                  <ChevronRight size={16} className="mx-2 text-gray-400" />
-                  <span className="text-gray-600">{item.content}</span>
+            <h3 className="font-semibold text-gray-800 mb-4">LIVE CHANNELS ({mockLiveStreams.length})</h3>
+            <div className="space-y-3">
+              {mockLiveStreams.map((stream) => (
+                <div key={stream.id} className="flex items-center p-2 rounded-lg hover:bg-gray-50 cursor-pointer">
+                  <div className="relative mr-3">
+                    <img
+                      src={stream.avatar}
+                      alt={stream.streamer}
+                      className="w-8 h-8 rounded-full"
+                    />
+                    <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-gray-800 truncate">{stream.streamer}</p>
+                    <p className="text-sm text-gray-600 truncate">{stream.title}</p>
+                    <p className="text-xs text-gray-500">{stream.viewers.toLocaleString()} viewers</p>
+                  </div>
+                  <Play size={16} className="text-red-500" />
                 </div>
-                <div className="flex items-center text-sm text-gray-500">
-                  <span>{item.profession}</span>
-                  <span className="mx-2">•</span>
-                  <span>{item.timestamp}</span>
-                </div>
-              </div>
+              ))}
             </div>
             
-            {item.type === 'reel' && (
-              <div className="relative">
-                <img
-                  src={item.thumbnail}
-                  alt={item.content}
-                  className="w-full h-64 object-cover rounded-lg"
-                />
-                <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between text-white">
-                  <div className="flex items-center space-x-4">
-                    <div className="flex items-center">
-                      <ArrowUp size={16} className="mr-1" />
-                      <span>{item.likes}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <MessageCircle size={16} className="mr-1" />
-                      <span>{item.comments}</span>
-                    </div>
+            <h3 className="font-semibold text-gray-800 mb-4 mt-6">OFFLINE CHANNELS ({mockOfflineChannels.length})</h3>
+            <div className="space-y-3">
+              {mockOfflineChannels.map((channel, index) => (
+                <div key={index} className="flex items-center p-2 rounded-lg hover:bg-gray-50 cursor-pointer">
+                  <div className="relative mr-3">
+                    <img
+                      src={channel.avatar}
+                      alt={channel.name}
+                      className="w-8 h-8 rounded-full grayscale"
+                    />
+                    <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-gray-400 rounded-full border-2 border-white"></div>
                   </div>
-                  <span className="text-sm">{item.duration}</span>
-                </div>
-              </div>
-            )}
-            
-            {item.type === 'casting' && (
-              <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center text-green-600">
-                    <DollarSign size={18} className="mr-1" />
-                    <span className="font-semibold">{item.budget}</span>
-                  </div>
-                  <div className="flex items-center text-red-600">
-                    <Clock size={16} className="mr-1" />
-                    <span className="text-sm">{item.deadline}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-gray-600 truncate">{channel.name}</p>
+                    <p className="text-xs text-gray-500">Last live {channel.lastSeen}</p>
                   </div>
                 </div>
-                <p className="text-gray-600 mb-3">{item.content}</p>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">{item.applicants} applicants</span>
-                  <button className="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium">
-                    View Details
-                  </button>
-                </div>
-              </div>
-            )}
-            
-            {item.type === 'live' && (
-              <div className="bg-gradient-to-r from-red-50 to-pink-50 rounded-lg p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="flex items-center mb-2">
-                      <div className="w-3 h-3 bg-red-500 rounded-full mr-2 animate-pulse"></div>
-                      <span className="font-semibold text-red-600">LIVE NOW</span>
-                    </div>
-                    <p className="text-gray-700">{item.content}</p>
-                  </div>
-                  <div className="text-center">
-                    <div className="flex items-center text-gray-600 mb-2">
-                      <Eye size={16} className="mr-1" />
-                      <span>{item.viewers} viewers</span>
-                    </div>
-                    <button className="px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-medium flex items-center">
-                      <Play size={16} className="mr-1" />
-                      Join
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
+              ))}
+            </div>
           </div>
         </div>
-      ))}
-    </div>
-  );
-  
-  // Render Live Feed (Twitch-style)
-  const renderLiveFeed = () => (
-    <div className="max-w-screen-xl mx-auto p-4">
-      {/* Search Bar */}
-      <div className="mb-6">
-        <div className="relative max-w-md">
-          <input
-            type="text"
-            placeholder="Search live streams..."
-            className="w-full py-3 pl-10 pr-4 rounded-lg bg-gray-100 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
-          />
-          <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
-        </div>
-      </div>
-      
-      {/* Categories */}
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4">Browse Categories</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          {[
-            { name: 'Voice Acting', viewers: '2.1K', image: 'https://images.pexels.com/photos/3783471/pexels-photo-3783471.jpeg?auto=compress&cs=tinysrgb&w=300' },
-            { name: 'Music Production', viewers: '1.8K', image: 'https://images.pexels.com/photos/4195504/pexels-photo-4195504.jpeg?auto=compress&cs=tinysrgb&w=300' },
-            { name: 'Film Making', viewers: '3.2K', image: 'https://images.pexels.com/photos/3062541/pexels-photo-3062541.jpeg?auto=compress&cs=tinysrgb&w=300' },
-            { name: 'Art & Design', viewers: '1.5K', image: 'https://images.pexels.com/photos/2873486/pexels-photo-2873486.jpeg?auto=compress&cs=tinysrgb&w=300' },
-            { name: 'Gaming', viewers: '5.7K', image: 'https://images.pexels.com/photos/5063095/pexels-photo-5063095.jpeg?auto=compress&cs=tinysrgb&w=300' },
-            { name: 'Tutorials', viewers: '892', image: 'https://images.pexels.com/photos/7504837/pexels-photo-7504837.jpeg?auto=compress&cs=tinysrgb&w=300' }
-          ].map((category) => (
-            <div key={category.name} className="relative group cursor-pointer">
-              <img
-                src={category.image}
-                alt={category.name}
-                className="w-full h-32 object-cover rounded-lg"
-              />
-              <div className="absolute inset-0 bg-black/40 rounded-lg flex flex-col justify-end p-3">
-                <h3 className="text-white font-semibold">{category.name}</h3>
-                <p className="text-white/80 text-sm">{category.viewers} viewers</p>
+        
+        {/* Main Content Area */}
+        <div className="flex-1 p-6">
+          {/* Top Navigation Bar */}
+          <div className="mb-6">
+            <div className="flex items-center space-x-6 mb-4">
+              {[
+                'Browse',
+                userMode === 'work' ? 'Auditions' : 'Just Chatting',
+                'Voice Acting',
+                userMode === 'work' ? 'Workshops' : 'Gaming',
+                'Music',
+                userMode === 'work' ? 'Dubbing Sessions' : 'Fan Q&A'
+              ].map((category) => (
+                <button
+                  key={category}
+                  onClick={() => setSelectedCategory(category)}
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                    selectedCategory === category
+                      ? 'bg-purple-500 text-white'
+                      : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                  }`}
+                >
+                  {category}
+                </button>
+              ))}
+              
+              {/* Search */}
+              <div className="relative ml-auto">
+                <input
+                  type="text"
+                  placeholder="Search streams..."
+                  className="w-64 py-2 pl-10 pr-4 rounded-lg bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+                <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
               </div>
             </div>
-          ))}
-        </div>
-      </div>
-      
-      {/* Recommended Streams */}
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4">Recommended for You</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[
-            {
-              streamer: 'Maya Voice Studio',
-              title: 'Live Voice Acting Session - Horror Characters',
-              viewers: 234,
-              category: 'Voice Acting',
-              thumbnail: 'https://images.pexels.com/photos/7991579/pexels-photo-7991579.jpeg?auto=compress&cs=tinysrgb&w=400',
-              avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100'
-            },
-            {
-              streamer: 'FilmCraft Studio',
-              title: 'Behind the Scenes: Indie Film Production',
-              viewers: 156,
-              category: 'Film Making',
-              thumbnail: 'https://images.pexels.com/photos/3062541/pexels-photo-3062541.jpeg?auto=compress&cs=tinysrgb&w=400',
-              avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100'
-            },
-            {
-              streamer: 'SoundWave Productions',
-              title: 'Music Composition for Games - Live Composing',
-              viewers: 89,
-              category: 'Music Production',
-              thumbnail: 'https://images.pexels.com/photos/4195504/pexels-photo-4195504.jpeg?auto=compress&cs=tinysrgb&w=400',
-              avatar: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=100'
-            }
-          ].map((stream, index) => (
-            <div key={index} className="bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-              <div className="relative">
-                <img
-                  src={stream.thumbnail}
-                  alt={stream.title}
-                  className="w-full h-48 object-cover"
-                />
-                <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-medium flex items-center">
-                  <div className="w-2 h-2 bg-white rounded-full mr-1 animate-pulse"></div>
-                  LIVE
-                </div>
-                <div className="absolute bottom-2 right-2 bg-black/70 text-white px-2 py-1 rounded text-xs">
-                  {stream.viewers} viewers
-                </div>
-              </div>
-              
-              <div className="p-4">
-                <div className="flex items-start space-x-3">
+          </div>
+          
+          {/* Stream Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {mockLiveStreams.map((stream) => (
+              <div key={stream.id} className="bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200 hover:shadow-md transition-shadow cursor-pointer">
+                <div className="relative">
                   <img
-                    src={stream.avatar}
-                    alt={stream.streamer}
-                    className="w-10 h-10 rounded-full"
+                    src={stream.thumbnail}
+                    alt={stream.title}
+                    className="w-full h-48 object-cover"
                   />
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-medium text-gray-800 line-clamp-2 mb-1">
-                      {stream.title}
-                    </h3>
-                    <p className="text-sm text-gray-600">{stream.streamer}</p>
-                    <p className="text-xs text-gray-500">{stream.category}</p>
+                  
+                  {/* Live Badge */}
+                  <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-medium flex items-center">
+                    <div className="w-2 h-2 bg-white rounded-full mr-1 animate-pulse"></div>
+                    LIVE
+                  </div>
+                  
+                  {/* Viewer Count */}
+                  <div className="absolute top-2 right-2 bg-black/70 text-white px-2 py-1 rounded text-xs">
+                    {stream.viewers.toLocaleString()} viewers
+                  </div>
+                  
+                  {/* Language Tag */}
+                  <div className="absolute bottom-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-xs flex items-center">
+                    <Zap size={12} className="mr-1" />
+                    Live in: {stream.language}
+                  </div>
+                  
+                  {/* Category Tag */}
+                  <div className="absolute bottom-2 right-2 bg-purple-500 text-white px-2 py-1 rounded text-xs">
+                    {stream.category}
+                  </div>
+                  
+                  {/* Work Mode Enhancements */}
+                  {userMode === 'work' && stream.category === 'Auditions' && (
+                    <div className="absolute inset-0 border-4 border-amber-400 pointer-events-none"></div>
+                  )}
+                </div>
+                
+                <div className="p-4">
+                  <div className="flex items-start space-x-3">
+                    <img
+                      src={stream.avatar}
+                      alt={stream.streamer}
+                      className="w-10 h-10 rounded-full"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-gray-800 line-clamp-2 mb-1">
+                        {stream.title}
+                      </h3>
+                      <p className="text-sm text-gray-600">{stream.streamer}</p>
+                      <p className="text-xs text-gray-500">{stream.category}</p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-      </div>
-      
-      {/* Top Live Streams Today */}
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Top Live Streams Today</h2>
-        <div className="space-y-3">
-          {[
-            { rank: 1, streamer: 'ProVoiceActor', title: 'Masterclass: Character Voice Development', viewers: 1247, category: 'Voice Acting' },
-            { rank: 2, streamer: 'IndieFilmHub', title: 'Q&A: Breaking into Independent Cinema', viewers: 892, category: 'Film Making' },
-            { rank: 3, streamer: 'GameAudioPro', title: 'Sound Design for Horror Games', viewers: 634, category: 'Sound Design' },
-            { rank: 4, streamer: 'AnimationStudio', title: 'Live Animation Process - Character Design', viewers: 456, category: 'Animation' },
-            { rank: 5, streamer: 'MusicComposer', title: 'Orchestral Composition for Films', viewers: 321, category: 'Music' }
-          ].map((stream) => (
-            <div key={stream.rank} className="flex items-center p-4 bg-white rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer">
-              <div className="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold text-sm mr-4">
-                {stream.rank}
-              </div>
-              <div className="flex-1">
-                <h3 className="font-medium text-gray-800">{stream.title}</h3>
-                <div className="flex items-center text-sm text-gray-600">
-                  <span>{stream.streamer}</span>
-                  <span className="mx-2">•</span>
-                  <span>{stream.category}</span>
+            ))}
+          </div>
+          
+          {/* Categories Section */}
+          <div className="mt-8">
+            <h2 className="text-xl font-semibold mb-4">Browse Categories</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              {[
+                { name: 'Voice Acting', viewers: '2.1K', image: 'https://images.pexels.com/photos/3783471/pexels-photo-3783471.jpeg?auto=compress&cs=tinysrgb&w=300' },
+                { name: 'Music Production', viewers: '1.8K', image: 'https://images.pexels.com/photos/4195504/pexels-photo-4195504.jpeg?auto=compress&cs=tinysrgb&w=300' },
+                { name: 'Film Making', viewers: '3.2K', image: 'https://images.pexels.com/photos/3062541/pexels-photo-3062541.jpeg?auto=compress&cs=tinysrgb&w=300' },
+                { name: 'Art & Design', viewers: '1.5K', image: 'https://images.pexels.com/photos/2873486/pexels-photo-2873486.jpeg?auto=compress&cs=tinysrgb&w=300' },
+                { name: userMode === 'work' ? 'Workshops' : 'Gaming', viewers: '5.7K', image: 'https://images.pexels.com/photos/5063095/pexels-photo-5063095.jpeg?auto=compress&cs=tinysrgb&w=300' },
+                { name: 'Tutorials', viewers: '892', image: 'https://images.pexels.com/photos/7504837/pexels-photo-7504837.jpeg?auto=compress&cs=tinysrgb&w=300' }
+              ].map((category) => (
+                <div key={category.name} className="relative group cursor-pointer">
+                  <img
+                    src={category.image}
+                    alt={category.name}
+                    className="w-full h-32 object-cover rounded-lg"
+                  />
+                  <div className="absolute inset-0 bg-black/40 rounded-lg flex flex-col justify-end p-3">
+                    <h3 className="text-white font-semibold">{category.name}</h3>
+                    <p className="text-white/80 text-sm">{category.viewers} viewers</p>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-center text-red-500 font-medium">
-                <div className="w-2 h-2 bg-red-500 rounded-full mr-2 animate-pulse"></div>
-                {stream.viewers.toLocaleString()} viewers
-              </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
       </div>
     </div>
@@ -898,17 +1003,9 @@ const HomePage: React.FC = () => {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
         >
-          {activeTab === 'for-you' && renderForYouFeed()}
-          {activeTab === 'following' && (
-            <div className="bg-gray-50 min-h-screen">
-              {renderFollowingFeed()}
-            </div>
-          )}
-          {activeTab === 'live' && (
-            <div className="bg-gray-50 min-h-screen">
-              {renderLiveFeed()}
-            </div>
-          )}
+          {activeTab === 'for-you' && renderReelInterface(currentReels)}
+          {activeTab === 'following' && renderReelInterface(currentReels)}
+          {activeTab === 'live' && renderLiveFeed()}
         </motion.div>
       </AnimatePresence>
       
