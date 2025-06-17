@@ -10,7 +10,7 @@ import {
   ChevronUp, ChevronDown, VolumeX, Pause, Search,
   Settings, Maximize, MoreHorizontal, UserCheck,
   Gift, ThumbsUp, Send, Smile, Home, PlusSquare, User,
-  ShoppingBag, X
+  ShoppingBag, X, CheckCircle
 } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 
