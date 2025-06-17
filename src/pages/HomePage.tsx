@@ -513,7 +513,7 @@ const HomePage: React.FC = () => {
             >
               {/* TikTok-style Reels for For You and Following */}
               {(activeTab === 'for-you' || activeTab === 'following') && (
-                <div className="h-[calc(100vh-112px)] overflow-hidden">
+                <div className="h-[calc(100vh-128px)] overflow-hidden">
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={currentReelIndex}
@@ -563,7 +563,7 @@ const HomePage: React.FC = () => {
 
               {/* Live Tab - Keep original Twitch-style layout */}
               {activeTab === 'live' && (
-                <div className="min-h-[calc(100vh-112px)] bg-neutral-50 p-6">
+                <div className="min-h-[calc(100vh-128px)] bg-neutral-50 p-6">
                   <div className="max-w-screen-xl mx-auto">
                     <div className="text-center py-12">
                       <div className="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-4">
