@@ -10,7 +10,7 @@ import {
   ChevronUp, ChevronDown, VolumeX, Pause, Search,
   Settings, Maximize, MoreHorizontal, UserCheck,
   Gift, ThumbsUp, Send, Smile, Home, PlusSquare, User,
-  ShoppingBag, CheckCircle, X
+  ShoppingBag, CheckCircle2, X
 } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 
@@ -46,6 +46,19 @@ interface AuditionAlert {
   company: string;
   type: string;
   urgent?: boolean;
+}
+
+interface Comment {
+  id: string;
+  user: {
+    name: string;
+    avatar: string;
+    verified?: boolean;
+  };
+  text: string;
+  likes: number;
+  time: string;
+  replies?: Comment[];
 }
 
 // Generate infinite content function
@@ -352,6 +365,74 @@ const mockAuditionAlerts: AuditionAlert[] = [
   },
 ];
 
+// Mock comments data
+const mockComments: Comment[] = [
+  {
+    id: '1',
+    user: {
+      name: 'VoiceActorFan',
+      avatar: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=600',
+      verified: true,
+    },
+    text: 'This is absolutely incredible! Your range is amazing 🔥',
+    likes: 24,
+    time: '2h',
+    replies: [
+      {
+        id: '1-1',
+        user: {
+          name: 'maya_rising_va',
+          avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=600',
+          verified: true,
+        },
+        text: 'Thank you so much! 💜',
+        likes: 8,
+        time: '1h',
+      }
+    ]
+  },
+  {
+    id: '2',
+    user: {
+      name: 'GameDevStudio',
+      avatar: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=600',
+    },
+    text: 'We need to work together! DMing you now',
+    likes: 15,
+    time: '3h',
+  },
+  {
+    id: '3',
+    user: {
+      name: 'AudioEngineer_Pro',
+      avatar: 'https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&cs=tinysrgb&w=600',
+    },
+    text: 'The audio quality is pristine. What mic are you using?',
+    likes: 7,
+    time: '4h',
+  },
+  {
+    id: '4',
+    user: {
+      name: 'HorrorFanatic',
+      avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=600',
+    },
+    text: 'Gave me chills! Perfect for horror games 😱',
+    likes: 12,
+    time: '5h',
+  },
+  {
+    id: '5',
+    user: {
+      name: 'NewVoiceActor',
+      avatar: 'https://images.pexels.com/photos/1036623/pexels-photo-1036623.jpeg?auto=compress&cs=tinysrgb&w=600',
+    },
+    text: 'Any tips for someone just starting out?',
+    likes: 3,
+    time: '6h',
+  },
+];
+
 const HomePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<HomeTab>('foryou');
   const [userMode, setUserMode] = useState<UserMode>('work');
@@ -365,7 +446,8 @@ const HomePage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStream, setSelectedStream] = useState<LiveStream | null>(null);
   const [showStreamModal, setShowStreamModal] = useState(false);
-  const [showComments, setShowComments] = useState<{[key: string]: boolean}>({});
+  const [showComments, setShowComments] = useState(false);
+  const [newComment, setNewComment] = useState('');
   
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<{[key: string]: HTMLVideoElement}>({});
@@ -498,11 +580,13 @@ const HomePage: React.FC = () => {
     setSelectedStream(null);
   };
 
-  const toggleComments = (postId: string) => {
-    setShowComments(prev => ({
-      ...prev,
-      [postId]: !prev[postId]
-    }));
+  const handleCommentSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newComment.trim()) {
+      // In a real app, this would add the comment to the database
+      console.log('Adding comment:', newComment);
+      setNewComment('');
+    }
   };
 
   const categories = ['All', 'Voice Acting', 'Education', 'Behind the Scenes', 'Just Chatting', 'Film Analysis', 'Game Development', 'Theater', 'Music Production'];
@@ -517,115 +601,114 @@ const HomePage: React.FC = () => {
     return matchesCategory && matchesSearch;
   });
 
-  // Mock comments data
-  const mockComments = [
-    {
-      id: '1',
-      user: {
-        name: 'GameDev_Pro',
-        avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=600',
-        verified: true
-      },
-      text: 'This is incredible! The emotion in your voice really brings the character to life. 🔥',
-      time: '2h',
-      likes: 12
-    },
-    {
-      id: '2',
-      user: {
-        name: 'VoiceActingFan',
-        avatar: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=600',
-        verified: false
-      },
-      text: 'Amazing work! How long did it take you to develop this character voice?',
-      time: '1h',
-      likes: 8
-    },
-    {
-      id: '3',
-      user: {
-        name: 'HorrorGameStudio',
-        avatar: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=600',
-        verified: true
-      },
-      text: 'We need to talk! This is exactly what we\'re looking for in our upcoming project. DMing you now! 👻',
-      time: '45m',
-      likes: 23
-    }
-  ];
-
-  const renderCommentSection = (postId: string) => (
-    <motion.div
-      initial={{ x: '100%' }}
-      animate={{ x: 0 }}
-      exit={{ x: '100%' }}
-      transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-      className="absolute top-0 right-0 w-80 h-full bg-black/95 backdrop-blur-sm z-30 flex flex-col"
-    >
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-white/20">
-        <h3 className="text-white font-semibold">Comments</h3>
-        <button
-          onClick={() => toggleComments(postId)}
-          className="text-white/70 hover:text-white"
+  const renderCommentSection = () => (
+    <AnimatePresence>
+      {showComments && (
+        <motion.div
+          initial={{ x: '100%' }}
+          animate={{ x: 0 }}
+          exit={{ x: '100%' }}
+          transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+          className="fixed right-0 top-0 bottom-0 w-80 bg-white shadow-2xl z-50 flex flex-col"
         >
-          <X size={20} />
-        </button>
-      </div>
-
-      {/* Comments List */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {mockComments.map((comment) => (
-          <div key={comment.id} className="flex space-x-3">
-            <img
-              src={comment.user.avatar}
-              alt={comment.user.name}
-              className="w-8 h-8 rounded-full object-cover flex-shrink-0"
-            />
-            <div className="flex-1">
-              <div className="flex items-center space-x-2 mb-1">
-                <span className="text-white font-medium text-sm">{comment.user.name}</span>
-                {comment.user.verified && (
-                  <CheckCircle size={12} className="text-blue-400" />
-                )}
-                <span className="text-white/50 text-xs">{comment.time}</span>
-              </div>
-              <p className="text-white/90 text-sm leading-relaxed">{comment.text}</p>
-              <div className="flex items-center space-x-4 mt-2">
-                <button className="flex items-center space-x-1 text-white/60 hover:text-white">
-                  <Heart size={12} />
-                  <span className="text-xs">{comment.likes}</span>
-                </button>
-                <button className="text-white/60 hover:text-white text-xs">
-                  Reply
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Comment Input */}
-      <div className="p-4 border-t border-white/20">
-        <div className="flex items-center space-x-3">
-          <img
-            src="https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=600"
-            alt="Your avatar"
-            className="w-8 h-8 rounded-full object-cover"
-          />
-          <div className="flex-1 relative">
-            <input
-              type="text"
-              placeholder="Add a comment..."
-              className="w-full bg-white/10 border border-white/20 rounded-full px-4 py-2 text-white placeholder-white/50 text-sm focus:outline-none focus:border-white/40"
-            />
-            <button className="absolute right-2 top-1/2 transform -translate-y-1/2 text-white/60 hover:text-white">
-              <Send size={14} />
+          {/* Header */}
+          <div className="flex items-center justify-between p-4 border-b border-neutral-200">
+            <h3 className="font-semibold text-lg">Comments</h3>
+            <button
+              onClick={() => setShowComments(false)}
+              className="p-2 rounded-full hover:bg-neutral-100"
+            >
+              <X size={20} />
             </button>
           </div>
-        </div>
-      </div>
-    </motion.div>
+
+          {/* Comments List */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {mockComments.map((comment) => (
+              <div key={comment.id} className="space-y-2">
+                <div className="flex items-start space-x-3">
+                  <img
+                    src={comment.user.avatar}
+                    alt={comment.user.name}
+                    className="w-8 h-8 rounded-full object-cover"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center space-x-2">
+                      <span className="font-medium text-sm">{comment.user.name}</span>
+                      {comment.user.verified && (
+                        <CheckCircle2 size={12} className="text-blue-500" />
+                      )}
+                      <span className="text-xs text-neutral-500">{comment.time}</span>
+                    </div>
+                    <p className="text-sm text-neutral-800 mt-1">{comment.text}</p>
+                    <div className="flex items-center space-x-4 mt-2">
+                      <button className="flex items-center space-x-1 text-xs text-neutral-500 hover:text-red-500">
+                        <Heart size={12} />
+                        <span>{comment.likes}</span>
+                      </button>
+                      <button className="text-xs text-neutral-500 hover:text-neutral-700">
+                        Reply
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Replies */}
+                {comment.replies && comment.replies.map((reply) => (
+                  <div key={reply.id} className="ml-11 flex items-start space-x-3">
+                    <img
+                      src={reply.user.avatar}
+                      alt={reply.user.name}
+                      className="w-6 h-6 rounded-full object-cover"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center space-x-2">
+                        <span className="font-medium text-sm">{reply.user.name}</span>
+                        {reply.user.verified && (
+                          <CheckCircle2 size={10} className="text-blue-500" />
+                        )}
+                        <span className="text-xs text-neutral-500">{reply.time}</span>
+                      </div>
+                      <p className="text-sm text-neutral-800 mt-1">{reply.text}</p>
+                      <div className="flex items-center space-x-4 mt-2">
+                        <button className="flex items-center space-x-1 text-xs text-neutral-500 hover:text-red-500">
+                          <Heart size={10} />
+                          <span>{reply.likes}</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+
+          {/* Comment Input */}
+          <div className="p-4 border-t border-neutral-200">
+            <form onSubmit={handleCommentSubmit} className="flex space-x-2">
+              <input
+                type="text"
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                placeholder="Add a comment..."
+                className="flex-1 px-3 py-2 border border-neutral-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+              />
+              <button
+                type="submit"
+                disabled={!newComment.trim()}
+                className={`px-4 py-2 rounded-full text-sm font-medium ${
+                  newComment.trim()
+                    ? 'bg-primary-800 text-white'
+                    : 'bg-neutral-200 text-neutral-400'
+                }`}
+              >
+                Post
+              </button>
+            </form>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 
   const renderSidebar = () => (
@@ -816,7 +899,7 @@ const HomePage: React.FC = () => {
   const renderReelPost = (content: any, index: number) => (
     <div 
       key={content.id}
-      className="w-full bg-black rounded-lg overflow-hidden relative"
+      className="w-full bg-black rounded-lg overflow-hidden"
       style={{ aspectRatio: '9/16', height: 'calc(100vh - 120px)' }}
     >
       {/* Background Media */}
@@ -833,6 +916,7 @@ const HomePage: React.FC = () => {
             muted={isMuted[content.id] !== false}
             playsInline
             autoPlay={index === currentPostIndex}
+            onClick={() => toggleVideoPlayback(content.id)}
           />
         ) : content.media.type === 'audio' ? (
           <div className="w-full h-full bg-gradient-to-br from-primary-900 via-secondary-800 to-accent-900 flex items-center justify-center relative">
@@ -890,109 +974,82 @@ const HomePage: React.FC = () => {
         )}
 
         {/* Content Overlay */}
-        <div className="absolute inset-0 flex flex-col justify-end p-4 text-white z-10">
-          {/* Bottom Section - User Info, Caption & Actions */}
-          <div className="pb-4">
+        <div className="absolute inset-0 flex flex-col justify-between text-white z-10">
+          {/* Bottom Section - User Info & Actions */}
+          <div className="mt-auto p-3">
             <div className="flex items-end justify-between">
               {/* Left - User Info & Caption */}
-              <div className="flex-1 mr-4">
-                {/* User Info */}
-                <div className="flex items-center mb-3">
+              <div className="flex-1 mr-3">
+                {/* User Info - Compact */}
+                <div className="flex items-center mb-2">
                   <div className="relative">
                     <img
                       src={content.userAvatar}
                       alt={content.username}
-                      className="w-10 h-10 rounded-full object-cover border-2 border-white/50"
+                      className="w-8 h-8 rounded-full object-cover border border-white/50"
                     />
                     {content.isRisingTalent && userMode === 'work' && (
-                      <div className="absolute -top-1 -right-1 w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center">
-                        <Crown size={10} className="text-white" />
+                      <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-amber-500 rounded-full flex items-center justify-center">
+                        <Crown size={8} className="text-white" />
                       </div>
                     )}
                   </div>
-                  <div className="ml-3">
+                  <div className="ml-2 flex-1">
                     <div className="flex items-center">
                       <h3 className="font-semibold text-sm">{content.username}</h3>
                       {content.isRisingTalent && userMode === 'work' && (
-                        <Star size={12} className="ml-1 text-amber-400" />
+                        <Star size={10} className="ml-1 text-amber-400" />
                       )}
                     </div>
                     <p className="text-white/80 text-xs">{content.profession}</p>
                   </div>
                   
-                  <button className="ml-3 px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-xs font-medium border border-white/30">
+                  {/* Follow Button - Compact */}
+                  <button className="px-2 py-1 bg-white/20 backdrop-blur-sm rounded-full text-xs font-medium border border-white/30">
                     {content.isFollowing ? 'Following' : 'Follow'}
                   </button>
                 </div>
-
-                {/* Caption */}
-                <p className="text-white text-sm leading-relaxed mb-2">
+                
+                {/* Caption - Compact */}
+                <p className="text-white text-sm leading-relaxed mb-1">
                   {content.caption}
                 </p>
                 
                 {userMode === 'work' && content.trustScore && (
-                  <div className="flex items-center bg-black/30 backdrop-blur-sm px-2 py-1 rounded-full w-fit">
-                    <Award size={12} className="text-amber-400 mr-1" />
-                    <span className="text-xs font-medium">Trust Score: {content.trustScore}/5.0</span>
+                  <div className="flex items-center bg-black/30 backdrop-blur-sm px-2 py-0.5 rounded-full w-fit">
+                    <Award size={10} className="text-amber-400 mr-1" />
+                    <span className="text-xs font-medium">Trust: {content.trustScore}/5.0</span>
                   </div>
                 )}
               </div>
 
-              {/* Right - Action Buttons */}
-              <div className="flex flex-col items-center space-y-4">
-                <button className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                  <Heart size={18} className={content.isLiked ? 'text-red-500 fill-current' : 'text-white'} />
+              {/* Right - Action Buttons - Compact */}
+              <div className="flex flex-col items-center space-y-3">
+                <button className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                  <Heart size={16} className={content.isLiked ? 'text-red-500 fill-current' : 'text-white'} />
                 </button>
                 <span className="text-xs font-medium">{content.likes}</span>
                 
                 <button 
-                  onClick={() => toggleComments(content.id)}
-                  className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center"
+                  onClick={() => setShowComments(true)}
+                  className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center"
                 >
-                  <MessageCircle size={18} className="text-white" />
+                  <MessageCircle size={16} className="text-white" />
                 </button>
                 <span className="text-xs font-medium">{content.comments}</span>
                 
-                <button className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                  <Bookmark size={18} className={content.isSaved ? 'text-yellow-400 fill-current' : 'text-white'} />
+                <button className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                  <Bookmark size={16} className={content.isSaved ? 'text-yellow-400 fill-current' : 'text-white'} />
                 </button>
                 
-                <button className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                  <Share2 size={18} className="text-white" />
+                <button className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                  <Share2 size={16} className="text-white" />
                 </button>
               </div>
             </div>
           </div>
         </div>
-
-        {/* Video Controls - Only show play button briefly when tapped */}
-        {content.media.type === 'video' && (
-          <div 
-            className="absolute inset-0 flex items-center justify-center z-20"
-            onClick={() => toggleVideoPlayback(content.id)}
-          >
-            {/* Play button will only show briefly when video is paused or when tapped */}
-            <AnimatePresence>
-              {!isPlaying[content.id] && (
-                <motion.button
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  transition={{ duration: 0.2 }}
-                  className="w-16 h-16 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white"
-                >
-                  <Play size={24} className="ml-1" />
-                </motion.button>
-              )}
-            </AnimatePresence>
-          </div>
-        )}
       </div>
-
-      {/* Comments Section */}
-      <AnimatePresence>
-        {showComments[content.id] && renderCommentSection(content.id)}
-      </AnimatePresence>
     </div>
   );
 
@@ -1395,6 +1452,9 @@ const HomePage: React.FC = () => {
           </div>
         )}
       </div>
+      
+      {/* Comments Section */}
+      {renderCommentSection()}
     </div>
   );
 };
