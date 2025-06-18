@@ -22,7 +22,7 @@ const mockTikTokVideos = [
       thumbnail: 'https://images.pexels.com/photos/7991579/pexels-photo-7991579.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
       duration: '0:15'
     },
-    caption: 'Spine-chilling villain voice for indie horror game 🎭 #HorrorVoice #GameDev #VoiceActing #Villain #IndieGame',
+    caption: 'Spine-chilling villain voice for indie horror game 🎭 This took me weeks to perfect and I\'m so excited to share it with you all! The character development process was incredible and I learned so much about voice modulation techniques. #HorrorVoice #GameDev #VoiceActing #Villain #IndieGame',
     music: {
       title: 'Original Sound',
       artist: 'maya_va',
@@ -158,6 +158,7 @@ const HomePage: React.FC = () => {
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState('');
   const [videos, setVideos] = useState(mockTikTokVideos);
+  const [expandedCaptions, setExpandedCaptions] = useState<Set<string>>(new Set());
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -253,6 +254,26 @@ const HomePage: React.FC = () => {
         ? { ...video, isFollowing: !video.isFollowing }
         : video
     ));
+  };
+  
+  // Toggle caption expansion
+  const toggleCaptionExpansion = (videoId: string) => {
+    const newExpanded = new Set(expandedCaptions);
+    if (newExpanded.has(videoId)) {
+      newExpanded.delete(videoId);
+    } else {
+      newExpanded.add(videoId);
+    }
+    setExpandedCaptions(newExpanded);
+  };
+  
+  // Truncate caption text
+  const getTruncatedCaption = (caption: string, isExpanded: boolean) => {
+    const maxLength = 100;
+    if (caption.length <= maxLength || isExpanded) {
+      return caption;
+    }
+    return caption.substring(0, maxLength) + '...';
   };
   
   // Mock comments data
@@ -458,44 +479,46 @@ const HomePage: React.FC = () => {
                   {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
                 </button>
                 
-                {/* Video Info Overlay */}
-                <div className="absolute bottom-0 left-0 right-16 bg-gradient-to-t from-black/80 to-transparent p-4">
-                  {/* User Info */}
-                  <div className="flex items-center mb-3">
+                {/* Video Info Overlay - Compact Design */}
+                <div className="absolute bottom-0 left-0 right-16 bg-gradient-to-t from-black/80 to-transparent p-3">
+                  {/* User Info - Smaller and more compact */}
+                  <div className="flex items-center mb-2">
                     <img
                       src={video.userAvatar}
                       alt={video.username}
-                      className="w-12 h-12 rounded-full border-2 border-white mr-3"
+                      className="w-8 h-8 rounded-full border border-white mr-2"
                     />
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <div className="flex items-center">
-                        <span className="text-white font-bold text-lg">@{video.username}</span>
+                        <span className="text-white font-semibold text-sm truncate">@{video.username}</span>
                         {video.isVerified && (
-                          <CheckCircle size={16} className="text-blue-400 ml-2" />
+                          <CheckCircle size={12} className="text-blue-400 ml-1 flex-shrink-0" />
                         )}
                       </div>
-                      <span className="text-white/80 text-sm">{video.displayName}</span>
                     </div>
-                    
-                    {!video.isFollowing && (
-                      <button
-                        onClick={() => handleFollow(video.id)}
-                        className="px-6 py-1.5 bg-red-500 text-white rounded-md font-semibold text-sm"
-                      >
-                        Follow
-                      </button>
-                    )}
                   </div>
                   
-                  {/* Caption */}
-                  <p className="text-white mb-3 leading-relaxed">{video.caption}</p>
+                  {/* Caption - Truncated with show more */}
+                  <div className="mb-2">
+                    <p className="text-white text-sm leading-relaxed">
+                      {getTruncatedCaption(video.caption, expandedCaptions.has(video.id))}
+                      {video.caption.length > 100 && (
+                        <button
+                          onClick={() => toggleCaptionExpansion(video.id)}
+                          className="text-white/80 text-sm ml-1 font-medium"
+                        >
+                          {expandedCaptions.has(video.id) ? 'less' : 'more'}
+                        </button>
+                      )}
+                    </p>
+                  </div>
                   
-                  {/* Music Info */}
+                  {/* Music Info - Smaller */}
                   <div className="flex items-center">
-                    <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center mr-2 animate-spin">
-                      <Music size={12} className="text-black" />
+                    <div className="w-4 h-4 bg-white rounded-full flex items-center justify-center mr-2 animate-spin">
+                      <Music size={8} className="text-black" />
                     </div>
-                    <span className="text-white/90 text-sm">
+                    <span className="text-white/90 text-xs truncate">
                       {video.music.isOriginal ? 'Original sound' : video.music.title} - {video.music.artist}
                     </span>
                   </div>
@@ -504,19 +527,19 @@ const HomePage: React.FC = () => {
               
               {/* Right Action Panel */}
               <div className="absolute right-3 bottom-20 flex flex-col items-center space-y-6">
-                {/* Profile Picture with Follow Button */}
+                {/* Profile Picture with Plus Button */}
                 <div className="relative">
                   <img
                     src={video.userAvatar}
                     alt={video.username}
-                    className="w-14 h-14 rounded-full border-2 border-white"
+                    className="w-12 h-12 rounded-full border-2 border-white"
                   />
                   {!video.isFollowing && (
                     <button
                       onClick={() => handleFollow(video.id)}
-                      className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center"
+                      className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center"
                     >
-                      <Plus size={16} className="text-white" />
+                      <Plus size={12} className="text-white" />
                     </button>
                   )}
                 </div>
