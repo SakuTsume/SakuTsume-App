@@ -577,7 +577,7 @@ const HomePage: React.FC = () => {
                   </div>
                 </div>
                 
-                {/* Right Action Panel - Simplified to 4 Essential Elements */}
+                {/* Right Action Panel - Now with 5 Elements including Comments */}
                 <div className="absolute right-2 bottom-16 flex flex-col items-center space-y-4">
                   {/* Profile Picture with Plus Button */}
                   <div className="relative">
@@ -608,6 +608,19 @@ const HomePage: React.FC = () => {
                     </button>
                     <span className="text-white text-xs font-semibold mt-1">
                       {formatNumber(video.likes)}
+                    </span>
+                  </div>
+                  
+                  {/* Comments Button */}
+                  <div className="flex flex-col items-center">
+                    <button
+                      onClick={() => setShowComments(true)}
+                      className="w-12 h-12 rounded-full flex items-center justify-center text-white transition-transform active:scale-125"
+                    >
+                      <MessageCircle size={26} />
+                    </button>
+                    <span className="text-white text-xs font-semibold mt-1">
+                      {formatNumber(video.comments)}
                     </span>
                   </div>
                   
