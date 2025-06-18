@@ -406,9 +406,49 @@ const HomePage: React.FC = () => {
   
   return (
     <div className="min-h-screen bg-black">
-      {/* Top Navigation - Centered Tabs with Transparent Background */}
+      {/* Top Navigation - Enhanced with Mode Switch */}
       <div className="fixed top-0 left-0 right-0 z-[99999]">
-        <div className="flex items-center justify-center h-16">
+        <div className="flex items-center justify-between h-16 px-4">
+          {/* Left side - Work/Fan Mode Switch */}
+          <div className="flex items-center">
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="bg-black/60 backdrop-blur-md rounded-full p-0.5 border border-white/20"
+            >
+              <div className="flex items-center">
+                <button
+                  onClick={() => setViewMode('fan')}
+                  className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 ${
+                    viewMode === 'fan'
+                      ? 'bg-white text-black shadow-lg'
+                      : 'text-white/80 hover:text-white'
+                  }`}
+                >
+                  <div className="flex items-center space-x-1.5">
+                    <Heart size={14} />
+                    <span>Fan</span>
+                  </div>
+                </button>
+                
+                <button
+                  onClick={() => setViewMode('work')}
+                  className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 ${
+                    viewMode === 'work'
+                      ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-black shadow-lg'
+                      : 'text-white/80 hover:text-white'
+                  }`}
+                >
+                  <div className="flex items-center space-x-1.5">
+                    <Briefcase size={14} />
+                    <span>Work</span>
+                  </div>
+                </button>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Center - Main Navigation Tabs */}
           <div className="flex items-center space-x-8">
             <button
               onClick={() => setActiveTab('for-you')}
@@ -438,57 +478,17 @@ const HomePage: React.FC = () => {
               <span>LIVE</span>
             </button>
           </div>
-        </div>
-      </div>
 
-      {/* Work/Fan Mode Switch - Bottom Left */}
-      <div className="fixed bottom-20 left-4 z-[99998] md:bottom-4">
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          className="bg-black/80 backdrop-blur-md rounded-full p-1 border border-white/20"
-        >
-          <div className="flex items-center">
-            <button
-              onClick={() => setViewMode('fan')}
-              className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
-                viewMode === 'fan'
-                  ? 'bg-white text-black shadow-lg'
-                  : 'text-white/80 hover:text-white'
-              }`}
-            >
-              <div className="flex items-center space-x-2">
-                <Heart size={16} />
-                <span>Fan</span>
-              </div>
+          {/* Right side - Search/Profile Actions */}
+          <div className="flex items-center space-x-3">
+            <button className="w-8 h-8 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/20 transition-colors">
+              <Search size={18} />
             </button>
-            
-            <button
-              onClick={() => setViewMode('work')}
-              className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
-                viewMode === 'work'
-                  ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-black shadow-lg'
-                  : 'text-white/80 hover:text-white'
-              }`}
-            >
-              <div className="flex items-center space-x-2">
-                <Briefcase size={16} />
-                <span>Work</span>
-              </div>
+            <button className="w-8 h-8 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/20 transition-colors">
+              <Bell size={18} />
             </button>
           </div>
-        </motion.div>
-        
-        {/* Mode indicator */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mt-2 text-center"
-        >
-          <span className="text-white/60 text-xs font-medium">
-            {viewMode === 'work' ? '💼 Professional Mode' : '❤️ Entertainment Mode'}
-          </span>
-        </motion.div>
+        </div>
       </div>
       
       {/* Video Feed */}
