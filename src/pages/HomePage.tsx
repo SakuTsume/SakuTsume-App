@@ -480,7 +480,7 @@ const HomePage: React.FC = () => {
                 </button>
                 
                 {/* Video Info Overlay - Compact Design */}
-                <div className="absolute bottom-0 left-0 right-20 bg-gradient-to-t from-black/80 to-transparent p-3">
+                <div className="absolute bottom-0 left-0 right-16 bg-gradient-to-t from-black/80 to-transparent p-3">
                   {/* User Info - Smaller and more compact */}
                   <div className="flex items-center mb-2">
                     <img
@@ -523,89 +523,89 @@ const HomePage: React.FC = () => {
                     </span>
                   </div>
                 </div>
-              </div>
-              
-              {/* Right Action Panel - Attached to right edge */}
-              <div className="absolute right-0 bottom-20 flex flex-col items-center space-y-6 pr-2">
-                {/* Profile Picture with Plus Button */}
-                <div className="relative">
-                  <img
-                    src={video.userAvatar}
-                    alt={video.username}
-                    className="w-12 h-12 rounded-full border-2 border-white"
-                  />
-                  {!video.isFollowing && (
+                
+                {/* Right Action Panel - Positioned within video container */}
+                <div className="absolute right-2 bottom-16 flex flex-col items-center space-y-4">
+                  {/* Profile Picture with Plus Button - More compact */}
+                  <div className="relative">
+                    <img
+                      src={video.userAvatar}
+                      alt={video.username}
+                      className="w-10 h-10 rounded-full border-2 border-white"
+                    />
+                    {!video.isFollowing && (
+                      <button
+                        onClick={() => handleFollow(video.id)}
+                        className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center"
+                      >
+                        <Plus size={10} className="text-white" />
+                      </button>
+                    )}
+                  </div>
+                  
+                  {/* Like Button - More compact */}
+                  <div className="flex flex-col items-center">
                     <button
-                      onClick={() => handleFollow(video.id)}
-                      className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center"
+                      onClick={() => handleLike(video.id)}
+                      className={`w-10 h-10 rounded-full flex items-center justify-center transition-transform active:scale-125 ${
+                        video.isLiked ? 'text-red-500' : 'text-white'
+                      }`}
                     >
-                      <Plus size={12} className="text-white" />
+                      <Heart size={26} fill={video.isLiked ? '#ef4444' : 'none'} />
                     </button>
-                  )}
-                </div>
-                
-                {/* Like Button */}
-                <div className="flex flex-col items-center">
-                  <button
-                    onClick={() => handleLike(video.id)}
-                    className={`w-12 h-12 rounded-full flex items-center justify-center transition-transform active:scale-125 ${
-                      video.isLiked ? 'text-red-500' : 'text-white'
-                    }`}
-                  >
-                    <Heart size={32} fill={video.isLiked ? '#ef4444' : 'none'} />
+                    <span className="text-white text-xs font-semibold mt-0.5">
+                      {formatNumber(video.likes)}
+                    </span>
+                  </div>
+                  
+                  {/* Comment Button - More compact */}
+                  <div className="flex flex-col items-center">
+                    <button
+                      onClick={() => setShowComments(true)}
+                      className="w-10 h-10 rounded-full flex items-center justify-center text-white transition-transform active:scale-125"
+                    >
+                      <MessageCircle size={26} />
+                    </button>
+                    <span className="text-white text-xs font-semibold mt-0.5">
+                      {formatNumber(video.comments)}
+                    </span>
+                  </div>
+                  
+                  {/* Bookmark Button - More compact */}
+                  <div className="flex flex-col items-center">
+                    <button
+                      onClick={() => handleBookmark(video.id)}
+                      className={`w-10 h-10 rounded-full flex items-center justify-center transition-transform active:scale-125 ${
+                        video.isBookmarked ? 'text-yellow-400' : 'text-white'
+                      }`}
+                    >
+                      <Bookmark size={24} fill={video.isBookmarked ? '#facc15' : 'none'} />
+                    </button>
+                    <span className="text-white text-xs font-semibold mt-0.5">
+                      {formatNumber(video.bookmarks)}
+                    </span>
+                  </div>
+                  
+                  {/* Share Button - More compact */}
+                  <div className="flex flex-col items-center">
+                    <button className="w-10 h-10 rounded-full flex items-center justify-center text-white transition-transform active:scale-125">
+                      <Share2 size={24} />
+                    </button>
+                    <span className="text-white text-xs font-semibold mt-0.5">
+                      {formatNumber(video.shares)}
+                    </span>
+                  </div>
+                  
+                  {/* More Options - More compact */}
+                  <button className="w-10 h-10 rounded-full flex items-center justify-center text-white">
+                    <MoreHorizontal size={24} />
                   </button>
-                  <span className="text-white text-sm font-semibold mt-1">
-                    {formatNumber(video.likes)}
-                  </span>
-                </div>
-                
-                {/* Comment Button */}
-                <div className="flex flex-col items-center">
-                  <button
-                    onClick={() => setShowComments(true)}
-                    className="w-12 h-12 rounded-full flex items-center justify-center text-white transition-transform active:scale-125"
-                  >
-                    <MessageCircle size={32} />
-                  </button>
-                  <span className="text-white text-sm font-semibold mt-1">
-                    {formatNumber(video.comments)}
-                  </span>
-                </div>
-                
-                {/* Bookmark Button */}
-                <div className="flex flex-col items-center">
-                  <button
-                    onClick={() => handleBookmark(video.id)}
-                    className={`w-12 h-12 rounded-full flex items-center justify-center transition-transform active:scale-125 ${
-                      video.isBookmarked ? 'text-yellow-400' : 'text-white'
-                    }`}
-                  >
-                    <Bookmark size={28} fill={video.isBookmarked ? '#facc15' : 'none'} />
-                  </button>
-                  <span className="text-white text-sm font-semibold mt-1">
-                    {formatNumber(video.bookmarks)}
-                  </span>
-                </div>
-                
-                {/* Share Button */}
-                <div className="flex flex-col items-center">
-                  <button className="w-12 h-12 rounded-full flex items-center justify-center text-white transition-transform active:scale-125">
-                    <Share2 size={28} />
-                  </button>
-                  <span className="text-white text-sm font-semibold mt-1">
-                    {formatNumber(video.shares)}
-                  </span>
-                </div>
-                
-                {/* More Options */}
-                <button className="w-12 h-12 rounded-full flex items-center justify-center text-white">
-                  <MoreHorizontal size={28} />
-                </button>
-                
-                {/* Spinning Music Disc */}
-                <div className="w-12 h-12 bg-gradient-to-r from-gray-800 to-gray-600 rounded-full flex items-center justify-center animate-spin">
-                  <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center">
-                    <Music size={16} className="text-white" />
+                  
+                  {/* Spinning Music Disc - More compact */}
+                  <div className="w-10 h-10 bg-gradient-to-r from-gray-800 to-gray-600 rounded-full flex items-center justify-center animate-spin">
+                    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center">
+                      <Music size={12} className="text-white" />
+                    </div>
                   </div>
                 </div>
               </div>
