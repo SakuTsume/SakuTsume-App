@@ -480,7 +480,7 @@ const HomePage: React.FC = () => {
                 </button>
                 
                 {/* Video Info Overlay - Compact Design */}
-                <div className="absolute bottom-0 left-0 right-16 bg-gradient-to-t from-black/80 to-transparent p-3">
+                <div className="absolute bottom-0 left-0 right-20 bg-gradient-to-t from-black/80 to-transparent p-3">
                   {/* User Info - Smaller and more compact */}
                   <div className="flex items-center mb-2">
                     <img
@@ -525,8 +525,8 @@ const HomePage: React.FC = () => {
                 </div>
               </div>
               
-              {/* Right Action Panel */}
-              <div className="absolute right-3 bottom-20 flex flex-col items-center space-y-6">
+              {/* Right Action Panel - Attached to right edge */}
+              <div className="absolute right-0 bottom-20 flex flex-col items-center space-y-6 pr-2">
                 {/* Profile Picture with Plus Button */}
                 <div className="relative">
                   <img
