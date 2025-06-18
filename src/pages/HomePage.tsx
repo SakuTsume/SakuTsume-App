@@ -577,8 +577,8 @@ const HomePage: React.FC = () => {
                   </div>
                 </div>
                 
-                {/* Right Action Panel - Now with 5 Elements including Comments */}
-                <div className="absolute right-2 bottom-16 flex flex-col items-center space-y-4">
+                {/* Right Action Panel - Moved Lower */}
+                <div className="absolute right-2 bottom-6 flex flex-col items-center space-y-4">
                   {/* Profile Picture with Plus Button */}
                   <div className="relative">
                     <img
