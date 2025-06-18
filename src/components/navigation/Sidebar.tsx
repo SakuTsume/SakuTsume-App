@@ -1,11 +1,8 @@
 import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { Home, Search, PlusSquare, User, Users, ShoppingBag, Settings, HelpCircle } from 'lucide-react';
 
 const Sidebar: React.FC = () => {
-  const location = useLocation();
-  const isHomePage = location.pathname === '/';
-  
   const navItems = [
     { path: '/', icon: <Home size={20} />, label: 'Home', end: true },
     { path: '/search', icon: <Search size={20} />, label: 'Search' },
@@ -14,19 +11,6 @@ const Sidebar: React.FC = () => {
     { path: '/network', icon: <Users size={20} />, label: 'Network' },
     { path: '/marketplace', icon: <ShoppingBag size={20} />, label: 'Market' },
   ];
-
-  // Different styling for HomePage vs other pages
-  const linkBaseClass = isHomePage 
-    ? 'flex items-center px-4 py-3 rounded-lg transition-colors'
-    : 'flex items-center px-4 py-3 rounded-lg transition-colors';
-    
-  const activeLinkClass = isHomePage
-    ? 'bg-white/20 text-white backdrop-blur-sm'
-    : 'bg-primary-100 text-primary-800';
-    
-  const inactiveLinkClass = isHomePage
-    ? 'text-white/80 hover:bg-white/10 hover:text-white'
-    : 'text-neutral-600 hover:bg-neutral-100';
 
   return (
     <div className="h-full py-4 px-2 flex flex-col justify-between overflow-y-auto">
@@ -37,8 +21,10 @@ const Sidebar: React.FC = () => {
             to={item.path}
             end={item.end}
             className={({ isActive }) =>
-              `${linkBaseClass} ${
-                isActive ? activeLinkClass : inactiveLinkClass
+              `flex items-center px-4 py-3 rounded-lg transition-colors ${
+                isActive
+                  ? 'bg-primary-100 text-primary-800'
+                  : 'text-neutral-600 hover:bg-neutral-100'
               }`
             }
           >
@@ -52,8 +38,10 @@ const Sidebar: React.FC = () => {
         <NavLink
           to="/settings"
           className={({ isActive }) =>
-            `${linkBaseClass} ${
-              isActive ? activeLinkClass : inactiveLinkClass
+            `flex items-center px-4 py-3 rounded-lg transition-colors ${
+              isActive
+                ? 'bg-primary-100 text-primary-800'
+                : 'text-neutral-600 hover:bg-neutral-100'
             }`
           }
         >
@@ -64,8 +52,10 @@ const Sidebar: React.FC = () => {
         <NavLink
           to="/help"
           className={({ isActive }) =>
-            `${linkBaseClass} ${
-              isActive ? activeLinkClass : inactiveLinkClass
+            `flex items-center px-4 py-3 rounded-lg transition-colors ${
+              isActive
+                ? 'bg-primary-100 text-primary-800'
+                : 'text-neutral-600 hover:bg-neutral-100'
             }`
           }
         >
