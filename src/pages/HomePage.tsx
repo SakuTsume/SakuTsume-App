@@ -149,9 +149,11 @@ const mockTikTokVideos = [
 ];
 
 type HomeTab = 'for-you' | 'following' | 'live';
+type ViewMode = 'fan' | 'work';
 
 const HomePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<HomeTab>('for-you');
+  const [viewMode, setViewMode] = useState<ViewMode>('fan');
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
@@ -438,6 +440,56 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Work/Fan Mode Switch - Bottom Left */}
+      <div className="fixed bottom-20 left-4 z-[99998] md:bottom-4">
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="bg-black/80 backdrop-blur-md rounded-full p-1 border border-white/20"
+        >
+          <div className="flex items-center">
+            <button
+              onClick={() => setViewMode('fan')}
+              className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
+                viewMode === 'fan'
+                  ? 'bg-white text-black shadow-lg'
+                  : 'text-white/80 hover:text-white'
+              }`}
+            >
+              <div className="flex items-center space-x-2">
+                <Heart size={16} />
+                <span>Fan</span>
+              </div>
+            </button>
+            
+            <button
+              onClick={() => setViewMode('work')}
+              className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
+                viewMode === 'work'
+                  ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-black shadow-lg'
+                  : 'text-white/80 hover:text-white'
+              }`}
+            >
+              <div className="flex items-center space-x-2">
+                <Briefcase size={16} />
+                <span>Work</span>
+              </div>
+            </button>
+          </div>
+        </motion.div>
+        
+        {/* Mode indicator */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-2 text-center"
+        >
+          <span className="text-white/60 text-xs font-medium">
+            {viewMode === 'work' ? '💼 Professional Mode' : '❤️ Entertainment Mode'}
+          </span>
+        </motion.div>
+      </div>
       
       {/* Video Feed */}
       <div className="pt-16">
@@ -478,6 +530,14 @@ const HomePage: React.FC = () => {
                 >
                   {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
                 </button>
+
+                {/* Work Mode Indicator */}
+                {viewMode === 'work' && (
+                  <div className="absolute top-4 left-4 bg-gradient-to-r from-amber-400 to-orange-500 text-black px-3 py-1 rounded-full text-xs font-bold flex items-center">
+                    <Briefcase size={12} className="mr-1" />
+                    WORK MODE
+                  </div>
+                )}
                 
                 {/* Video Info Overlay - Compact Design */}
                 <div className="absolute bottom-0 left-0 right-16 bg-gradient-to-t from-black/80 to-transparent p-3">
