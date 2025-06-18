@@ -148,7 +148,7 @@ const mockTikTokVideos = [
   }
 ];
 
-type HomeTab = 'for-you' | 'following' | 'friends' | 'live';
+type HomeTab = 'for-you' | 'following' | 'live';
 
 const HomePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<HomeTab>('for-you');
@@ -383,48 +383,37 @@ const HomePage: React.FC = () => {
   
   return (
     <div className="min-h-screen bg-black">
-      {/* Top Navigation - TikTok Style */}
-      <div className="bg-black/90 backdrop-blur-md border-b border-gray-800 fixed top-0 left-0 right-0 z-[99999]">
-        <div className="max-w-screen-xl mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
-            {/* Left - Live and Following */}
-            <div className="flex items-center space-x-6">
-              <button
-                onClick={() => setActiveTab('live')}
-                className={`flex items-center space-x-1 font-medium ${
-                  activeTab === 'live' ? 'text-white' : 'text-gray-400'
-                }`}
-              >
-                <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-                <span>LIVE</span>
-              </button>
-              
-              <button
-                onClick={() => setActiveTab('following')}
-                className={`font-medium ${
-                  activeTab === 'following' ? 'text-white' : 'text-gray-400'
-                }`}
-              >
-                Following
-              </button>
-            </div>
-            
-            {/* Center - For You */}
+      {/* Top Navigation - Centered Tabs with Transparent Background */}
+      <div className="fixed top-0 left-0 right-0 z-[99999]">
+        <div className="flex items-center justify-center h-16">
+          <div className="flex items-center space-x-8">
             <button
               onClick={() => setActiveTab('for-you')}
-              className={`font-bold text-lg ${
-                activeTab === 'for-you' ? 'text-white' : 'text-gray-400'
+              className={`font-bold text-lg transition-colors ${
+                activeTab === 'for-you' ? 'text-white' : 'text-white/60'
               }`}
             >
               For You
             </button>
             
-            {/* Right - Search */}
-            <div className="flex items-center space-x-4">
-              <button className="text-white">
-                <Search size={24} />
-              </button>
-            </div>
+            <button
+              onClick={() => setActiveTab('following')}
+              className={`font-bold text-lg transition-colors ${
+                activeTab === 'following' ? 'text-white' : 'text-white/60'
+              }`}
+            >
+              Following
+            </button>
+            
+            <button
+              onClick={() => setActiveTab('live')}
+              className={`flex items-center space-x-2 font-bold text-lg transition-colors ${
+                activeTab === 'live' ? 'text-white' : 'text-white/60'
+              }`}
+            >
+              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+              <span>LIVE</span>
+            </button>
           </div>
         </div>
       </div>
