@@ -1,18 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Heart, MessageCircle, Share2, Bookmark, Play, Pause, Volume2, VolumeX, 
-  MoreHorizontal, UserPlus, Star, Crown, Award, Zap, Users, Search, Filter,
-  Eye, Clock, Mic, Video, Camera, PenTool, Music, Palette, Code, Gamepad2,
-  TrendingUp, Calendar, MapPin, Globe, ChevronDown, ChevronUp, Settings,
-  Bell, Mail, Phone, MessageSquare, ThumbsUp, Send, Plus, X, ArrowRight,
-  Briefcase, Target, Coffee, Headphones, Monitor, Smartphone, Tablet,
-  Wifi, Signal, Battery, Volume1, SkipBack, SkipForward, Repeat, Shuffle,
-  Download, Upload, Share, Link, Copy, Edit, Trash, Archive, Flag,
-  CheckCircle, AlertCircle, Info, HelpCircle, Lock, Unlock, Shield,
-  Home, Compass, Trending, Library, History, WatchLater, ThumbsDown,
-  Subscribe, Notifications, LiveIcon as Live, StreamIcon as Stream
-} from 'lucide-react';
+import { Heart, MessageCircle, Share2, Bookmark, Play, Pause, Volume2, VolumeX, MoreHorizontal, UserPlus, Star, Crown, Award, Zap, Users, Search, Filter, Eye, Clock, Mic, Video, Camera, PenTool, Music, Palette, Code, Gamepad2, TrendingUp, Calendar, MapPin, Globe, ChevronDown, ChevronUp, Settings, Bell, Mail, Phone, MessageSquare, ThumbsUp, Send, Plus, X, ArrowRight, Briefcase, Target, Coffee, Headphones, Monitor, Smartphone, Tablet, Wifi, Signal, Battery, Volume1, SkipBack, SkipForward, Repeat, Shuffle, Download, Upload, Share, Link, Copy, Edit, Trash, Archive, Flag, CheckCircle, AlertCircle, Info, HelpCircle, Lock, Unlock, Shield, Home, Compass, TrendingUp as Trending, Library, History, Watch as WatchLater, ThumbsDown, Subscript as Subscribe, Captions as Notifications, MoveIcon as Live, IceCreamIcon as Stream } from 'lucide-react';
 
 // Mock data for different content types
 const mockForYouContent = [
