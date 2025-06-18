@@ -409,7 +409,41 @@ const HomePage: React.FC = () => {
       {/* Top Navigation - Enhanced with Mode Switch */}
       <div className="fixed top-0 left-0 right-0 z-[99999]">
         <div className="flex items-center justify-between h-16 px-4">
-          {/* Left side - Work/Fan Mode Switch */}
+          {/* Left side - Empty for balance */}
+          <div className="w-24"></div>
+
+          {/* Center - Main Navigation Tabs */}
+          <div className="flex items-center space-x-8">
+            <button
+              onClick={() => setActiveTab('for-you')}
+              className={`font-bold text-lg transition-colors ${
+                activeTab === 'for-you' ? 'text-white' : 'text-white/60'
+              }`}
+            >
+              For You
+            </button>
+            
+            <button
+              onClick={() => setActiveTab('following')}
+              className={`font-bold text-lg transition-colors ${
+                activeTab === 'following' ? 'text-white' : 'text-white/60'
+              }`}
+            >
+              Following
+            </button>
+            
+            <button
+              onClick={() => setActiveTab('live')}
+              className={`flex items-center space-x-2 font-bold text-lg transition-colors ${
+                activeTab === 'live' ? 'text-white' : 'text-white/60'
+              }`}
+            >
+              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+              <span>LIVE</span>
+            </button>
+          </div>
+
+          {/* Right side - Work/Fan Mode Switch */}
           <div className="flex items-center">
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
@@ -446,47 +480,6 @@ const HomePage: React.FC = () => {
                 </button>
               </div>
             </motion.div>
-          </div>
-
-          {/* Center - Main Navigation Tabs */}
-          <div className="flex items-center space-x-8">
-            <button
-              onClick={() => setActiveTab('for-you')}
-              className={`font-bold text-lg transition-colors ${
-                activeTab === 'for-you' ? 'text-white' : 'text-white/60'
-              }`}
-            >
-              For You
-            </button>
-            
-            <button
-              onClick={() => setActiveTab('following')}
-              className={`font-bold text-lg transition-colors ${
-                activeTab === 'following' ? 'text-white' : 'text-white/60'
-              }`}
-            >
-              Following
-            </button>
-            
-            <button
-              onClick={() => setActiveTab('live')}
-              className={`flex items-center space-x-2 font-bold text-lg transition-colors ${
-                activeTab === 'live' ? 'text-white' : 'text-white/60'
-              }`}
-            >
-              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-              <span>LIVE</span>
-            </button>
-          </div>
-
-          {/* Right side - Search/Profile Actions */}
-          <div className="flex items-center space-x-3">
-            <button className="w-8 h-8 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/20 transition-colors">
-              <Search size={18} />
-            </button>
-            <button className="w-8 h-8 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/20 transition-colors">
-              <Bell size={18} />
-            </button>
           </div>
         </div>
       </div>
