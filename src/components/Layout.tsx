@@ -14,12 +14,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className="min-h-screen bg-neutral-50 text-neutral-800 flex flex-col">
       <div className="flex flex-1">
-        {/* Hide sidebar completely on HomePage */}
-        {!isHomePage && (
-          <div className="hidden md:block w-64 fixed h-full">
-            <Sidebar />
-          </div>
-        )}
+        {/* Sidebar - Always show on desktop, but with different styling for HomePage */}
+        <div className={`hidden md:block w-64 fixed h-full z-[100000] ${
+          isHomePage ? 'bg-black/80 backdrop-blur-md' : 'bg-white'
+        }`}>
+          <Sidebar />
+        </div>
         
         <main className={`flex-1 ${isHomePage ? '' : 'pb-16 md:pb-0'} ${!isHomePage ? 'md:ml-64' : ''}`}>
           {children}
