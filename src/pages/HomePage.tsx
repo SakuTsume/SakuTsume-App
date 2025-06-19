@@ -501,33 +501,26 @@ const HomePage: React.FC = () => {
           </div>
 
           {/* View Mode Toggle */}
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={() => setViewMode(viewMode === 'work' ? 'fan' : 'work')}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-full font-medium transition-all ${
-                viewMode === 'work'
-                  ? 'bg-amber-500 text-black'
-                  : 'bg-purple-500 text-white'
-              }`}
-            >
-              {viewMode === 'work' ? (
-                <>
-                  <Briefcase size={18} />
-                  <span className="hidden sm:inline">💼 WORK MODE</span>
-                </>
-              ) : (
-                <>
-                  <Theater size={18} />
-                  <span className="hidden sm:inline">🎭 FAN MODE</span>
-                </>
-              )}
-            </button>
-
-            {/* Profile */}
-            <button className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white">
-              <User size={20} />
-            </button>
-          </div>
+          <button
+            onClick={() => setViewMode(viewMode === 'work' ? 'fan' : 'work')}
+            className={`flex items-center space-x-2 px-4 py-2 rounded-full font-medium transition-all ${
+              viewMode === 'work'
+                ? 'bg-amber-500 text-black'
+                : 'bg-purple-500 text-white'
+            }`}
+          >
+            {viewMode === 'work' ? (
+              <>
+                <Briefcase size={18} />
+                <span className="hidden sm:inline">💼 WORK MODE</span>
+              </>
+            ) : (
+              <>
+                <Theater size={18} />
+                <span className="hidden sm:inline">🎭 FAN MODE</span>
+              </>
+            )}
+          </button>
         </div>
       </div>
 
