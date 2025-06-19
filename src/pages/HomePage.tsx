@@ -102,10 +102,20 @@ const HomePage: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const touchStartY = useRef<number>(0);
   const touchEndY = useRef<number>(0);
+
+  // Auto-hide instructions after 2 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowInstructions(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   // Load more content when approaching the end
   const loadMoreContent = useCallback(() => {
@@ -573,10 +583,20 @@ const HomePage: React.FC = () => {
         {activeFeed === 'for-you' ? 'For You' : 'Following'} • {viewMode === 'work' ? 'Work Mode' : 'Fan Mode'}
       </div>
 
-      {/* Instructions */}
-      <div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-black/60 backdrop-blur-sm text-white px-4 py-2 rounded-full text-xs opacity-50">
-        Scroll, swipe, or use arrow keys to navigate
-      </div>
+      {/* Instructions - Auto-hide after 2 seconds */}
+      <AnimatePresence>
+        {showInstructions && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ duration: 0.3 }}
+            className="fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-black/60 backdrop-blur-sm text-white px-4 py-2 rounded-full text-xs"
+          >
+            Scroll, swipe, or use arrow keys to navigate
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
