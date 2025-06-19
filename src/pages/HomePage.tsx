@@ -248,53 +248,55 @@ const HomePage: React.FC = () => {
     // Audition Alert Card
     if (content.type === 'audition_alert') {
       return (
-        <div className="h-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center p-6">
-          <div className="text-center text-white max-w-sm">
-            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Zap size={32} />
-            </div>
-            
-            <div className="bg-white/10 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium mb-4">
-              AUDITION ALERT
-            </div>
-            
-            <h3 className="text-xl font-bold mb-2">{content.title}</h3>
-            <p className="text-white/90 mb-4">{content.description}</p>
-            
-            <div className="flex items-center justify-between mb-4 text-sm">
-              <div className="flex items-center">
-                <Briefcase size={16} className="mr-1" />
-                <span>{content.budget}</span>
+        <div className="max-w-md mx-auto bg-gradient-to-br from-orange-500 to-red-600 rounded-xl overflow-hidden">
+          <div className="aspect-[9/16] flex items-center justify-center p-6">
+            <div className="text-center text-white max-w-sm">
+              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Zap size={32} />
               </div>
-              <div className="flex items-center">
-                <Clock size={16} className="mr-1" />
-                <span>{content.deadline}</span>
+              
+              <div className="bg-white/10 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium mb-4">
+                AUDITION ALERT
               </div>
+              
+              <h3 className="text-xl font-bold mb-2">{content.title}</h3>
+              <p className="text-white/90 mb-4">{content.description}</p>
+              
+              <div className="flex items-center justify-between mb-4 text-sm">
+                <div className="flex items-center">
+                  <Briefcase size={16} className="mr-1" />
+                  <span>{content.budget}</span>
+                </div>
+                <div className="flex items-center">
+                  <Clock size={16} className="mr-1" />
+                  <span>{content.deadline}</span>
+                </div>
+              </div>
+              
+              <div className="flex flex-wrap gap-1 mb-6 justify-center">
+                {content.tags.map((tag: string) => (
+                  <span key={tag} className="px-2 py-1 bg-white/20 rounded-full text-xs">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+              
+              <button className="w-full py-3 bg-white text-orange-600 rounded-lg font-bold text-lg hover:bg-white/90 transition-colors">
+                APPLY NOW
+              </button>
+              
+              <p className="text-xs text-white/70 mt-2">{content.applicants} applicants so far</p>
             </div>
-            
-            <div className="flex flex-wrap gap-1 mb-6 justify-center">
-              {content.tags.map((tag: string) => (
-                <span key={tag} className="px-2 py-1 bg-white/20 rounded-full text-xs">
-                  {tag}
-                </span>
-              ))}
-            </div>
-            
-            <button className="w-full py-3 bg-white text-orange-600 rounded-lg font-bold text-lg hover:bg-white/90 transition-colors">
-              APPLY NOW
-            </button>
-            
-            <p className="text-xs text-white/70 mt-2">{content.applicants} applicants so far</p>
           </div>
         </div>
       );
     }
 
-    // Regular Content Card
+    // Regular Content Card - Compact TikTok Web Style
     return (
-      <div className="h-full bg-black relative">
-        {/* Media Content */}
-        <div className="absolute inset-0">
+      <div className="max-w-md mx-auto bg-black rounded-xl overflow-hidden">
+        <div className="aspect-[9/16] relative">
+          {/* Media Content */}
           {content.media.type === 'video' ? (
             <div className="relative w-full h-full">
               <video
@@ -357,123 +359,123 @@ const HomePage: React.FC = () => {
               className="w-full h-full object-cover"
             />
           )}
-        </div>
 
-        {/* Overlays */}
-        {/* Rising Talent Badge */}
-        {content.isRisingTalent && viewMode === 'work' && (
-          <div className="absolute top-4 left-4 bg-gradient-to-r from-amber-400 to-orange-500 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center shadow-lg">
-            <Star size={14} className="mr-1" />
-            RISING TALENT
-          </div>
-        )}
+          {/* Overlays */}
+          {/* Rising Talent Badge */}
+          {content.isRisingTalent && viewMode === 'work' && (
+            <div className="absolute top-4 left-4 bg-gradient-to-r from-amber-400 to-orange-500 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center shadow-lg">
+              <Star size={14} className="mr-1" />
+              RISING TALENT
+            </div>
+          )}
 
-        {/* Casting Call Badge */}
-        {content.isCastingCall && (
-          <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-            CASTING CALL
-          </div>
-        )}
+          {/* Casting Call Badge */}
+          {content.isCastingCall && (
+            <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+              CASTING CALL
+            </div>
+          )}
 
-        {/* Duration Badge */}
-        {content.duration && (
-          <div className="absolute top-4 right-4 bg-black/60 text-white px-2 py-1 rounded text-xs">
-            {content.duration}
-          </div>
-        )}
+          {/* Duration Badge */}
+          {content.duration && (
+            <div className="absolute top-4 right-4 bg-black/60 text-white px-2 py-1 rounded text-xs">
+              {content.duration}
+            </div>
+          )}
 
-        {/* User Info & Actions */}
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-          <div className="flex items-end justify-between">
-            {/* Left: User Info & Caption */}
-            <div className="flex-1 mr-4">
-              <div className="flex items-center mb-2">
-                <img
-                  src={content.userAvatar}
-                  alt={content.username}
-                  className="w-10 h-10 rounded-full object-cover mr-3"
-                />
-                <div>
-                  <div className="flex items-center">
-                    <h3 className="text-white font-semibold">{content.username}</h3>
-                    {content.isRisingTalent && viewMode === 'work' && (
-                      <Crown size={14} className="ml-2 text-amber-400" />
+          {/* Bottom Content Overlay - More Compact */}
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent">
+            <div className="flex items-end justify-between p-3">
+              {/* Left: User Info & Caption - More Compact */}
+              <div className="flex-1 mr-3">
+                <div className="flex items-center mb-2">
+                  <img
+                    src={content.userAvatar}
+                    alt={content.username}
+                    className="w-8 h-8 rounded-full object-cover mr-2"
+                  />
+                  <div>
+                    <div className="flex items-center">
+                      <h3 className="text-white font-semibold text-sm">{content.username}</h3>
+                      {content.isRisingTalent && viewMode === 'work' && (
+                        <Crown size={12} className="ml-1 text-amber-400" />
+                      )}
+                    </div>
+                    <p className="text-white/80 text-xs">{content.profession}</p>
+                  </div>
+                </div>
+                
+                <p className="text-white text-sm mb-2 line-clamp-2">{content.caption}</p>
+                
+                {/* Work Mode Additional Info - More Compact */}
+                {viewMode === 'work' && content.trustScore && (
+                  <div className="flex items-center space-x-3 text-xs text-white/70">
+                    <div className="flex items-center">
+                      <Award size={10} className="mr-1" />
+                      <span>Trust Score: {content.trustScore}/5.0</span>
+                    </div>
+                    {content.skills && (
+                      <div className="flex space-x-1">
+                        {content.skills.slice(0, 2).map((skill: string) => (
+                          <span key={skill} className="bg-white/20 px-2 py-0.5 rounded-full text-xs">
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
                     )}
                   </div>
-                  <p className="text-white/80 text-sm">{content.profession}</p>
-                </div>
+                )}
               </div>
-              
-              <p className="text-white text-sm mb-2">{content.caption}</p>
-              
-              {/* Work Mode Additional Info */}
-              {viewMode === 'work' && content.trustScore && (
-                <div className="flex items-center space-x-4 text-xs text-white/70">
-                  <div className="flex items-center">
-                    <Award size={12} className="mr-1" />
-                    <span>Trust Score: {content.trustScore}/5.0</span>
-                  </div>
-                  {content.skills && (
-                    <div className="flex space-x-1">
-                      {content.skills.slice(0, 2).map((skill: string) => (
-                        <span key={skill} className="bg-white/20 px-2 py-1 rounded-full">
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
 
-            {/* Right: Action Buttons */}
-            <div className="flex flex-col items-center space-y-4">
-              {/* Follow/Following Button */}
-              <button className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                content.isFollowing 
-                  ? 'bg-white/20 text-white' 
-                  : 'bg-white text-black'
-              }`}>
-                <UserPlus size={20} />
-              </button>
-
-              {/* Like */}
-              <div className="text-center">
-                <button className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                  content.isLiked ? 'text-red-500' : 'text-white'
+              {/* Right: Action Buttons - More Compact */}
+              <div className="flex flex-col items-center space-y-3">
+                {/* Follow/Following Button */}
+                <button className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                  content.isFollowing 
+                    ? 'bg-white/20 text-white' 
+                    : 'bg-white text-black'
                 }`}>
-                  <Heart size={24} fill={content.isLiked ? '#ef4444' : 'none'} />
+                  <UserPlus size={16} />
                 </button>
-                <span className="text-white text-xs">{content.likes}</span>
-              </div>
 
-              {/* Comment */}
-              <div className="text-center">
-                <button className="w-12 h-12 rounded-full flex items-center justify-center text-white">
-                  <MessageCircle size={24} />
+                {/* Like */}
+                <div className="text-center">
+                  <button className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                    content.isLiked ? 'text-red-500' : 'text-white'
+                  }`}>
+                    <Heart size={20} fill={content.isLiked ? '#ef4444' : 'none'} />
+                  </button>
+                  <span className="text-white text-xs">{content.likes > 999 ? `${(content.likes/1000).toFixed(1)}K` : content.likes}</span>
+                </div>
+
+                {/* Comment */}
+                <div className="text-center">
+                  <button className="w-10 h-10 rounded-full flex items-center justify-center text-white">
+                    <MessageCircle size={20} />
+                  </button>
+                  <span className="text-white text-xs">{content.comments}</span>
+                </div>
+
+                {/* Share */}
+                <div className="text-center">
+                  <button className="w-10 h-10 rounded-full flex items-center justify-center text-white">
+                    <Share2 size={20} />
+                  </button>
+                  <span className="text-white text-xs">{content.shares}</span>
+                </div>
+
+                {/* Save */}
+                <button className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                  content.isSaved ? 'text-yellow-500' : 'text-white'
+                }`}>
+                  <Bookmark size={20} fill={content.isSaved ? '#eab308' : 'none'} />
                 </button>
-                <span className="text-white text-xs">{content.comments}</span>
-              </div>
 
-              {/* Share */}
-              <div className="text-center">
-                <button className="w-12 h-12 rounded-full flex items-center justify-center text-white">
-                  <Share2 size={24} />
+                {/* More */}
+                <button className="w-10 h-10 rounded-full flex items-center justify-center text-white">
+                  <MoreHorizontal size={20} />
                 </button>
-                <span className="text-white text-xs">{content.shares}</span>
               </div>
-
-              {/* Save */}
-              <button className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                content.isSaved ? 'text-yellow-500' : 'text-white'
-              }`}>
-                <Bookmark size={24} fill={content.isSaved ? '#eab308' : 'none'} />
-              </button>
-
-              {/* More */}
-              <button className="w-12 h-12 rounded-full flex items-center justify-center text-white">
-                <MoreHorizontal size={24} />
-              </button>
             </div>
           </div>
         </div>
@@ -482,7 +484,7 @@ const HomePage: React.FC = () => {
   };
 
   return (
-    <div className="h-screen bg-black overflow-hidden">
+    <div className="min-h-screen bg-neutral-900">
       {/* Fixed Header */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md">
         <div className="flex items-center justify-between h-16 px-4">
@@ -548,14 +550,16 @@ const HomePage: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="h-full pt-16">
-        <div className="h-full overflow-y-auto snap-y snap-mandatory">
-          {filteredContent.map((content, index) => (
-            <div key={content.id} className="h-full snap-start">
-              {renderContent(content)}
-            </div>
-          ))}
+      {/* Main Content - TikTok Web Style */}
+      <div className="pt-16 pb-4">
+        <div className="max-w-screen-lg mx-auto px-4">
+          <div className="space-y-6">
+            {filteredContent.map((content, index) => (
+              <div key={content.id} className="w-full">
+                {renderContent(content)}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
