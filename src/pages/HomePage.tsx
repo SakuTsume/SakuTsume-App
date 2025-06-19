@@ -578,11 +578,6 @@ const HomePage: React.FC = () => {
         {isLoading && <span className="ml-2">Loading...</span>}
       </div>
 
-      {/* Feed Info */}
-      <div className="fixed bottom-6 right-6 bg-black/60 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm">
-        {activeFeed === 'for-you' ? 'For You' : 'Following'} • {viewMode === 'work' ? 'Work Mode' : 'Fan Mode'}
-      </div>
-
       {/* Instructions - Auto-hide after 2 seconds */}
       <AnimatePresence>
         {showInstructions && (
