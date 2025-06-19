@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Filter, MessageCircle, Users, MessageSquare, Mic, Star, ArrowUp, ArrowDown, Clock, Zap, Plus, Send, Phone, Video, MoreHorizontal, Hash, Volume2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Filter, MessageCircle, Users, MessageSquare, Star, ArrowUp, ArrowDown, Clock, Zap, Plus, Send, Phone, Video, MoreHorizontal, Hash, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Mock data for different sections
@@ -34,33 +34,6 @@ const mockDirectMessages = [
     time: '1h',
     unread: 0,
     online: true,
-  },
-];
-
-const mockAudioRooms = [
-  {
-    id: '1',
-    name: 'Indie Dev Lounge',
-    participants: 12,
-    maxParticipants: 20,
-    topic: 'Discussing upcoming game projects',
-    speakers: ['Alex', 'Maya', 'Tom'],
-  },
-  {
-    id: '2',
-    name: 'Animation Hub',
-    participants: 8,
-    maxParticipants: 15,
-    topic: 'Character design techniques',
-    speakers: ['Sarah', 'Mike'],
-  },
-  {
-    id: '3',
-    name: 'Voice Acting Workshop',
-    participants: 15,
-    maxParticipants: 25,
-    topic: 'Emotion delivery masterclass',
-    speakers: ['Emma', 'David', 'Lisa'],
   },
 ];
 
@@ -271,11 +244,6 @@ const NetworkPage: React.FC = () => {
     }
   };
 
-  const joinAudioRoom = (roomId: string) => {
-    console.log('Joining audio room:', roomId);
-    // In a real app, this would show a preview and then join
-  };
-
   const toggleSidebar = () => {
     setSidebarCollapsed(!sidebarCollapsed);
   };
@@ -378,51 +346,6 @@ const NetworkPage: React.FC = () => {
                         </span>
                       )}
                     </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Audio Rooms */}
-          <div className={`p-4 border-t border-neutral-200 ${sidebarCollapsed ? 'px-2' : ''}`}>
-            <h3 className={`text-sm font-semibold text-neutral-600 mb-3 flex items-center ${
-              sidebarCollapsed ? 'justify-center' : ''
-            }`}>
-              <Mic size={16} className={sidebarCollapsed ? '' : 'mr-2'} />
-              {!sidebarCollapsed && 'AUDIO ROOMS'}
-            </h3>
-            <div className="space-y-2">
-              {mockAudioRooms.map((room) => (
-                <div
-                  key={room.id}
-                  onClick={() => joinAudioRoom(room.id)}
-                  className={`${sidebarCollapsed ? 'p-2 flex justify-center' : 'p-3'} rounded-lg bg-gradient-to-r from-primary-50 to-secondary-50 hover:from-primary-100 hover:to-secondary-100 cursor-pointer transition-colors`}
-                >
-                  {sidebarCollapsed ? (
-                    <div className="relative">
-                      <Volume2 size={16} className="text-primary-600" />
-                      <span className="absolute -top-1 -right-1 bg-primary-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                        {room.participants}
-                      </span>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="flex items-center justify-between mb-1">
-                        <h4 className="font-medium text-neutral-800">{room.name}</h4>
-                        <div className="flex items-center text-xs text-neutral-600">
-                          <Users size={12} className="mr-1" />
-                          {room.participants}/{room.maxParticipants}
-                        </div>
-                      </div>
-                      <p className="text-xs text-neutral-600 mb-2">{room.topic}</p>
-                      <div className="flex items-center">
-                        <Volume2 size={12} className="text-primary-600 mr-1" />
-                        <span className="text-xs text-primary-600">
-                          {room.speakers.join(', ')} speaking
-                        </span>
-                      </div>
-                    </>
                   )}
                 </div>
               ))}
