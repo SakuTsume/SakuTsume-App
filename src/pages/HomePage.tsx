@@ -216,7 +216,7 @@ const HomePage: React.FC = () => {
     // Audition Alert Card
     if (contentItem.type === 'audition_alert') {
       return (
-        <div className="w-full h-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center">
+        <div className="w-full h-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center rounded-2xl">
           <div className="text-center text-white max-w-sm px-6">
             <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
               <Zap size={40} />
@@ -260,7 +260,7 @@ const HomePage: React.FC = () => {
 
     // Regular Content
     return (
-      <div className="w-full h-full relative">
+      <div className="w-full h-full relative rounded-2xl overflow-hidden">
         {/* Media Content */}
         {contentItem.media.type === 'video' ? (
           <div className="relative w-full h-full">
@@ -349,39 +349,39 @@ const HomePage: React.FC = () => {
 
         {/* Bottom Content Overlay */}
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent">
-          <div className="flex items-end justify-between p-6">
+          <div className="flex items-end justify-between p-4">
             {/* Left: User Info & Caption */}
-            <div className="flex-1 mr-6">
-              <div className="flex items-center mb-4">
+            <div className="flex-1 mr-4">
+              <div className="flex items-center mb-3">
                 <img
                   src={contentItem.userAvatar}
                   alt={contentItem.username}
-                  className="w-12 h-12 rounded-full object-cover mr-3"
+                  className="w-10 h-10 rounded-full object-cover mr-3"
                 />
                 <div>
                   <div className="flex items-center">
-                    <h3 className="text-white font-bold text-lg">{contentItem.username}</h3>
+                    <h3 className="text-white font-bold text-base">{contentItem.username}</h3>
                     {contentItem.isRisingTalent && viewMode === 'work' && (
-                      <Crown size={16} className="ml-2 text-amber-400" />
+                      <Crown size={14} className="ml-2 text-amber-400" />
                     )}
                   </div>
                   <p className="text-white/80 text-sm">{contentItem.profession}</p>
                 </div>
               </div>
               
-              <p className="text-white text-lg mb-4 leading-relaxed">{contentItem.caption}</p>
+              <p className="text-white text-base mb-3 leading-relaxed">{contentItem.caption}</p>
               
               {/* Work Mode Additional Info */}
               {viewMode === 'work' && contentItem.trustScore && (
-                <div className="flex items-center space-x-4 text-sm text-white/80">
+                <div className="flex items-center space-x-3 text-sm text-white/80">
                   <div className="flex items-center">
-                    <Award size={14} className="mr-1" />
+                    <Award size={12} className="mr-1" />
                     <span>Trust Score: {contentItem.trustScore}/5.0</span>
                   </div>
                   {contentItem.skills && (
-                    <div className="flex space-x-2">
+                    <div className="flex space-x-1">
                       {contentItem.skills.slice(0, 2).map((skill: string) => (
-                        <span key={skill} className="bg-white/20 px-3 py-1 rounded-full text-xs">
+                        <span key={skill} className="bg-white/20 px-2 py-1 rounded-full text-xs">
                           {skill}
                         </span>
                       ))}
@@ -392,54 +392,54 @@ const HomePage: React.FC = () => {
             </div>
 
             {/* Right: Action Buttons */}
-            <div className="flex flex-col items-center space-y-6">
+            <div className="flex flex-col items-center space-y-4">
               {/* Follow/Following Button */}
-              <button className={`w-14 h-14 rounded-full flex items-center justify-center transition-all ${
+              <button className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
                 contentItem.isFollowing 
                   ? 'bg-white/20 text-white' 
                   : 'bg-white text-black'
               }`}>
-                <UserPlus size={24} />
+                <UserPlus size={20} />
               </button>
 
               {/* Like */}
               <div className="text-center">
-                <button className={`w-14 h-14 rounded-full flex items-center justify-center transition-all ${
+                <button className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
                   contentItem.isLiked ? 'text-red-500' : 'text-white'
                 }`}>
-                  <Heart size={28} fill={contentItem.isLiked ? '#ef4444' : 'none'} />
+                  <Heart size={24} fill={contentItem.isLiked ? '#ef4444' : 'none'} />
                 </button>
-                <span className="text-white text-sm font-medium mt-1 block">
+                <span className="text-white text-xs font-medium mt-1 block">
                   {contentItem.likes > 999 ? `${(contentItem.likes/1000).toFixed(1)}K` : contentItem.likes}
                 </span>
               </div>
 
               {/* Comment */}
               <div className="text-center">
-                <button className="w-14 h-14 rounded-full flex items-center justify-center text-white">
-                  <MessageCircle size={28} />
+                <button className="w-12 h-12 rounded-full flex items-center justify-center text-white">
+                  <MessageCircle size={24} />
                 </button>
-                <span className="text-white text-sm font-medium mt-1 block">{contentItem.comments}</span>
+                <span className="text-white text-xs font-medium mt-1 block">{contentItem.comments}</span>
               </div>
 
               {/* Share */}
               <div className="text-center">
-                <button className="w-14 h-14 rounded-full flex items-center justify-center text-white">
-                  <Share2 size={28} />
+                <button className="w-12 h-12 rounded-full flex items-center justify-center text-white">
+                  <Share2 size={24} />
                 </button>
-                <span className="text-white text-sm font-medium mt-1 block">{contentItem.shares}</span>
+                <span className="text-white text-xs font-medium mt-1 block">{contentItem.shares}</span>
               </div>
 
               {/* Save */}
-              <button className={`w-14 h-14 rounded-full flex items-center justify-center transition-all ${
+              <button className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
                 contentItem.isSaved ? 'text-yellow-500' : 'text-white'
               }`}>
-                <Bookmark size={28} fill={contentItem.isSaved ? '#eab308' : 'none'} />
+                <Bookmark size={24} fill={contentItem.isSaved ? '#eab308' : 'none'} />
               </button>
 
               {/* More */}
-              <button className="w-14 h-14 rounded-full flex items-center justify-center text-white">
-                <MoreHorizontal size={28} />
+              <button className="w-12 h-12 rounded-full flex items-center justify-center text-white">
+                <MoreHorizontal size={24} />
               </button>
             </div>
           </div>
@@ -521,40 +521,45 @@ const HomePage: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Content - Single Reel */}
-      <div className="h-full pt-16">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentIndex}
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -50 }}
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
-            className="h-full"
-          >
-            {currentContent && renderContent(currentContent)}
-          </motion.div>
-        </AnimatePresence>
-      </div>
+      {/* Main Content - YouTube Shorts Style */}
+      <div className="h-full pt-16 flex items-center justify-center bg-black">
+        {/* Centered Reel Container */}
+        <div className="w-full max-w-md h-full flex items-center justify-center px-4">
+          <div className="w-full aspect-[9/16] max-h-[calc(100vh-80px)]">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentIndex}
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -50 }}
+                transition={{ duration: 0.3, ease: 'easeInOut' }}
+                className="w-full h-full"
+              >
+                {currentContent && renderContent(currentContent)}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </div>
 
-      {/* Navigation Indicators */}
-      <div className="fixed right-6 top-1/2 transform -translate-y-1/2 flex flex-col space-y-2">
-        {currentIndex > 0 && (
-          <button
-            onClick={() => setCurrentIndex(prev => prev - 1)}
-            className="w-12 h-12 bg-black/50 rounded-full flex items-center justify-center text-white hover:bg-black/70 transition-colors"
-          >
-            <ChevronUp size={24} />
-          </button>
-        )}
-        {currentIndex < content.length - 1 && (
-          <button
-            onClick={() => setCurrentIndex(prev => prev + 1)}
-            className="w-12 h-12 bg-black/50 rounded-full flex items-center justify-center text-white hover:bg-black/70 transition-colors"
-          >
-            <ChevronDown size={24} />
-          </button>
-        )}
+        {/* Navigation Indicators - Positioned outside the reel */}
+        <div className="fixed right-6 top-1/2 transform -translate-y-1/2 flex flex-col space-y-2">
+          {currentIndex > 0 && (
+            <button
+              onClick={() => setCurrentIndex(prev => prev - 1)}
+              className="w-12 h-12 bg-black/50 rounded-full flex items-center justify-center text-white hover:bg-black/70 transition-colors"
+            >
+              <ChevronUp size={24} />
+            </button>
+          )}
+          {currentIndex < content.length - 1 && (
+            <button
+              onClick={() => setCurrentIndex(prev => prev + 1)}
+              className="w-12 h-12 bg-black/50 rounded-full flex items-center justify-center text-white hover:bg-black/70 transition-colors"
+            >
+              <ChevronDown size={24} />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Progress Indicator */}
