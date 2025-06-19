@@ -6,7 +6,7 @@ import {
   Search, Bell, Settings, User, Plus, Zap, TrendingUp,
   Camera, Video, Mic, PenTool, Users, Globe, Clock,
   ArrowRight, Filter, Eye, ThumbsUp, Briefcase, 
-  Theater, MoreHorizontal, Send, UserPlus
+  Theater, Send, UserPlus
 } from 'lucide-react';
 
 // Enhanced mock data generator for infinite scroll
@@ -445,11 +445,6 @@ const HomePage: React.FC = () => {
                 contentItem.isSaved ? 'text-yellow-500' : 'text-white'
               }`}>
                 <Bookmark size={24} fill={contentItem.isSaved ? '#eab308' : 'none'} />
-              </button>
-
-              {/* More */}
-              <button className="w-12 h-12 rounded-full flex items-center justify-center text-white">
-                <MoreHorizontal size={24} />
               </button>
             </div>
           </div>
