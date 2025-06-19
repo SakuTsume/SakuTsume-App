@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Play, Pause, Volume2, VolumeX, Heart, MessageCircle, Share2, 
@@ -9,184 +9,87 @@ import {
   Theater, MoreHorizontal, Send, UserPlus
 } from 'lucide-react';
 
-// Enhanced mock data for For You feed with work/fan mode content
-const mockForYouFeed = [
-  {
-    id: '1',
-    username: 'maya_va',
-    userAvatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=600',
-    profession: 'Voice Actor',
-    isRisingTalent: true,
-    trustScore: 4.8,
-    isTopThree: true,
-    media: {
-      type: 'video' as const,
-      url: 'https://example.com/maya-horror-demo.mp4',
-      thumbnail: 'https://images.pexels.com/photos/7991579/pexels-photo-7991579.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-    },
-    caption: 'Horror villain voice for upcoming indie game 🎭 What do you think of this spine-chilling performance?',
-    likes: 2847,
-    comments: 156,
-    shares: 89,
-    duration: '0:15',
-    isLiked: true,
-    isSaved: false,
-    timestamp: '2 hours ago',
-    isFollowing: false,
-    skills: ['Horror VO', 'Character Voices', 'Game VO'],
-    workModeOnly: true,
-  },
-  {
-    id: 'ad_1',
-    type: 'audition_alert',
-    title: 'Sci-Fi Hero Voice Actor Needed',
-    company: 'Stellar Games Studio',
-    budget: '$2,000',
-    deadline: '5 days left',
-    description: 'Looking for a heroic male voice for our upcoming space adventure game.',
-    tags: ['Voice Acting', 'Sci-Fi', 'Hero Character'],
-    applicants: 23,
-  },
-  {
-    id: '2',
-    username: 'alexcinema',
-    userAvatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=600',
-    profession: 'Cinematographer',
-    isRisingTalent: false,
-    trustScore: 4.9,
-    isTopThree: true,
-    media: {
-      type: 'video' as const,
-      url: 'https://example.com/alex-cinematography.mp4',
-      thumbnail: 'https://images.pexels.com/photos/3062541/pexels-photo-3062541.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-    },
-    caption: 'Golden hour magic ✨ This is why I love being a cinematographer',
-    likes: 1923,
-    comments: 89,
-    shares: 45,
-    duration: '0:30',
-    isLiked: false,
-    isSaved: true,
-    timestamp: '4 hours ago',
-    isFollowing: false,
-    skills: ['Cinematography', 'Lighting', 'Color Grading'],
-    workModeOnly: true,
-  },
-  {
-    id: '3',
-    username: 'soundscape_sam',
-    userAvatar: 'https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&cs=tinysrgb&w=600',
-    profession: 'Sound Designer',
-    isRisingTalent: true,
-    trustScore: 4.7,
-    isTopThree: false,
-    media: {
-      type: 'audio' as const,
-      url: 'https://example.com/ambient-forest.mp3',
-      thumbnail: 'https://images.pexels.com/photos/4195504/pexels-photo-4195504.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-    },
-    caption: 'Ambient forest soundscape for indie horror film 🌲 Recorded at 3 AM for maximum creepiness',
-    likes: 1456,
-    comments: 67,
-    shares: 23,
-    duration: '1:45',
-    isLiked: true,
-    isSaved: false,
-    timestamp: '6 hours ago',
-    isFollowing: true,
-    skills: ['Sound Design', 'Field Recording', 'Audio Post'],
-    workModeOnly: false,
-  },
-  {
-    id: '4',
-    username: 'storycraft_emma',
-    userAvatar: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=600',
-    profession: 'Screenwriter',
-    isRisingTalent: false,
-    trustScore: 4.6,
-    isTopThree: false,
-    media: {
-      type: 'image' as const,
-      url: 'https://images.pexels.com/photos/261763/pexels-photo-261763.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-    },
-    caption: 'Late night writing session vibes 📝 Working on a cyberpunk thriller that\'s going to blow your mind!',
-    likes: 892,
-    comments: 34,
-    shares: 12,
-    isLiked: false,
-    isSaved: true,
-    timestamp: '8 hours ago',
-    isFollowing: false,
-    skills: ['Screenwriting', 'Story Development', 'Character Creation'],
-    workModeOnly: false,
-  },
-];
+// Enhanced mock data generator for infinite scroll
+const generateMockContent = (startId: number, count: number) => {
+  const professions = ['Voice Actor', 'Cinematographer', 'Sound Designer', 'Screenwriter', 'Director', 'Animator', 'Composer'];
+  const usernames = ['maya_va', 'alexcinema', 'soundscape_sam', 'storycraft_emma', 'director_mike', 'anim_sarah', 'composer_jay'];
+  const avatars = [
+    'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=600',
+    'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=600',
+    'https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&cs=tinysrgb&w=600',
+    'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=600',
+    'https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=600',
+    'https://images.pexels.com/photos/1036623/pexels-photo-1036623.jpeg?auto=compress&cs=tinysrgb&w=600',
+    'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=600'
+  ];
+  const thumbnails = [
+    'https://images.pexels.com/photos/7991579/pexels-photo-7991579.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'https://images.pexels.com/photos/3062541/pexels-photo-3062541.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'https://images.pexels.com/photos/4195504/pexels-photo-4195504.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'https://images.pexels.com/photos/261763/pexels-photo-261763.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
+  ];
 
-// Mock following feed data
-const mockFollowingFeed = [
-  {
-    id: 'f1',
-    username: 'maya_va',
-    userAvatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=600',
-    profession: 'Voice Actor',
-    media: {
-      type: 'video' as const,
-      url: 'https://example.com/maya-rpg-villain.mp4',
-      thumbnail: 'https://images.pexels.com/photos/7991579/pexels-photo-7991579.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-    },
-    caption: 'New RPG Villain Reel 🎭 Just finished this epic character for an upcoming fantasy game!',
-    likes: 142,
-    comments: 12,
-    shares: 8,
-    duration: '1:30',
-    isLiked: true,
-    isSaved: false,
-    timestamp: '1 hour ago',
-    isFollowing: true,
-    isTopThree: true,
-  },
-  {
-    id: 'f2',
-    username: 'studiox_casting',
-    userAvatar: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=600',
-    profession: 'Casting Director',
-    media: {
-      type: 'image' as const,
-      url: 'https://images.pexels.com/photos/3062541/pexels-photo-3062541.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-    },
-    caption: 'CASTING CALL: Cyberpunk Detective needed for major production! Budget: $3,000. Apply now! 🕵️‍♀️',
-    likes: 89,
-    comments: 23,
-    shares: 45,
-    isLiked: false,
-    isSaved: true,
-    timestamp: '3 hours ago',
-    isFollowing: true,
-    isCastingCall: true,
-    budget: '$3,000',
-  },
-  {
-    id: 'f3',
-    username: 'tom_soundguy',
-    userAvatar: 'https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&cs=tinysrgb&w=600',
-    profession: 'Sound Engineer',
-    media: {
-      type: 'video' as const,
-      url: 'https://example.com/tom-behind-scenes.mp4',
-      thumbnail: 'https://images.pexels.com/photos/4195504/pexels-photo-4195504.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-    },
-    caption: 'Behind-the-scenes of our latest recording session 🎙️ The magic happens in post!',
-    likes: 89,
-    comments: 7,
-    shares: 3,
-    duration: '4:00',
-    isLiked: true,
-    isSaved: false,
-    timestamp: '5 hours ago',
-    isFollowing: true,
-    isTopThree: false,
-  },
-];
+  const content = [];
+  
+  for (let i = 0; i < count; i++) {
+    const id = startId + i;
+    const isAd = (id % 8 === 0); // Audition alert every 8th post
+    
+    if (isAd) {
+      content.push({
+        id: `ad_${id}`,
+        type: 'audition_alert',
+        title: `${['Sci-Fi Hero', 'Fantasy Villain', 'Cyberpunk Detective', 'Horror Narrator'][Math.floor(Math.random() * 4)]} Voice Actor Needed`,
+        company: `${['Stellar Games', 'Epic Studios', 'Indie Collective', 'Dream Productions'][Math.floor(Math.random() * 4)]} Studio`,
+        budget: `$${[1500, 2000, 2500, 3000, 3500][Math.floor(Math.random() * 5)]}`,
+        deadline: `${Math.floor(Math.random() * 7) + 1} days left`,
+        description: 'Looking for a talented voice actor for our upcoming project.',
+        tags: ['Voice Acting', 'Character Work', 'Professional'],
+        applicants: Math.floor(Math.random() * 50) + 10,
+      });
+    } else {
+      const professionIndex = Math.floor(Math.random() * professions.length);
+      const mediaTypes = ['video', 'audio', 'image'];
+      const mediaType = mediaTypes[Math.floor(Math.random() * mediaTypes.length)];
+      
+      content.push({
+        id: `content_${id}`,
+        username: usernames[professionIndex] + (Math.random() > 0.5 ? '_pro' : '_artist'),
+        userAvatar: avatars[professionIndex],
+        profession: professions[professionIndex],
+        isRisingTalent: Math.random() > 0.7,
+        trustScore: (Math.random() * 1.5 + 3.5).toFixed(1),
+        isTopThree: Math.random() > 0.4,
+        media: {
+          type: mediaType,
+          url: `https://example.com/content-${id}.${mediaType === 'audio' ? 'mp3' : 'mp4'}`,
+          thumbnail: thumbnails[Math.floor(Math.random() * thumbnails.length)],
+        },
+        caption: [
+          'Just finished an amazing project! 🎭',
+          'Behind the scenes magic ✨',
+          'Working on something special 🎬',
+          'New character voice reveal! 🎙️',
+          'Creative process in action 🎨',
+          'Latest work showcase 🌟'
+        ][Math.floor(Math.random() * 6)],
+        likes: Math.floor(Math.random() * 5000) + 100,
+        comments: Math.floor(Math.random() * 200) + 10,
+        shares: Math.floor(Math.random() * 100) + 5,
+        duration: mediaType === 'image' ? undefined : `${Math.floor(Math.random() * 3)}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')}`,
+        isLiked: Math.random() > 0.7,
+        isSaved: Math.random() > 0.8,
+        timestamp: `${Math.floor(Math.random() * 24)} hours ago`,
+        isFollowing: Math.random() > 0.6,
+        skills: ['Skill A', 'Skill B', 'Skill C'],
+        workModeOnly: Math.random() > 0.5,
+      });
+    }
+  }
+  
+  return content;
+};
 
 type FeedType = 'for-you' | 'following';
 type ViewMode = 'work' | 'fan';
@@ -195,36 +98,99 @@ const HomePage: React.FC = () => {
   const [activeFeed, setActiveFeed] = useState<FeedType>('for-you');
   const [viewMode, setViewMode] = useState<ViewMode>('work');
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [content, setContent] = useState(() => generateMockContent(1, 20));
+  const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const touchStartY = useRef<number>(0);
+  const touchEndY = useRef<number>(0);
 
-  // Get filtered content based on feed type and view mode
-  const getFilteredContent = () => {
-    const baseContent = activeFeed === 'for-you' ? mockForYouFeed : mockFollowingFeed;
+  // Load more content when approaching the end
+  const loadMoreContent = useCallback(() => {
+    if (isLoading) return;
     
-    if (viewMode === 'work') {
-      // Work Mode: Only Top 3 reels for talents
-      return baseContent.filter(item => {
-        if (item.type === 'audition_alert') return true; // Always show audition alerts
-        return item.isTopThree !== false; // Show top 3 content
-      });
-    } else {
-      // Fan Mode: All public content
-      return baseContent;
+    setIsLoading(true);
+    // Simulate API delay
+    setTimeout(() => {
+      const newContent = generateMockContent(content.length + 1, 10);
+      setContent(prev => [...prev, ...newContent]);
+      setIsLoading(false);
+    }, 500);
+  }, [content.length, isLoading]);
+
+  // Check if we need to load more content
+  useEffect(() => {
+    if (currentIndex >= content.length - 5) {
+      loadMoreContent();
+    }
+  }, [currentIndex, content.length, loadMoreContent]);
+
+  // Handle keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowUp' && currentIndex > 0) {
+        setCurrentIndex(prev => prev - 1);
+      } else if (e.key === 'ArrowDown' && currentIndex < content.length - 1) {
+        setCurrentIndex(prev => prev + 1);
+      } else if (e.key === ' ') {
+        e.preventDefault();
+        togglePlayback();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentIndex, content.length]);
+
+  // Handle touch/swipe navigation
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchEnd = () => {
+    const deltaY = touchStartY.current - touchEndY.current;
+    const threshold = 50;
+
+    if (Math.abs(deltaY) > threshold) {
+      if (deltaY > 0 && currentIndex < content.length - 1) {
+        // Swipe up - next content
+        setCurrentIndex(prev => prev + 1);
+      } else if (deltaY < 0 && currentIndex > 0) {
+        // Swipe down - previous content
+        setCurrentIndex(prev => prev - 1);
+      }
     }
   };
 
-  const filteredContent = getFilteredContent();
+  // Handle wheel/scroll navigation
+  const handleWheel = (e: WheelEvent) => {
+    e.preventDefault();
+    const threshold = 50;
 
-  // Auto-advance content
+    if (Math.abs(e.deltaY) > threshold) {
+      if (e.deltaY > 0 && currentIndex < content.length - 1) {
+        // Scroll down - next content
+        setCurrentIndex(prev => prev + 1);
+      } else if (e.deltaY < 0 && currentIndex > 0) {
+        // Scroll up - previous content
+        setCurrentIndex(prev => prev - 1);
+      }
+    }
+  };
+
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % filteredContent.length);
-    }, 15000); // 15 seconds per item
-
-    return () => clearInterval(timer);
-  }, [filteredContent.length]);
+    const container = containerRef.current;
+    if (container) {
+      container.addEventListener('wheel', handleWheel, { passive: false });
+      return () => container.removeEventListener('wheel', handleWheel);
+    }
+  }, [currentIndex, content.length]);
 
   const togglePlayback = () => {
     if (videoRef.current) {
@@ -244,238 +210,237 @@ const HomePage: React.FC = () => {
     }
   };
 
-  const renderContent = (content: any) => {
+  const currentContent = content[currentIndex];
+
+  const renderContent = (contentItem: any) => {
     // Audition Alert Card
-    if (content.type === 'audition_alert') {
+    if (contentItem.type === 'audition_alert') {
       return (
-        <div className="max-w-md mx-auto bg-gradient-to-br from-orange-500 to-red-600 rounded-xl overflow-hidden">
-          <div className="aspect-[9/16] flex items-center justify-center p-6">
-            <div className="text-center text-white max-w-sm">
-              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Zap size={32} />
-              </div>
-              
-              <div className="bg-white/10 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium mb-4">
-                AUDITION ALERT
-              </div>
-              
-              <h3 className="text-xl font-bold mb-2">{content.title}</h3>
-              <p className="text-white/90 mb-4">{content.description}</p>
-              
-              <div className="flex items-center justify-between mb-4 text-sm">
-                <div className="flex items-center">
-                  <Briefcase size={16} className="mr-1" />
-                  <span>{content.budget}</span>
-                </div>
-                <div className="flex items-center">
-                  <Clock size={16} className="mr-1" />
-                  <span>{content.deadline}</span>
-                </div>
-              </div>
-              
-              <div className="flex flex-wrap gap-1 mb-6 justify-center">
-                {content.tags.map((tag: string) => (
-                  <span key={tag} className="px-2 py-1 bg-white/20 rounded-full text-xs">
-                    {tag}
-                  </span>
-                ))}
-              </div>
-              
-              <button className="w-full py-3 bg-white text-orange-600 rounded-lg font-bold text-lg hover:bg-white/90 transition-colors">
-                APPLY NOW
-              </button>
-              
-              <p className="text-xs text-white/70 mt-2">{content.applicants} applicants so far</p>
+        <div className="w-full h-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center">
+          <div className="text-center text-white max-w-sm px-6">
+            <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Zap size={40} />
             </div>
+            
+            <div className="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-medium mb-6">
+              AUDITION ALERT
+            </div>
+            
+            <h3 className="text-2xl font-bold mb-4">{contentItem.title}</h3>
+            <p className="text-white/90 mb-6 text-lg">{contentItem.description}</p>
+            
+            <div className="flex items-center justify-between mb-6 text-lg">
+              <div className="flex items-center">
+                <Briefcase size={20} className="mr-2" />
+                <span className="font-semibold">{contentItem.budget}</span>
+              </div>
+              <div className="flex items-center">
+                <Clock size={20} className="mr-2" />
+                <span>{contentItem.deadline}</span>
+              </div>
+            </div>
+            
+            <div className="flex flex-wrap gap-2 mb-8 justify-center">
+              {contentItem.tags.map((tag: string) => (
+                <span key={tag} className="px-3 py-1 bg-white/20 rounded-full text-sm">
+                  {tag}
+                </span>
+              ))}
+            </div>
+            
+            <button className="w-full py-4 bg-white text-orange-600 rounded-xl font-bold text-xl hover:bg-white/90 transition-colors mb-4">
+              APPLY NOW
+            </button>
+            
+            <p className="text-sm text-white/70">{contentItem.applicants} applicants so far</p>
           </div>
         </div>
       );
     }
 
-    // Regular Content Card - Compact TikTok Web Style
+    // Regular Content
     return (
-      <div className="max-w-md mx-auto bg-black rounded-xl overflow-hidden">
-        <div className="aspect-[9/16] relative">
-          {/* Media Content */}
-          {content.media.type === 'video' ? (
-            <div className="relative w-full h-full">
-              <video
-                ref={videoRef}
-                src={content.media.url}
-                poster={content.media.thumbnail}
-                className="w-full h-full object-cover"
-                muted={isMuted}
-                loop
-                playsInline
-              />
-              
-              {/* Video Controls */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <button
-                  onClick={togglePlayback}
-                  className="w-16 h-16 bg-black/50 rounded-full flex items-center justify-center text-white opacity-0 hover:opacity-100 transition-opacity"
-                >
-                  {isPlaying ? <Pause size={24} /> : <Play size={24} />}
-                </button>
-              </div>
-              
+      <div className="w-full h-full relative">
+        {/* Media Content */}
+        {contentItem.media.type === 'video' ? (
+          <div className="relative w-full h-full">
+            <video
+              ref={videoRef}
+              src={contentItem.media.url}
+              poster={contentItem.media.thumbnail}
+              className="w-full h-full object-cover"
+              muted={isMuted}
+              loop
+              playsInline
+              autoPlay={isPlaying}
+            />
+            
+            {/* Video Controls */}
+            <div className="absolute inset-0 flex items-center justify-center">
               <button
-                onClick={toggleMute}
-                className="absolute top-4 right-4 w-10 h-10 bg-black/50 rounded-full flex items-center justify-center text-white"
+                onClick={togglePlayback}
+                className="w-20 h-20 bg-black/50 rounded-full flex items-center justify-center text-white opacity-0 hover:opacity-100 transition-opacity"
               >
-                {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+                {isPlaying ? <Pause size={32} /> : <Play size={32} />}
               </button>
             </div>
-          ) : content.media.type === 'audio' ? (
-            <div className="relative w-full h-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center">
-              <div className="text-center text-white p-6">
-                <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Mic size={32} />
-                </div>
-                
-                {/* Audio waveform visualization */}
-                <div className="flex items-center justify-center mb-4 space-x-1">
-                  {[...Array(20)].map((_, i) => (
-                    <div
-                      key={i}
-                      className="w-1 bg-white/60 rounded-full animate-pulse"
-                      style={{
-                        height: `${Math.random() * 30 + 10}px`,
-                        animationDelay: `${i * 0.1}s`
-                      }}
-                    />
-                  ))}
-                </div>
-                
-                <div className="bg-white/20 rounded-full px-4 py-2 text-sm">
-                  {content.duration}
-                </div>
+          </div>
+        ) : contentItem.media.type === 'audio' ? (
+          <div className="relative w-full h-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center">
+            <div className="text-center text-white p-8">
+              <div className="w-32 h-32 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-8">
+                <Mic size={48} />
+              </div>
+              
+              <h3 className="text-2xl font-bold mb-4">{contentItem.caption}</h3>
+              
+              {/* Audio waveform visualization */}
+              <div className="flex items-center justify-center mb-8 space-x-2">
+                {[...Array(25)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="w-1.5 bg-white/60 rounded-full animate-pulse"
+                    style={{
+                      height: `${Math.random() * 40 + 20}px`,
+                      animationDelay: `${i * 0.1}s`
+                    }}
+                  />
+                ))}
+              </div>
+              
+              <div className="bg-white/20 rounded-full px-6 py-3 text-lg font-medium">
+                {contentItem.duration}
               </div>
             </div>
-          ) : (
-            <img
-              src={content.media.url}
-              alt={content.caption}
-              className="w-full h-full object-cover"
-            />
-          )}
+          </div>
+        ) : (
+          <img
+            src={contentItem.media.url}
+            alt={contentItem.caption}
+            className="w-full h-full object-cover"
+          />
+        )}
 
-          {/* Overlays */}
-          {/* Rising Talent Badge */}
-          {content.isRisingTalent && viewMode === 'work' && (
-            <div className="absolute top-4 left-4 bg-gradient-to-r from-amber-400 to-orange-500 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center shadow-lg">
-              <Star size={14} className="mr-1" />
-              RISING TALENT
-            </div>
-          )}
+        {/* Overlays */}
+        {/* Rising Talent Badge */}
+        {contentItem.isRisingTalent && viewMode === 'work' && (
+          <div className="absolute top-6 left-6 bg-gradient-to-r from-amber-400 to-orange-500 text-white px-4 py-2 rounded-full text-sm font-medium flex items-center shadow-lg">
+            <Star size={16} className="mr-2" />
+            RISING TALENT
+          </div>
+        )}
 
-          {/* Casting Call Badge */}
-          {content.isCastingCall && (
-            <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-              CASTING CALL
-            </div>
-          )}
+        {/* Duration Badge */}
+        {contentItem.duration && (
+          <div className="absolute top-6 right-6 bg-black/60 text-white px-3 py-1 rounded-lg text-sm font-medium">
+            {contentItem.duration}
+          </div>
+        )}
 
-          {/* Duration Badge */}
-          {content.duration && (
-            <div className="absolute top-4 right-4 bg-black/60 text-white px-2 py-1 rounded text-xs">
-              {content.duration}
-            </div>
-          )}
+        {/* Mute Button */}
+        {contentItem.media.type === 'video' && (
+          <button
+            onClick={toggleMute}
+            className="absolute top-20 right-6 w-12 h-12 bg-black/50 rounded-full flex items-center justify-center text-white"
+          >
+            {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+          </button>
+        )}
 
-          {/* Bottom Content Overlay - More Compact */}
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent">
-            <div className="flex items-end justify-between p-3">
-              {/* Left: User Info & Caption - More Compact */}
-              <div className="flex-1 mr-3">
-                <div className="flex items-center mb-2">
-                  <img
-                    src={content.userAvatar}
-                    alt={content.username}
-                    className="w-8 h-8 rounded-full object-cover mr-2"
-                  />
-                  <div>
-                    <div className="flex items-center">
-                      <h3 className="text-white font-semibold text-sm">{content.username}</h3>
-                      {content.isRisingTalent && viewMode === 'work' && (
-                        <Crown size={12} className="ml-1 text-amber-400" />
-                      )}
-                    </div>
-                    <p className="text-white/80 text-xs">{content.profession}</p>
-                  </div>
-                </div>
-                
-                <p className="text-white text-sm mb-2 line-clamp-2">{content.caption}</p>
-                
-                {/* Work Mode Additional Info - More Compact */}
-                {viewMode === 'work' && content.trustScore && (
-                  <div className="flex items-center space-x-3 text-xs text-white/70">
-                    <div className="flex items-center">
-                      <Award size={10} className="mr-1" />
-                      <span>Trust Score: {content.trustScore}/5.0</span>
-                    </div>
-                    {content.skills && (
-                      <div className="flex space-x-1">
-                        {content.skills.slice(0, 2).map((skill: string) => (
-                          <span key={skill} className="bg-white/20 px-2 py-0.5 rounded-full text-xs">
-                            {skill}
-                          </span>
-                        ))}
-                      </div>
+        {/* Bottom Content Overlay */}
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent">
+          <div className="flex items-end justify-between p-6">
+            {/* Left: User Info & Caption */}
+            <div className="flex-1 mr-6">
+              <div className="flex items-center mb-4">
+                <img
+                  src={contentItem.userAvatar}
+                  alt={contentItem.username}
+                  className="w-12 h-12 rounded-full object-cover mr-3"
+                />
+                <div>
+                  <div className="flex items-center">
+                    <h3 className="text-white font-bold text-lg">{contentItem.username}</h3>
+                    {contentItem.isRisingTalent && viewMode === 'work' && (
+                      <Crown size={16} className="ml-2 text-amber-400" />
                     )}
                   </div>
-                )}
+                  <p className="text-white/80 text-sm">{contentItem.profession}</p>
+                </div>
+              </div>
+              
+              <p className="text-white text-lg mb-4 leading-relaxed">{contentItem.caption}</p>
+              
+              {/* Work Mode Additional Info */}
+              {viewMode === 'work' && contentItem.trustScore && (
+                <div className="flex items-center space-x-4 text-sm text-white/80">
+                  <div className="flex items-center">
+                    <Award size={14} className="mr-1" />
+                    <span>Trust Score: {contentItem.trustScore}/5.0</span>
+                  </div>
+                  {contentItem.skills && (
+                    <div className="flex space-x-2">
+                      {contentItem.skills.slice(0, 2).map((skill: string) => (
+                        <span key={skill} className="bg-white/20 px-3 py-1 rounded-full text-xs">
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Right: Action Buttons */}
+            <div className="flex flex-col items-center space-y-6">
+              {/* Follow/Following Button */}
+              <button className={`w-14 h-14 rounded-full flex items-center justify-center transition-all ${
+                contentItem.isFollowing 
+                  ? 'bg-white/20 text-white' 
+                  : 'bg-white text-black'
+              }`}>
+                <UserPlus size={24} />
+              </button>
+
+              {/* Like */}
+              <div className="text-center">
+                <button className={`w-14 h-14 rounded-full flex items-center justify-center transition-all ${
+                  contentItem.isLiked ? 'text-red-500' : 'text-white'
+                }`}>
+                  <Heart size={28} fill={contentItem.isLiked ? '#ef4444' : 'none'} />
+                </button>
+                <span className="text-white text-sm font-medium mt-1 block">
+                  {contentItem.likes > 999 ? `${(contentItem.likes/1000).toFixed(1)}K` : contentItem.likes}
+                </span>
               </div>
 
-              {/* Right: Action Buttons - More Compact */}
-              <div className="flex flex-col items-center space-y-3">
-                {/* Follow/Following Button */}
-                <button className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  content.isFollowing 
-                    ? 'bg-white/20 text-white' 
-                    : 'bg-white text-black'
-                }`}>
-                  <UserPlus size={16} />
+              {/* Comment */}
+              <div className="text-center">
+                <button className="w-14 h-14 rounded-full flex items-center justify-center text-white">
+                  <MessageCircle size={28} />
                 </button>
-
-                {/* Like */}
-                <div className="text-center">
-                  <button className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    content.isLiked ? 'text-red-500' : 'text-white'
-                  }`}>
-                    <Heart size={20} fill={content.isLiked ? '#ef4444' : 'none'} />
-                  </button>
-                  <span className="text-white text-xs">{content.likes > 999 ? `${(content.likes/1000).toFixed(1)}K` : content.likes}</span>
-                </div>
-
-                {/* Comment */}
-                <div className="text-center">
-                  <button className="w-10 h-10 rounded-full flex items-center justify-center text-white">
-                    <MessageCircle size={20} />
-                  </button>
-                  <span className="text-white text-xs">{content.comments}</span>
-                </div>
-
-                {/* Share */}
-                <div className="text-center">
-                  <button className="w-10 h-10 rounded-full flex items-center justify-center text-white">
-                    <Share2 size={20} />
-                  </button>
-                  <span className="text-white text-xs">{content.shares}</span>
-                </div>
-
-                {/* Save */}
-                <button className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  content.isSaved ? 'text-yellow-500' : 'text-white'
-                }`}>
-                  <Bookmark size={20} fill={content.isSaved ? '#eab308' : 'none'} />
-                </button>
-
-                {/* More */}
-                <button className="w-10 h-10 rounded-full flex items-center justify-center text-white">
-                  <MoreHorizontal size={20} />
-                </button>
+                <span className="text-white text-sm font-medium mt-1 block">{contentItem.comments}</span>
               </div>
+
+              {/* Share */}
+              <div className="text-center">
+                <button className="w-14 h-14 rounded-full flex items-center justify-center text-white">
+                  <Share2 size={28} />
+                </button>
+                <span className="text-white text-sm font-medium mt-1 block">{contentItem.shares}</span>
+              </div>
+
+              {/* Save */}
+              <button className={`w-14 h-14 rounded-full flex items-center justify-center transition-all ${
+                contentItem.isSaved ? 'text-yellow-500' : 'text-white'
+              }`}>
+                <Bookmark size={28} fill={contentItem.isSaved ? '#eab308' : 'none'} />
+              </button>
+
+              {/* More */}
+              <button className="w-14 h-14 rounded-full flex items-center justify-center text-white">
+                <MoreHorizontal size={28} />
+              </button>
             </div>
           </div>
         </div>
@@ -484,10 +449,16 @@ const HomePage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-900">
+    <div 
+      ref={containerRef}
+      className="h-screen bg-black overflow-hidden"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
       {/* Fixed Header */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md">
-        <div className="flex items-center justify-between h-16 px-4">
+        <div className="flex items-center justify-between h-16 px-6">
           {/* Logo */}
           <div className="flex items-center space-x-2">
             <img src="/sakutsume-icon.svg" alt="SakuTsume" className="h-8 w-8" />
@@ -498,7 +469,7 @@ const HomePage: React.FC = () => {
           <div className="flex items-center space-x-1 bg-white/10 rounded-full p-1">
             <button
               onClick={() => setActiveFeed('for-you')}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+              className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${
                 activeFeed === 'for-you'
                   ? 'bg-white text-black'
                   : 'text-white hover:text-white/80'
@@ -509,7 +480,7 @@ const HomePage: React.FC = () => {
             <span className="text-white/40">•</span>
             <button
               onClick={() => setActiveFeed('following')}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+              className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${
                 activeFeed === 'following'
                   ? 'bg-white text-black'
                   : 'text-white hover:text-white/80'
@@ -520,7 +491,7 @@ const HomePage: React.FC = () => {
           </div>
 
           {/* View Mode Toggle */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-4">
             <button
               onClick={() => setViewMode(viewMode === 'work' ? 'fan' : 'work')}
               className={`flex items-center space-x-2 px-4 py-2 rounded-full font-medium transition-all ${
@@ -531,12 +502,12 @@ const HomePage: React.FC = () => {
             >
               {viewMode === 'work' ? (
                 <>
-                  <Briefcase size={16} />
+                  <Briefcase size={18} />
                   <span className="hidden sm:inline">💼 WORK MODE</span>
                 </>
               ) : (
                 <>
-                  <Theater size={16} />
+                  <Theater size={18} />
                   <span className="hidden sm:inline">🎭 FAN MODE</span>
                 </>
               )}
@@ -550,27 +521,56 @@ const HomePage: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Content - TikTok Web Style */}
-      <div className="pt-16 pb-4">
-        <div className="max-w-screen-lg mx-auto px-4">
-          <div className="space-y-6">
-            {filteredContent.map((content, index) => (
-              <div key={content.id} className="w-full">
-                {renderContent(content)}
-              </div>
-            ))}
-          </div>
-        </div>
+      {/* Main Content - Single Reel */}
+      <div className="h-full pt-16">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentIndex}
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -50 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            className="h-full"
+          >
+            {currentContent && renderContent(currentContent)}
+          </motion.div>
+        </AnimatePresence>
       </div>
 
-      {/* Feed Info Indicator */}
-      <div className="fixed bottom-4 left-4 bg-black/60 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs">
+      {/* Navigation Indicators */}
+      <div className="fixed right-6 top-1/2 transform -translate-y-1/2 flex flex-col space-y-2">
+        {currentIndex > 0 && (
+          <button
+            onClick={() => setCurrentIndex(prev => prev - 1)}
+            className="w-12 h-12 bg-black/50 rounded-full flex items-center justify-center text-white hover:bg-black/70 transition-colors"
+          >
+            <ChevronUp size={24} />
+          </button>
+        )}
+        {currentIndex < content.length - 1 && (
+          <button
+            onClick={() => setCurrentIndex(prev => prev + 1)}
+            className="w-12 h-12 bg-black/50 rounded-full flex items-center justify-center text-white hover:bg-black/70 transition-colors"
+          >
+            <ChevronDown size={24} />
+          </button>
+        )}
+      </div>
+
+      {/* Progress Indicator */}
+      <div className="fixed bottom-6 left-6 bg-black/60 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm">
+        {currentIndex + 1} / {content.length}
+        {isLoading && <span className="ml-2">Loading...</span>}
+      </div>
+
+      {/* Feed Info */}
+      <div className="fixed bottom-6 right-6 bg-black/60 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm">
         {activeFeed === 'for-you' ? 'For You' : 'Following'} • {viewMode === 'work' ? 'Work Mode' : 'Fan Mode'}
       </div>
 
-      {/* Content Counter */}
-      <div className="fixed bottom-4 right-4 bg-black/60 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs">
-        {currentIndex + 1} / {filteredContent.length}
+      {/* Instructions */}
+      <div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-black/60 backdrop-blur-sm text-white px-4 py-2 rounded-full text-xs opacity-50">
+        Scroll, swipe, or use arrow keys to navigate
       </div>
     </div>
   );
