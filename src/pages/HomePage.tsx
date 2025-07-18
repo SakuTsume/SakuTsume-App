@@ -624,10 +624,10 @@ const HomePage: React.FC = () => {
       </div>
 
       {/* Main Content - YouTube Shorts Style */}
-      <div className="h-full pt-16 flex items-center justify-center bg-black relative">
+      <div className="h-full flex items-center justify-center bg-black relative">
         {/* Centered Reel Container */}
         <div className="w-full max-w-md h-full flex items-center justify-center px-4">
-          <div className="w-full aspect-[9/16] max-h-[calc(100vh-80px)]">
+          <div className="w-full aspect-[9/16] max-h-screen">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentIndex}
