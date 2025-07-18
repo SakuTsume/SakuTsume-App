@@ -180,10 +180,7 @@ const HomePage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showInstructions, setShowInstructions] = useState(true);
   const [showComments, setShowComments] = useState(false);
-  const [comments, setComments] = useState<any[]>(() => {
-    const saved = localStorage.getItem('sakutsume_comments');
-    return saved ? JSON.parse(saved) : {};
-  });
+  const [comments, setComments] = useState<any[]>([]);
   const [newComment, setNewComment] = useState('');
   const [followingUsers, setFollowingUsers] = useState<Set<string>>(() => {
     const saved = localStorage.getItem('sakutsume_following');
