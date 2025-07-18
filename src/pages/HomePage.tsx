@@ -168,6 +168,7 @@ const HomePage: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [content, setContent] = useState(() => generateMockContent(1, 20));
   const [likedContent, setLikedContent] = useState<Set<string>>(new Set());
+  const [savedContent, setSavedContent] = useState<Set<string>>(new Set());
   const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -344,6 +345,33 @@ const HomePage: React.FC = () => {
             ...item,
             likes: newLikeCount,
             isLiked: !wasLiked
+          };
+        }
+        return item;
+      })
+    );
+  };
+
+  const handleSave = (contentId: string) => {
+    setContent(prevContent => 
+      prevContent.map(item => {
+        if (item.id === contentId) {
+          const wasSaved = savedContent.has(contentId);
+          
+          // Update saved content set
+          setSavedContent(prev => {
+            const newSet = new Set(prev);
+            if (wasSaved) {
+              newSet.delete(contentId);
+            } else {
+              newSet.add(contentId);
+            }
+            return newSet;
+          });
+          
+          return {
+            ...item,
+            isSaved: !wasSaved
           };
         }
         return item;
@@ -577,10 +605,12 @@ const HomePage: React.FC = () => {
               </div>
 
               {/* Save */}
-              <button className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
-                contentItem.isSaved ? 'text-yellow-500' : 'text-white'
+              <button 
+                onClick={() => handleSave(contentItem.id)}
+                className={`w-12 h-12 rounded-full flex items-center justify-center transition-all transform hover:scale-110 ${
+                savedContent.has(contentItem.id) ? 'text-yellow-500' : 'text-white'
               }`}>
-                <Bookmark size={24} fill={contentItem.isSaved ? '#eab308' : 'none'} />
+                <Bookmark size={24} fill={savedContent.has(contentItem.id) ? '#eab308' : 'none'} />
               </button>
             </div>
           </div>
