@@ -167,19 +167,65 @@ const HomePage: React.FC = () => {
   const [viewMode, setViewMode] = useState<ViewMode>('work');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [content, setContent] = useState(() => generateMockContent(1, 20));
-  const [likedContent, setLikedContent] = useState<Set<string>>(new Set());
-  const [savedContent, setSavedContent] = useState<Set<string>>(new Set());
+  const [likedContent, setLikedContent] = useState<Set<string>>(() => {
+    const saved = localStorage.getItem('sakutsume_liked_content');
+    return saved ? new Set(JSON.parse(saved)) : new Set();
+  });
+  const [savedContent, setSavedContent] = useState<Set<string>>(() => {
+    const saved = localStorage.getItem('sakutsume_saved_content');
+    return saved ? new Set(JSON.parse(saved)) : new Set();
+  });
   const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [showInstructions, setShowInstructions] = useState(true);
   const [showComments, setShowComments] = useState(false);
-  const [comments, setComments] = useState<any[]>([]);
+  const [comments, setComments] = useState<any[]>(() => {
+    const saved = localStorage.getItem('sakutsume_comments');
+    return saved ? JSON.parse(saved) : {};
+  });
   const [newComment, setNewComment] = useState('');
+  const [followingUsers, setFollowingUsers] = useState<Set<string>>(() => {
+    const saved = localStorage.getItem('sakutsume_following');
+    return saved ? new Set(JSON.parse(saved)) : new Set();
+  });
+  const [allComments, setAllComments] = useState<{[key: string]: any[]}>(() => {
+    const saved = localStorage.getItem('sakutsume_all_comments');
+    return saved ? JSON.parse(saved) : {};
+  });
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const touchStartY = useRef<number>(0);
   const touchEndY = useRef<number>(0);
+
+  // Save to localStorage whenever state changes
+  useEffect(() => {
+    localStorage.setItem('sakutsume_liked_content', JSON.stringify([...likedContent]));
+  }, [likedContent]);
+
+  useEffect(() => {
+    localStorage.setItem('sakutsume_saved_content', JSON.stringify([...savedContent]));
+  }, [savedContent]);
+
+  useEffect(() => {
+    localStorage.setItem('sakutsume_following', JSON.stringify([...followingUsers]));
+  }, [followingUsers]);
+
+  useEffect(() => {
+    localStorage.setItem('sakutsume_all_comments', JSON.stringify(allComments));
+  }, [allComments]);
+
+  // Load content with persisted like/save states
+  useEffect(() => {
+    setContent(prevContent => 
+      prevContent.map(item => ({
+        ...item,
+        isLiked: likedContent.has(item.id),
+        isSaved: savedContent.has(item.id),
+        isFollowing: followingUsers.has(item.username),
+      }))
+    );
+  }, [likedContent, savedContent, followingUsers]);
 
   // Auto-hide instructions after 2 seconds
   useEffect(() => {
@@ -193,10 +239,19 @@ const HomePage: React.FC = () => {
   // Load comments when comment section is opened
   useEffect(() => {
     if (showComments && currentContent) {
-      const mockComments = generateMockComments(currentContent.id);
-      setComments(mockComments);
+      const existingComments = allComments[currentContent.id];
+      if (existingComments) {
+        setComments(existingComments);
+      } else {
+        const mockComments = generateMockComments(currentContent.id);
+        setComments(mockComments);
+        setAllComments(prev => ({
+          ...prev,
+          [currentContent.id]: mockComments
+        }));
+      }
     }
-  }, [showComments, currentIndex]);
+  }, [showComments, currentIndex, allComments]);
 
   // Load more content when approaching the end
   const loadMoreContent = useCallback(() => {
@@ -206,10 +261,16 @@ const HomePage: React.FC = () => {
     // Simulate API delay
     setTimeout(() => {
       const newContent = generateMockContent(content.length + 1, 10);
-      setContent(prev => [...prev, ...newContent]);
+      const contentWithStates = newContent.map(item => ({
+        ...item,
+        isLiked: likedContent.has(item.id),
+        isSaved: savedContent.has(item.id),
+        isFollowing: followingUsers.has(item.username),
+      }));
+      setContent(prev => [...prev, ...contentWithStates]);
       setIsLoading(false);
     }, 500);
-  }, [content.length, isLoading]);
+  }, [content.length, isLoading, likedContent, savedContent, followingUsers]);
 
   // Check if we need to load more content
   useEffect(() => {
@@ -318,29 +379,35 @@ const HomePage: React.FC = () => {
         time: 'now',
         replies: 0
       };
-      setComments(prev => [comment, ...prev]);
+      const updatedComments = [comment, ...comments];
+      setComments(updatedComments);
+      setAllComments(prev => ({
+        ...prev,
+        [currentContent.id]: updatedComments
+      }));
       setNewComment('');
     }
   };
 
   const handleLike = (contentId: string) => {
+    const wasLiked = likedContent.has(contentId);
+    
+    // Update liked content set
+    setLikedContent(prev => {
+      const newSet = new Set(prev);
+      if (wasLiked) {
+        newSet.delete(contentId);
+      } else {
+        newSet.add(contentId);
+      }
+      return newSet;
+    });
+    
+    // Update content state
     setContent(prevContent => 
       prevContent.map(item => {
         if (item.id === contentId) {
-          const wasLiked = likedContent.has(contentId);
           const newLikeCount = wasLiked ? item.likes - 1 : item.likes + 1;
-          
-          // Update liked content set
-          setLikedContent(prev => {
-            const newSet = new Set(prev);
-            if (wasLiked) {
-              newSet.delete(contentId);
-            } else {
-              newSet.add(contentId);
-            }
-            return newSet;
-          });
-          
           return {
             ...item,
             likes: newLikeCount,
@@ -353,25 +420,54 @@ const HomePage: React.FC = () => {
   };
 
   const handleSave = (contentId: string) => {
+    const wasSaved = savedContent.has(contentId);
+    
+    // Update saved content set
+    setSavedContent(prev => {
+      const newSet = new Set(prev);
+      if (wasSaved) {
+        newSet.delete(contentId);
+      } else {
+        newSet.add(contentId);
+      }
+      return newSet;
+    });
+    
+    // Update content state
     setContent(prevContent => 
       prevContent.map(item => {
         if (item.id === contentId) {
-          const wasSaved = savedContent.has(contentId);
-          
-          // Update saved content set
-          setSavedContent(prev => {
-            const newSet = new Set(prev);
-            if (wasSaved) {
-              newSet.delete(contentId);
-            } else {
-              newSet.add(contentId);
-            }
-            return newSet;
-          });
-          
           return {
             ...item,
             isSaved: !wasSaved
+          };
+        }
+        return item;
+      })
+    );
+  };
+
+  const handleFollow = (username: string) => {
+    const wasFollowing = followingUsers.has(username);
+    
+    // Update following users set
+    setFollowingUsers(prev => {
+      const newSet = new Set(prev);
+      if (wasFollowing) {
+        newSet.delete(username);
+      } else {
+        newSet.add(username);
+      }
+      return newSet;
+    });
+    
+    // Update content state
+    setContent(prevContent => 
+      prevContent.map(item => {
+        if (item.username === username) {
+          return {
+            ...item,
+            isFollowing: !wasFollowing
           };
         }
         return item;
@@ -563,11 +659,14 @@ const HomePage: React.FC = () => {
             {/* Right: Action Buttons */}
             <div className="flex flex-col items-center space-y-4">
               {/* Follow/Following Button */}
-              <button className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
+              <button 
+                onClick={() => handleFollow(contentItem.username)}
+                className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
                 contentItem.isFollowing 
                   ? 'bg-white/20 text-white' 
                   : 'bg-white text-black'
-              }`}>
+              }`}
+              >
                 <UserPlus size={20} />
               </button>
 
@@ -576,9 +675,9 @@ const HomePage: React.FC = () => {
                 <button 
                   onClick={() => handleLike(contentItem.id)}
                   className={`w-12 h-12 rounded-full flex items-center justify-center transition-all transform hover:scale-110 ${
-                    likedContent.has(contentItem.id) ? 'text-red-500' : 'text-white'
+                    contentItem.isLiked ? 'text-red-500' : 'text-white'
                 }`}>
-                  <Heart size={24} fill={likedContent.has(contentItem.id) ? '#ef4444' : 'none'} />
+                  <Heart size={24} fill={contentItem.isLiked ? '#ef4444' : 'none'} />
                 </button>
                 <span className="text-white text-xs font-medium mt-1 block">
                   {contentItem.likes > 999 ? `${(contentItem.likes/1000).toFixed(1)}K` : contentItem.likes}
@@ -608,9 +707,9 @@ const HomePage: React.FC = () => {
               <button 
                 onClick={() => handleSave(contentItem.id)}
                 className={`w-12 h-12 rounded-full flex items-center justify-center transition-all transform hover:scale-110 ${
-                savedContent.has(contentItem.id) ? 'text-yellow-500' : 'text-white'
+                contentItem.isSaved ? 'text-yellow-500' : 'text-white'
               }`}>
-                <Bookmark size={24} fill={savedContent.has(contentItem.id) ? '#eab308' : 'none'} />
+                <Bookmark size={24} fill={contentItem.isSaved ? '#eab308' : 'none'} />
               </button>
             </div>
           </div>
