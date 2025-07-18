@@ -575,12 +575,12 @@ const HomePage: React.FC = () => {
           </div>
 
           {/* Feed Toggle */}
-          <div className="flex items-center space-x-1 bg-black/30 backdrop-blur-md rounded-full p-1">
+          <div className="flex items-center space-x-1">
             <button
               onClick={() => setActiveFeed('for-you')}
-              className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${
+              className={`px-6 py-2 text-sm font-medium transition-colors ${
                 activeFeed === 'for-you'
-                  ? 'bg-white/30 text-white backdrop-blur-sm'
+                  ? 'text-white font-bold'
                   : 'text-white/70 hover:text-white/90'
               }`}
             >
@@ -589,9 +589,9 @@ const HomePage: React.FC = () => {
             <span className="text-white/40">•</span>
             <button
               onClick={() => setActiveFeed('following')}
-              className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${
+              className={`px-6 py-2 text-sm font-medium transition-colors ${
                 activeFeed === 'following'
-                  ? 'bg-white/30 text-white backdrop-blur-sm'
+                  ? 'text-white font-bold'
                   : 'text-white/70 hover:text-white/90'
               }`}
             >
