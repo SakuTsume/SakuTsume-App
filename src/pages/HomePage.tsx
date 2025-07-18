@@ -167,6 +167,7 @@ const HomePage: React.FC = () => {
   const [viewMode, setViewMode] = useState<ViewMode>('work');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [content, setContent] = useState(() => generateMockContent(1, 20));
+  const [likedContent, setLikedContent] = useState<Set<string>>(new Set());
   const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -319,6 +320,35 @@ const HomePage: React.FC = () => {
       setComments(prev => [comment, ...prev]);
       setNewComment('');
     }
+  };
+
+  const handleLike = (contentId: string) => {
+    setContent(prevContent => 
+      prevContent.map(item => {
+        if (item.id === contentId) {
+          const wasLiked = likedContent.has(contentId);
+          const newLikeCount = wasLiked ? item.likes - 1 : item.likes + 1;
+          
+          // Update liked content set
+          setLikedContent(prev => {
+            const newSet = new Set(prev);
+            if (wasLiked) {
+              newSet.delete(contentId);
+            } else {
+              newSet.add(contentId);
+            }
+            return newSet;
+          });
+          
+          return {
+            ...item,
+            likes: newLikeCount,
+            isLiked: !wasLiked
+          };
+        }
+        return item;
+      })
+    );
   };
 
   const currentContent = content[currentIndex];
@@ -515,10 +545,12 @@ const HomePage: React.FC = () => {
 
               {/* Like */}
               <div className="text-center">
-                <button className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
-                  contentItem.isLiked ? 'text-red-500' : 'text-white'
+                <button 
+                  onClick={() => handleLike(contentItem.id)}
+                  className={`w-12 h-12 rounded-full flex items-center justify-center transition-all transform hover:scale-110 ${
+                    likedContent.has(contentItem.id) ? 'text-red-500' : 'text-white'
                 }`}>
-                  <Heart size={24} fill={contentItem.isLiked ? '#ef4444' : 'none'} />
+                  <Heart size={24} fill={likedContent.has(contentItem.id) ? '#ef4444' : 'none'} />
                 </button>
                 <span className="text-white text-xs font-medium mt-1 block">
                   {contentItem.likes > 999 ? `${(contentItem.likes/1000).toFixed(1)}K` : contentItem.likes}
