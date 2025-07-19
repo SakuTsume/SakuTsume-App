@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Home, Search, PlusSquare, User, Users, ShoppingBag, Settings, HelpCircle } from 'lucide-react';
+import RoleToggle from '../shared/RoleToggle';
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
@@ -49,6 +50,11 @@ const Sidebar: React.FC = () => {
       </nav>
       
       <div className="mt-4 space-y-1">
+        {/* Role Toggle */}
+        <div className="px-4 py-2">
+          <RoleToggle />
+        </div>
+        
         <NavLink
           to="/settings"
           className={({ isActive }) =>
