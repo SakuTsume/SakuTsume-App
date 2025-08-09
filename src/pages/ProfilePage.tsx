@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   UserPlus, MessageCircle, Share2, Link, MapPin, Mail, Calendar, 
@@ -217,49 +216,9 @@ type ContentSubTab = 'my-content' | 'private-content' | 'favorited-content' | 'l
 
 const ProfilePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<ProfileTab>('content');
   const [activeContentTab, setActiveContentTab] = useState<ContentSubTab>('my-content');
-  const [profile, setProfile] = useState(() => {
-    // If viewing own profile and user exists, create profile from user data
-    if (id === 'me' && user) {
-      return {
-        ...mockProfile,
-        id: user.id,
-        name: user.name.toUpperCase(),
-        avatar: user.avatar || mockProfile.avatar,
-        // For new users, show minimal content
-        topThree: [],
-        allContent: [],
-        stats: {
-          followers: 0,
-          following: 0,
-          posts: 0
-        },
-        bioStory: {
-          journey: 'Just getting started on SakuTsume!',
-          dreamRole: 'Building my creative career 🎯',
-          studying: 'Learning the platform 📚',
-          fullStory: `Welcome to my SakuTsume profile! I'm just getting started on this amazing platform and excited to connect with other creatives in the entertainment industry.
-
-I'm here to build my network, showcase my work, and discover new opportunities. Looking forward to collaborating with talented professionals and growing my career.
-
-Feel free to reach out if you'd like to connect or collaborate on projects!`
-        },
-        skills: user.activeRole === 'talent' ? [
-          { name: 'Getting Started', level: 20, badge: null, icon: '🌟', nextBadge: 'Newcomer' },
-        ] : [],
-        quickStats: {
-          responseTime: 'New',
-          gigsCompleted: 0,
-          languages: ['EN'],
-          rating: 0,
-          reviewCount: 0
-        }
-      };
-    }
-    return mockProfile;
-  });
+  const [profile, setProfile] = useState(mockProfile);
   const [isFollowing, setIsFollowing] = useState(false);
   const [bioExpanded, setBioExpanded] = useState(false);
   const [currentSpotlight, setCurrentSpotlight] = useState(0);
@@ -271,7 +230,7 @@ Feel free to reach out if you'd like to connect or collaborate on projects!`
   const videoRef = useRef<HTMLVideoElement>(null);
   
   // Check if this is the user's own profile
-  const isOwnProfile = id === 'me' || (user && id === user.id);
+  const isOwnProfile = id === 'me';
   
   // Auto-advance spotlight carousel
   useEffect(() => {
