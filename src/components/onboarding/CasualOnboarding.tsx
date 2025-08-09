@@ -13,10 +13,15 @@ interface CasualOnboardingProps {
 const CasualOnboarding: React.FC<CasualOnboardingProps> = ({ onComplete, onBack }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
     followedUsers: [] as string[],
   });
 
   const steps = [
+    { title: 'Create Account', description: 'Set up your SakuTsume account' },
     { title: 'Follow Creators', description: 'Follow 5 creators to personalize your feed' },
     { title: 'Learn to Connect', description: 'Quick tutorial on messaging and community features' },
   ];
@@ -105,8 +110,13 @@ const CasualOnboarding: React.FC<CasualOnboardingProps> = ({ onComplete, onBack 
 
   const canProceed = () => {
     switch (currentStep) {
-      case 0: return formData.followedUsers.length >= 5;
-      case 1: return true;
+      case 0: 
+        return formData.username.length >= 3 && 
+               formData.email.includes('@') && 
+               formData.password.length >= 8 && 
+               formData.password === formData.confirmPassword;
+      case 1: return formData.followedUsers.length >= 5;
+      case 2: return true;
       default: return false;
     }
   };
@@ -122,6 +132,95 @@ const CasualOnboarding: React.FC<CasualOnboardingProps> = ({ onComplete, onBack 
   const renderStep = () => {
     switch (currentStep) {
       case 0:
+        return (
+          <div className="text-center max-w-md mx-auto">
+            <div className="w-20 h-20 bg-gradient-to-br from-accent-100 to-pink-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Heart size={32} className="text-accent-500" />
+            </div>
+            <h2 className="text-2xl font-bold text-neutral-800 mb-2">Create Your Account</h2>
+            <p className="text-neutral-600 mb-8">
+              Set up your SakuTsume account to start exploring amazing content.
+            </p>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-2 text-left">
+                  Username *
+                </label>
+                <input
+                  type="text"
+                  placeholder="Choose a unique username"
+                  value={formData.username}
+                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+                {formData.username && formData.username.length < 3 && (
+                  <p className="text-sm text-orange-600 mt-1">Username must be at least 3 characters</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-2 text-left">
+                  Email *
+                </label>
+                <input
+                  type="email"
+                  placeholder="your.email@example.com"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-2 text-left">
+                  Password *
+                </label>
+                <input
+                  type="password"
+                  placeholder="Create a strong password"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+                {formData.password && formData.password.length < 8 && (
+                  <p className="text-sm text-orange-600 mt-1">Password must be at least 8 characters</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-2 text-left">
+                  Confirm Password *
+                </label>
+                <input
+                  type="password"
+                  placeholder="Confirm your password"
+                  value={formData.confirmPassword}
+                  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+                {formData.confirmPassword && formData.password !== formData.confirmPassword && (
+                  <p className="text-sm text-red-600 mt-1">Passwords do not match</p>
+                )}
+              </div>
+            </div>
+
+            <div className="mt-8 p-4 bg-gradient-to-r from-accent-50 to-pink-50 rounded-lg">
+              <div className="flex items-center justify-center mb-2">
+                <Award size={16} className="text-accent-500 mr-2" />
+                <span className="text-sm font-medium text-accent-600">Casual Benefits</span>
+              </div>
+              <ul className="text-xs text-accent-600 space-y-1">
+                <li>• Follow and connect with creators</li>
+                <li>• Access to all public content</li>
+                <li>• Join open communities</li>
+                <li>• Upgrade to Talent/Business anytime</li>
+              </ul>
+            </div>
+          </div>
+        );
+
+      case 1:
         return (
           <div>
             <div className="text-center mb-8">
@@ -193,7 +292,7 @@ const CasualOnboarding: React.FC<CasualOnboardingProps> = ({ onComplete, onBack 
           </div>
         );
 
-      case 1:
+      case 2:
         return (
           <div className="text-center max-w-2xl mx-auto">
             <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
