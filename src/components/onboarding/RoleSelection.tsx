@@ -74,7 +74,7 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({ onRoleSelect }) => {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 max-w-6xl mx-auto">
           {roles.map((role, index) => (
             <motion.div
               key={role.id}
@@ -82,53 +82,53 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({ onRoleSelect }) => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
               whileHover={{ y: -8, transition: { duration: 0.2 } }}
-              className="relative"
+              className="relative flex-1"
             >
               <div
-                className={`bg-gradient-to-br ${role.color} rounded-2xl p-8 h-full cursor-pointer transform transition-all duration-300 hover:shadow-2xl`}
+                className={`bg-gradient-to-br ${role.color} rounded-2xl p-6 lg:p-8 h-full cursor-pointer transform transition-all duration-300 hover:shadow-2xl min-h-[400px] lg:min-h-[450px]`}
                 onClick={() => onRoleSelect(role.id)}
               >
-                <div className="text-center mb-6">
-                  <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="text-center mb-4 lg:mb-6">
+                  <div className="w-16 h-16 lg:w-20 lg:h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3 lg:mb-4">
                     <div className={role.textColor}>
                       {role.icon}
                     </div>
                   </div>
-                  <h2 className={`text-2xl font-bold ${role.textColor} mb-2`}>
+                  <h2 className={`text-xl lg:text-2xl font-bold ${role.textColor} mb-2`}>
                     {role.title}
                   </h2>
-                  <p className={`${role.textColor} opacity-90`}>
+                  <p className={`${role.textColor} opacity-90 text-sm lg:text-base`}>
                     {role.description}
                   </p>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-2 lg:space-y-3">
                   {role.features.map((feature, featureIndex) => (
                     <div key={featureIndex} className="flex items-center">
                       <div className="w-2 h-2 bg-white/80 rounded-full mr-3 flex-shrink-0" />
-                      <span className={`text-sm ${role.textColor} opacity-90`}>
+                      <span className={`text-xs lg:text-sm ${role.textColor} opacity-90`}>
                         {feature}
                       </span>
                     </div>
                   ))}
                 </div>
 
-                <div className="mt-8">
-                  <button className="w-full py-3 bg-white/20 backdrop-blur-sm rounded-xl font-semibold text-white hover:bg-white/30 transition-colors">
+                <div className="mt-6 lg:mt-8">
+                  <button className="w-full py-2.5 lg:py-3 bg-white/20 backdrop-blur-sm rounded-xl font-semibold text-white hover:bg-white/30 transition-colors text-sm lg:text-base">
                     Choose {role.title}
                   </button>
                 </div>
 
                 {/* Special badges */}
                 {role.id === 'talent' && (
-                  <div className="absolute -top-3 -right-3 bg-amber-400 text-amber-900 px-3 py-1 rounded-full text-xs font-bold flex items-center">
+                  <div className="absolute -top-2 -right-2 lg:-top-3 lg:-right-3 bg-amber-400 text-amber-900 px-2 lg:px-3 py-1 rounded-full text-xs font-bold flex items-center">
                     <Star size={12} className="mr-1" />
                     POPULAR
                   </div>
                 )}
                 
                 {role.id === 'business' && (
-                  <div className="absolute -top-3 -right-3 bg-blue-400 text-blue-900 px-3 py-1 rounded-full text-xs font-bold flex items-center">
+                  <div className="absolute -top-2 -right-2 lg:-top-3 lg:-right-3 bg-blue-400 text-blue-900 px-2 lg:px-3 py-1 rounded-full text-xs font-bold flex items-center">
                     <Building size={12} className="mr-1" />
                     VERIFIED
                   </div>
@@ -142,7 +142,7 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({ onRoleSelect }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="text-center mt-12"
+          className="text-center mt-8 lg:mt-12"
         >
           <p className="text-neutral-600 mb-4">
             Not sure which role fits you? You can always upgrade or add roles later.
