@@ -25,7 +25,7 @@ const OnboardingComplete: React.FC<OnboardingCompleteProps> = ({ role, data, onC
             { icon: <Star size={20} />, text: 'Rising Talent boost activated', highlight: true },
             { icon: <Zap size={20} />, text: 'Demo reel uploaded and verified' },
             { icon: <Trophy size={20} />, text: 'Skills tagged and showcased' },
-            { icon: <Crown size={20} />, text: 'Top 3 spotlight configured' },
+            { icon: <Crown size={20} />, text: 'Profile spotlight ready' },
           ],
           nextSteps: [
             'Explore gig opportunities in Work Mode',

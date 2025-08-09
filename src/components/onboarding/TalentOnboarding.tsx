@@ -48,7 +48,6 @@ const TalentOnboarding: React.FC<TalentOnboardingProps> = ({ onComplete, onBack 
   const steps = [
     { title: 'Record Demo Reel', description: 'Show off your talent with a 15-second professional demo' },
     { title: 'Tag Your Skills', description: 'Help others discover your expertise' },
-    { title: 'Set Top 3 Picks', description: 'Choose your best content to spotlight on your profile' },
   ];
 
   const startRecording = async () => {
@@ -141,7 +140,6 @@ const TalentOnboarding: React.FC<TalentOnboardingProps> = ({ onComplete, onBack 
     switch (currentStep) {
       case 0: return recordedBlob && recordingDuration >= 15;
       case 1: return formData.skills.length >= 3;
-      case 2: return formData.topThreePicks.length === 3;
       default: return false;
     }
   };
@@ -295,77 +293,6 @@ const TalentOnboarding: React.FC<TalentOnboardingProps> = ({ onComplete, onBack 
           </div>
         );
 
-      case 2:
-        return (
-          <div>
-            <div className="text-center mb-8">
-              <div className="w-20 h-20 bg-gradient-to-br from-accent-100 to-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Crown size={32} className="text-accent-500" />
-              </div>
-              <h2 className="text-2xl font-bold text-neutral-800 mb-2">Set Your Top 3 Picks</h2>
-              <p className="text-neutral-600">
-                Choose 3 pieces of content to spotlight on your profile. These will be the first things visitors see.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {mockTopContent.map((content) => (
-                <div
-                  key={content.id}
-                  onClick={() => toggleTopPick(content.id)}
-                  className={`relative cursor-pointer rounded-xl overflow-hidden transition-all ${
-                    formData.topThreePicks.includes(content.id)
-                      ? 'ring-4 ring-primary-500 transform scale-105'
-                      : 'hover:transform hover:scale-102'
-                  }`}
-                >
-                  <div className="aspect-[9/16] bg-neutral-900">
-                    <img
-                      src={content.thumbnail}
-                      alt={content.title}
-                      className="w-full h-full object-cover"
-                    />
-                    
-                    {/* Selection indicator */}
-                    {formData.topThreePicks.includes(content.id) && (
-                      <div className="absolute top-2 right-2 w-8 h-8 bg-primary-800 rounded-full flex items-center justify-center">
-                        <span className="text-white font-bold text-sm">
-                          {formData.topThreePicks.indexOf(content.id) + 1}
-                        </span>
-                      </div>
-                    )}
-                    
-                    {/* Content type indicator */}
-                    <div className="absolute top-2 left-2 bg-black/60 text-white px-2 py-1 rounded-full text-xs flex items-center">
-                      {content.type === 'audio' ? <Mic size={12} className="mr-1" /> : <Video size={12} className="mr-1" />}
-                      {content.type}
-                    </div>
-                    
-                    {/* Content info */}
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3">
-                      <h4 className="text-white font-medium text-sm mb-1">{content.title}</h4>
-                      <div className="text-white/80 text-xs">
-                        {content.views.toLocaleString()} views
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-6 text-center">
-              <div className="text-sm text-neutral-600">
-                Selected: {formData.topThreePicks.length}/3 content pieces
-                {formData.topThreePicks.length < 3 && (
-                  <span className="text-orange-600 ml-2">
-                    (Select {3 - formData.topThreePicks.length} more)
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-        );
-
       default:
         return null;
     }
@@ -404,7 +331,7 @@ const TalentOnboarding: React.FC<TalentOnboardingProps> = ({ onComplete, onBack 
               />
             </div>
             <div className="text-sm text-neutral-600 mt-2">
-              Step {currentStep + 1} of {steps.length}: {steps[currentStep].title}
+              Step {currentStep + 1} of {steps.length}: {steps[currentStep]?.title}
             </div>
           </div>
         </div>
