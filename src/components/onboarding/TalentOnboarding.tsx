@@ -14,9 +14,12 @@ interface TalentOnboardingProps {
 const TalentOnboarding: React.FC<TalentOnboardingProps> = ({ onComplete, onBack }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
     demoReel: null as File | null,
     skills: [] as string[],
-    topThreePicks: [] as string[],
   });
   const [isRecording, setIsRecording] = useState(false);
   const [recordedBlob, setRecordedBlob] = useState<Blob | null>(null);
@@ -46,6 +49,7 @@ const TalentOnboarding: React.FC<TalentOnboardingProps> = ({ onComplete, onBack 
   ];
 
   const steps = [
+    { title: 'Create Account', description: 'Set up your SakuTsume account' },
     { title: 'Record Demo Reel', description: 'Show off your talent with a 15-second professional demo' },
     { title: 'Tag Your Skills', description: 'Help others discover your expertise' },
   ];
@@ -138,8 +142,13 @@ const TalentOnboarding: React.FC<TalentOnboardingProps> = ({ onComplete, onBack 
 
   const canProceed = () => {
     switch (currentStep) {
-      case 0: return recordedBlob && recordingDuration >= 15;
-      case 1: return formData.skills.length >= 3;
+      case 0: 
+        return formData.username.length >= 3 && 
+               formData.email.includes('@') && 
+               formData.password.length >= 8 && 
+               formData.password === formData.confirmPassword;
+      case 1: return recordedBlob && recordingDuration >= 15;
+      case 2: return formData.skills.length >= 3;
       default: return false;
     }
   };
@@ -155,6 +164,95 @@ const TalentOnboarding: React.FC<TalentOnboardingProps> = ({ onComplete, onBack 
   const renderStep = () => {
     switch (currentStep) {
       case 0:
+        return (
+          <div className="text-center max-w-md mx-auto">
+            <div className="w-20 h-20 bg-gradient-to-br from-primary-100 to-secondary-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Mic size={32} className="text-primary-800" />
+            </div>
+            <h2 className="text-2xl font-bold text-neutral-800 mb-2">Create Your Account</h2>
+            <p className="text-neutral-600 mb-8">
+              Set up your SakuTsume account to start showcasing your talent.
+            </p>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-2 text-left">
+                  Username *
+                </label>
+                <input
+                  type="text"
+                  placeholder="Choose a unique username"
+                  value={formData.username}
+                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+                {formData.username && formData.username.length < 3 && (
+                  <p className="text-sm text-orange-600 mt-1">Username must be at least 3 characters</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-2 text-left">
+                  Email *
+                </label>
+                <input
+                  type="email"
+                  placeholder="your.email@example.com"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-2 text-left">
+                  Password *
+                </label>
+                <input
+                  type="password"
+                  placeholder="Create a strong password"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+                {formData.password && formData.password.length < 8 && (
+                  <p className="text-sm text-orange-600 mt-1">Password must be at least 8 characters</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-2 text-left">
+                  Confirm Password *
+                </label>
+                <input
+                  type="password"
+                  placeholder="Confirm your password"
+                  value={formData.confirmPassword}
+                  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+                {formData.confirmPassword && formData.password !== formData.confirmPassword && (
+                  <p className="text-sm text-red-600 mt-1">Passwords do not match</p>
+                )}
+              </div>
+            </div>
+
+            <div className="mt-8 p-4 bg-blue-50 rounded-lg">
+              <div className="flex items-center mb-2">
+                <Star size={16} className="text-blue-600 mr-2" />
+                <span className="text-sm font-medium text-blue-800">Talent Benefits</span>
+              </div>
+              <ul className="text-xs text-blue-700 space-y-1">
+                <li>• Showcase your work with demo reels</li>
+                <li>• Get discovered by industry professionals</li>
+                <li>• Sell your services in the marketplace</li>
+                <li>• Rising Talent boost for new creators</li>
+              </ul>
+            </div>
+          </div>
+        );
+
+      case 1:
         return (
           <div className="text-center">
             <div className="mb-8">
@@ -238,7 +336,7 @@ const TalentOnboarding: React.FC<TalentOnboardingProps> = ({ onComplete, onBack 
           </div>
         );
 
-      case 1:
+      case 2:
         return (
           <div>
             <div className="text-center mb-8">
