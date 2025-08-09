@@ -14,6 +14,10 @@ interface BusinessOnboardingProps {
 const BusinessOnboarding: React.FC<BusinessOnboardingProps> = ({ onComplete, onBack }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
     companyName: '',
     companyEmail: '',
     companySize: '',
@@ -33,6 +37,7 @@ const BusinessOnboarding: React.FC<BusinessOnboardingProps> = ({ onComplete, onB
   const [isVerifyingEmail, setIsVerifyingEmail] = useState(false);
 
   const steps = [
+    { title: 'Create Account', description: 'Set up your SakuTsume business account' },
     { title: 'Company Email', description: 'Verify your business email for credibility' },
     { title: 'Company Profile', description: 'Tell us about your business' },
     { title: 'First Job (Optional)', description: 'Post your first opportunity' },
@@ -84,10 +89,15 @@ const BusinessOnboarding: React.FC<BusinessOnboardingProps> = ({ onComplete, onB
   const canProceed = () => {
     switch (currentStep) {
       case 0: 
-        return formData.companyEmail && emailVerificationStatus === 'verified';
+        return formData.username.length >= 3 && 
+               formData.email.includes('@') && 
+               formData.password.length >= 8 && 
+               formData.password === formData.confirmPassword;
       case 1: 
-        return formData.companyName && formData.companySize && formData.industry;
+        return formData.companyEmail && emailVerificationStatus === 'verified';
       case 2: 
+        return formData.companyName && formData.companySize && formData.industry;
+      case 3: 
         return formData.skipFirstJob || (formData.firstJob.title && formData.firstJob.description);
       default: 
         return false;
@@ -105,6 +115,95 @@ const BusinessOnboarding: React.FC<BusinessOnboardingProps> = ({ onComplete, onB
   const renderStep = () => {
     switch (currentStep) {
       case 0:
+        return (
+          <div className="text-center max-w-md mx-auto">
+            <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-secondary-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Briefcase size={32} className="text-blue-800" />
+            </div>
+            <h2 className="text-2xl font-bold text-neutral-800 mb-2">Create Your Business Account</h2>
+            <p className="text-neutral-600 mb-8">
+              Set up your SakuTsume business account to start hiring talent.
+            </p>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-2 text-left">
+                  Username *
+                </label>
+                <input
+                  type="text"
+                  placeholder="Choose a unique username"
+                  value={formData.username}
+                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+                {formData.username && formData.username.length < 3 && (
+                  <p className="text-sm text-orange-600 mt-1">Username must be at least 3 characters</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-2 text-left">
+                  Email *
+                </label>
+                <input
+                  type="email"
+                  placeholder="your.email@example.com"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-2 text-left">
+                  Password *
+                </label>
+                <input
+                  type="password"
+                  placeholder="Create a strong password"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+                {formData.password && formData.password.length < 8 && (
+                  <p className="text-sm text-orange-600 mt-1">Password must be at least 8 characters</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-2 text-left">
+                  Confirm Password *
+                </label>
+                <input
+                  type="password"
+                  placeholder="Confirm your password"
+                  value={formData.confirmPassword}
+                  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+                {formData.confirmPassword && formData.password !== formData.confirmPassword && (
+                  <p className="text-sm text-red-600 mt-1">Passwords do not match</p>
+                )}
+              </div>
+            </div>
+
+            <div className="mt-8 p-4 bg-blue-50 rounded-lg">
+              <div className="flex items-center justify-center mb-2">
+                <Shield size={16} className="text-blue-600 mr-2" />
+                <span className="text-sm font-medium text-blue-800">Business Benefits</span>
+              </div>
+              <ul className="text-xs text-blue-700 space-y-1">
+                <li>• Get verified business badge</li>
+                <li>• Access to verified talent pool</li>
+                <li>• 3 free gig promotions</li>
+                <li>• Priority customer support</li>
+              </ul>
+            </div>
+          </div>
+        );
+
+      case 1:
         return (
           <div className="text-center max-w-md mx-auto">
             <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-secondary-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -176,7 +275,7 @@ const BusinessOnboarding: React.FC<BusinessOnboardingProps> = ({ onComplete, onB
           </div>
         );
 
-      case 1:
+      case 2:
         return (
           <div className="max-w-2xl mx-auto">
             <div className="text-center mb-8">
@@ -301,7 +400,7 @@ const BusinessOnboarding: React.FC<BusinessOnboardingProps> = ({ onComplete, onB
           </div>
         );
 
-      case 2:
+      case 3:
         return (
           <div className="max-w-2xl mx-auto">
             <div className="text-center mb-8">
