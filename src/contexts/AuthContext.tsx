@@ -26,21 +26,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [onboardingState, setOnboardingState] = useState<OnboardingState | null>(null);
 
-  // Mock user for development
+  // Initialize with onboarding state for new users
   useEffect(() => {
-    const mockUser: User = {
-      id: 'user_1',
-      email: 'maya@example.com',
-      name: 'Maya',
-      roles: ['casual'],
-      activeRole: 'casual',
-      isVerified: false,
-      onboardingCompleted: false,
-      createdAt: new Date().toISOString(),
-    };
+    // Check if there's a stored user or if we need to start onboarding
+    const storedUser = localStorage.getItem('sakutsume_user');
     
-    // Check if user needs onboarding
-    if (!mockUser.onboardingCompleted) {
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      setUser(parsedUser);
+    } else {
+      // New user - start onboarding
       setOnboardingState({
         currentStep: 0,
         totalSteps: 3,
@@ -49,8 +44,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         data: {},
       });
     }
-    
-    setUser(mockUser);
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -61,11 +54,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     setUser(null);
     setOnboardingState(null);
+    localStorage.removeItem('sakutsume_user');
   };
 
   const switchRole = (role: UserRole) => {
     if (user && user.roles.includes(role)) {
-      setUser({ ...user, activeRole: role });
+      const updatedUser = { ...user, activeRole: role };
+      setUser(updatedUser);
+      localStorage.setItem('sakutsume_user', JSON.stringify(updatedUser));
     }
   };
 
@@ -76,9 +72,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const completeOnboarding = () => {
-    if (user && onboardingState) {
-      setUser({ ...user, onboardingCompleted: true });
+    if (onboardingState && onboardingState.selectedRole && onboardingState.data) {
+      // Create user from onboarding data
+      const newUser: User = {
+        id: `user_${Date.now()}`,
+        email: onboardingState.data.email || 'user@example.com',
+        name: onboardingState.data.username || 'User',
+        avatar: onboardingState.data.avatar || undefined,
+        roles: [onboardingState.selectedRole],
+        activeRole: onboardingState.selectedRole,
+        isVerified: onboardingState.selectedRole === 'business' && onboardingState.data.companyEmail ? true : false,
+        onboardingCompleted: true,
+        createdAt: new Date().toISOString(),
+      };
+
+      setUser(newUser);
       setOnboardingState(null);
+      
+      // Store user data
+      localStorage.setItem('sakutsume_user', JSON.stringify(newUser));
     }
   };
 

@@ -108,7 +108,12 @@ const BusinessOnboarding: React.FC<BusinessOnboardingProps> = ({ onComplete, onB
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      onComplete(formData);
+      // Pass the complete form data to the parent
+      onComplete({
+        ...formData,
+        role: 'business',
+        avatar: formData.logo ? URL.createObjectURL(formData.logo) : undefined
+      });
     }
   };
 

@@ -23,6 +23,8 @@ const OnboardingFlow: React.FC = () => {
 
   const handleOnboardingComplete = (data: any) => {
     setOnboardingData(data);
+    // Store the onboarding data in the auth context
+    updateOnboardingState({ data: data });
     updateOnboardingState({ currentStep: 2 });
   };
 

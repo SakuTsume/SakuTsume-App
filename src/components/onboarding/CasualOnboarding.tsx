@@ -125,7 +125,11 @@ const CasualOnboarding: React.FC<CasualOnboardingProps> = ({ onComplete, onBack 
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      onComplete(formData);
+      // Pass the complete form data to the parent
+      onComplete({
+        ...formData,
+        role: 'casual'
+      });
     }
   };
 

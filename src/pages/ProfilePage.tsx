@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   UserPlus, MessageCircle, Share2, Link, MapPin, Mail, Calendar, 
@@ -216,6 +217,7 @@ type ContentSubTab = 'my-content' | 'private-content' | 'favorited-content' | 'l
 
 const ProfilePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<ProfileTab>('content');
   const [activeContentTab, setActiveContentTab] = useState<ContentSubTab>('my-content');
   const [profile, setProfile] = useState(mockProfile);
@@ -231,6 +233,27 @@ const ProfilePage: React.FC = () => {
   
   // Check if this is the user's own profile
   const isOwnProfile = id === 'me';
+  
+  // Use actual user data if viewing own profile, otherwise use mock data
+  const displayProfile = isOwnProfile && user ? {
+    ...mockProfile,
+    id: user.id,
+    name: user.name.toUpperCase(),
+    avatar: user.avatar || mockProfile.avatar,
+    // Add other user-specific data as needed
+  } : mockProfile;
+  
+  // Update profile state with actual user data
+  useEffect(() => {
+    if (isOwnProfile && user) {
+      setProfile({
+        ...mockProfile,
+        id: user.id,
+        name: user.name.toUpperCase(),
+        avatar: user.avatar || mockProfile.avatar,
+      });
+    }
+  }, [user, isOwnProfile]);
   
   // Auto-advance spotlight carousel
   useEffect(() => {
@@ -328,11 +351,11 @@ const ProfilePage: React.FC = () => {
             <div className="flex items-center">
               <div className="relative mr-4">
                 <img
-                  src={profile.avatar}
-                  alt={profile.name}
+                  src={displayProfile.avatar}
+                  alt={displayProfile.name}
                   className="w-12 h-12 rounded-full object-cover"
                 />
-                {profile.status.active && (
+                {displayProfile.status.active && (
                   <div className="absolute -bottom-1 -right-1 bg-success-500 border-2 border-white rounded-full w-4 h-4"></div>
                 )}
               </div>
@@ -340,18 +363,18 @@ const ProfilePage: React.FC = () => {
               <div>
                 <div className="flex items-center">
                   <h1 className="text-xl font-bold text-neutral-800 mr-2">
-                    {profile.name} | {profile.profession}
+                    {displayProfile.name} | {displayProfile.profession}
                   </h1>
-                  {profile.status.active && (
+                  {displayProfile.status.active && (
                     <div className="flex items-center bg-gradient-to-r from-orange-100 to-red-100 px-3 py-1 rounded-full">
-                      <span className="mr-1">{profile.status.emoji}</span>
-                      <span className="text-sm font-medium text-orange-800">{profile.status.text}</span>
+                      <span className="mr-1">{displayProfile.status.emoji}</span>
+                      <span className="text-sm font-medium text-orange-800">{displayProfile.status.text}</span>
                     </div>
                   )}
                 </div>
                 
                 <div className="flex items-center mt-1">
-                  {profile.dynamicTags.map((tag, index) => (
+                  {displayProfile.dynamicTags.map((tag, index) => (
                     <span key={index} className="text-sm text-primary-600 mr-2 font-medium">
                       {tag}
                     </span>
@@ -364,7 +387,7 @@ const ProfilePage: React.FC = () => {
             <div className="flex items-center space-x-3">
               <div className="flex items-center bg-amber-50 px-3 py-1.5 rounded-full">
                 <Star size={16} fill="#F59E0B" className="text-amber-500 mr-1" />
-                <span className="font-semibold text-amber-800">{profile.trustScore}</span>
+                <span className="font-semibold text-amber-800">{displayProfile.trustScore}</span>
               </div>
               
               {isOwnProfile ? (
@@ -373,15 +396,15 @@ const ProfilePage: React.FC = () => {
                   {/* Stats */}
                   <div className="flex items-center space-x-4 text-sm">
                     <div className="text-center">
-                      <div className="font-bold text-neutral-800">{formatNumber(profile.stats.posts)}</div>
+                      <div className="font-bold text-neutral-800">{formatNumber(displayProfile.stats.posts)}</div>
                       <div className="text-neutral-600">Posts</div>
                     </div>
                     <div className="text-center">
-                      <div className="font-bold text-neutral-800">{formatNumber(profile.stats.followers)}</div>
+                      <div className="font-bold text-neutral-800">{formatNumber(displayProfile.stats.followers)}</div>
                       <div className="text-neutral-600">Followers</div>
                     </div>
                     <div className="text-center">
-                      <div className="font-bold text-neutral-800">{formatNumber(profile.stats.following)}</div>
+                      <div className="font-bold text-neutral-800">{formatNumber(displayProfile.stats.following)}</div>
                       <div className="text-neutral-600">Following</div>
                     </div>
                   </div>
