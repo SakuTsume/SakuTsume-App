@@ -26,21 +26,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [onboardingState, setOnboardingState] = useState<OnboardingState | null>(null);
 
-  // Mock user for development
+  // Initialize with a new user that needs onboarding
   useEffect(() => {
-    const mockUser: User = {
-      id: 'user_1',
-      email: 'maya@example.com',
-      name: 'Maya',
-      roles: ['casual'],
-      activeRole: 'casual',
-      isVerified: false,
-      onboardingCompleted: false,
-      createdAt: new Date().toISOString(),
-    };
-    
-    // Check if user needs onboarding
-    if (!mockUser.onboardingCompleted) {
+    // Check if we have a completed user in localStorage
+    const savedUser = localStorage.getItem('sakutsume_user');
+    if (savedUser) {
+      const parsedUser = JSON.parse(savedUser);
+      setUser(parsedUser);
+    } else {
+      // New user needs onboarding
       setOnboardingState({
         currentStep: 0,
         totalSteps: 3,
@@ -49,8 +43,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         data: {},
       });
     }
-    
-    setUser(mockUser);
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -61,11 +53,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     setUser(null);
     setOnboardingState(null);
+    localStorage.removeItem('sakutsume_user');
   };
 
   const switchRole = (role: UserRole) => {
     if (user && user.roles.includes(role)) {
-      setUser({ ...user, activeRole: role });
+      const updatedUser = { ...user, activeRole: role };
+      setUser(updatedUser);
+      localStorage.setItem('sakutsume_user', JSON.stringify(updatedUser));
     }
   };
 
@@ -76,9 +71,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const completeOnboarding = () => {
-    if (user && onboardingState) {
-      setUser({ ...user, onboardingCompleted: true });
+    if (onboardingState && onboardingState.selectedRole) {
+      // Create user from onboarding data
+      const onboardingData = onboardingState.data;
+      
+      const newUser: User = {
+        id: `user_${Date.now()}`,
+        email: onboardingData.email || 'user@example.com',
+        name: onboardingData.username || 'User',
+        avatar: getDefaultAvatar(onboardingState.selectedRole),
+        roles: [onboardingState.selectedRole],
+        activeRole: onboardingState.selectedRole,
+        isVerified: onboardingState.selectedRole === 'business' && onboardingData.emailVerificationStatus === 'verified',
+        onboardingCompleted: true,
+        createdAt: new Date().toISOString(),
+      };
+
+      setUser(newUser);
       setOnboardingState(null);
+      
+      // Save to localStorage
+      localStorage.setItem('sakutsume_user', JSON.stringify(newUser));
+    }
+  };
+
+  const getDefaultAvatar = (role: UserRole): string => {
+    // Return different default avatars based on role
+    switch (role) {
+      case 'talent':
+        return 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=600';
+      case 'business':
+        return 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=600';
+      case 'casual':
+        return 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=600';
+      default:
+        return 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=600';
     }
   };
 
